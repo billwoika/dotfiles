@@ -1,0 +1,91 @@
+" ~/.vim/vimrc
+" ─────────────────────────────────────────────────────────────────────
+" Minimal sensible-defaults vim configuration.
+" Symlinked from dotfiles/vim/vimrc by bootstrap.sh.
+"
+" Heavier configurations (plugins, LSP, color schemes) belong in
+" ~/.vimrc.local, sourced at the bottom of this file if present.
+" ─────────────────────────────────────────────────────────────────────
+
+set nocompatible
+filetype plugin indent on
+syntax on
+
+" ── XDG-compliant state directories ────────────────────────────────
+" Created by bootstrap.sh; the // suffix means full-path-encoded
+" filenames in the directory, avoiding collisions across projects.
+set undofile
+set undodir=~/.local/state/vim/undo//
+set directory=~/.local/state/vim/swap//
+set backupdir=~/.local/state/vim/backup//
+set viminfofile=~/.local/state/vim/viminfo
+
+" ── Display ────────────────────────────────────────────────────────
+set number              " line numbers
+set ruler               " cursor position in status line
+set showcmd             " show partial commands as typed
+set laststatus=2        " always show status line
+set scrolloff=3         " keep 3 lines visible above/below cursor
+set sidescrolloff=5
+set wildmenu            " visual command-line completion
+set wildmode=list:longest
+set display+=lastline
+set lazyredraw          " don't redraw during macros (faster)
+
+" ── Editing ────────────────────────────────────────────────────────
+set expandtab           " spaces, not tabs (overridden per-filetype below)
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set autoindent
+set smartindent
+set backspace=indent,eol,start
+set encoding=utf-8
+set fileencoding=utf-8
+set fileformats=unix,dos,mac
+
+" ── Search ─────────────────────────────────────────────────────────
+set ignorecase
+set smartcase           " case-sensitive when query has uppercase
+set incsearch
+set hlsearch
+nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
+
+" ── Behavior ───────────────────────────────────────────────────────
+set hidden              " allow buffer switching with unsaved changes
+set autoread            " reload file changed outside vim
+set confirm             " prompt rather than fail on unsaved changes
+set mouse=a
+if has('mouse_sgr')
+  set ttymouse=sgr      " modern mouse protocol
+endif
+set clipboard=unnamed   " yank to system clipboard
+
+" ── Status line ────────────────────────────────────────────────────
+" filename, modified flag, type, cursor position, file %
+set statusline=%f\ %m%r%h%w\ [%{&ff}/%Y]\ [%04l,%04v]\ [%p%%]
+
+" ── Filetype-specific overrides ────────────────────────────────────
+
+" Makefiles MUST use real tabs
+autocmd FileType make setlocal noexpandtab
+
+" Go uses tabs by convention
+autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4
+
+" Python: 4-space indent (PEP 8)
+autocmd FileType python setlocal tabstop=4 shiftwidth=4 softtabstop=4
+
+" Commit messages and rebase: spell check + 72-col soft wrap
+autocmd FileType gitcommit setlocal spell textwidth=72
+autocmd FileType gitrebase setlocal spell
+
+" Markdown: spell check + soft wrap with linebreak
+autocmd FileType markdown setlocal spell wrap linebreak
+
+" ── Optional local override ─────────────────────────────────────────
+" Add plugins, color schemes, LSP, etc. in ~/.vimrc.local.
+" Ignored if absent.
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif

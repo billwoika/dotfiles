@@ -1,0 +1,18 @@
+# ~/.config/git/allowed_signers
+# ─────────────────────────────────────────────────────────────────────
+# SSH public key registry for git commit signature verification.
+#
+# Format: <email> [<namespaces>] <key-type> <public-key> [comment]
+# One line per identity. The email must match user.email in the
+# corresponding git profile for signatures to verify.
+#
+# SETUP: copy this file to ~/.config/git/allowed_signers (drop the
+# .example suffix) and replace the placeholders with your real public
+# keys. Generate each line with:
+#
+#   echo "dev@springbig.com $(cat ~/.ssh/id_ed25519_work.pub)" \
+#     >> ~/.config/git/allowed_signers
+# ─────────────────────────────────────────────────────────────────────
+
+dev@springbig.com    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...REPLACE_ME
+you@billwoika.com    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...REPLACE_ME

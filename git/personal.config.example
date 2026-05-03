@@ -1,0 +1,28 @@
+# ~/.config/git/personal.config
+# ─────────────────────────────────────────────────────────────────────
+# Personal identity profile. Loaded via includeIf when a repository
+# lives under ~/personal/.
+#
+# SETUP: copy this file to ~/.config/git/personal.config (drop the
+# .example suffix) and fill in your real email and signing key. The
+# framework's reference values use `billwoika.com` as a concrete
+# placeholder for the personal domain — substitute yours if forking.
+# ─────────────────────────────────────────────────────────────────────
+
+[user]
+    email = you@billwoika.com
+    signingkey = ~/.ssh/id_ed25519_personal.pub
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    allowedSignersFile = ~/.config/git/allowed_signers
+
+# ── URL rewrites ────────────────────────────────────────────────────
+# Broad rewrite: all github.com URLs route through the personal SSH
+# identity. This is appropriate when the personal key has push access
+# everywhere it needs to.
+[url "git@github.com-personal:"]
+    insteadOf = https://github.com/
+    insteadOf = git@github.com:

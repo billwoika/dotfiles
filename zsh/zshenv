@@ -1,0 +1,19 @@
+# ~/.zshenv
+# ─────────────────────────────────────────────────────────────────────
+# Bootstrap only. Redirects zsh to the XDG config directory.
+# All further configuration lives in $ZDOTDIR.
+#
+# Keep this file under ten lines. No PATH manipulation, no aliases, no
+# conditionals beyond the XDG/ZDOTDIR redirects.
+# ─────────────────────────────────────────────────────────────────────
+
+# Establish XDG base directories with POSIX-compliant defaults.
+# The := form assigns only if unset or empty (idempotent).
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:=$HOME/.local/state}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:=$HOME/.cache}"
+
+# Point zsh at its XDG config directory.
+# Subsequent files (.zshrc, .zprofile, etc.) are resolved from here.
+export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"

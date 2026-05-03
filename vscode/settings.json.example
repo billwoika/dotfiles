@@ -1,0 +1,38 @@
+{
+  // Reference workspace settings template for projects following this framework.
+  // Copy to <project>/.vscode/settings.json and adapt per project.
+  //
+  // Workspace settings should capture team decisions only. Personal
+  // preferences (theme, font, keybindings) belong in user settings.
+
+  "editor.formatOnSave": true,
+
+  // Per-language formatter overrides
+  "[typescript]":   { "editor.defaultFormatter": "biomejs.biome" },
+  "[javascript]":   { "editor.defaultFormatter": "biomejs.biome" },
+  "[json]":         { "editor.defaultFormatter": "biomejs.biome" },
+  "[python]":       { "editor.defaultFormatter": "charliermarsh.ruff" },
+  "[ruby]":         { "editor.defaultFormatter": "Shopify.ruby-lsp" },
+
+  // File watcher exclusions for performance
+  "files.watcherExclude": {
+    "**/.git/objects/**":  true,
+    "**/node_modules/**":  true,
+    "**/.venv/**":         true,
+    "**/.bundle/**":       true,
+    "**/.direnv/**":       true,
+    "**/target/**":        true
+  },
+  "search.exclude": {
+    "**/node_modules":     true,
+    "**/.venv":            true,
+    "**/dist":             true,
+    "**/build":            true,
+    "**/.next":            true,
+    "**/coverage":         true
+  },
+
+  // Use zsh as the default integrated shell
+  "terminal.integrated.defaultProfile.osx":   "zsh",
+  "terminal.integrated.defaultProfile.linux": "zsh"
+}

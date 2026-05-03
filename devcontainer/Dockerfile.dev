@@ -1,0 +1,51 @@
+# Reference Dockerfile.dev for devcontainers following this framework.
+# Copy to <project>/.devcontainer/Dockerfile.dev and adapt.
+#
+# Strategy: slim Debian base + non-root user + mise, with rv installed
+# directly. The project's own mise.toml then drives runtime installation
+# in post-create.sh.
+
+FROM debian:bookworm-slim
+
+# Minimal system packages: build essentials, libsecret for keychain
+# parity, zsh as the user shell, sudo for the non-root user.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
+      ca-certificates \
+      curl \
+      git \
+      gnupg \
+      libssl-dev \
+      libsecret-tools \
+      pkg-config \
+      sudo \
+      zsh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create the vscode user. UID 1000 commonly matches the host user on
+# Linux; on macOS the bind mount semantics differ and UID alignment
+# matters less, but we keep this consistent for portability.
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN groupadd --gid $USER_GID $USERNAME \
+ && useradd --uid $USER_UID --gid $USER_GID -m -s /usr/bin/zsh $USERNAME \
+ && echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+ && chmod 0440 /etc/sudoers.d/$USERNAME
+
+USER $USERNAME
+WORKDIR /home/$USERNAME
+
+# Install mise (XDG-native; goes to ~/.local/share/mise).
+RUN curl https://mise.run | sh
+
+ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/.local/share/mise/shims:$PATH"
+
+# Install rv for Ruby management. Pinning the install URL to the latest
+# release is acceptable for local dev; production images should pin a
+# specific rv version.
+RUN curl --proto '=https' --tlsv1.2 -LsSf \
+      https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh | sh
+
+# Container stays alive; VS Code attaches to it.
+CMD ["sleep", "infinity"]

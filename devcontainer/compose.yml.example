@@ -1,0 +1,69 @@
+# Reference compose.yml for local dependent services.
+# Copy to <project>/compose.yml and adapt the services list per project.
+#
+# Strategy: this file defines ONLY the services your application
+# depends on (Postgres, Redis, search, message brokers). The application
+# itself runs on the host via mise, connecting to these services via
+# the host-mapped ports. See framework Section 21.3.4 for the rationale.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: myapp_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Optional: SQL files in db/init/ run on first DB creation.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "myapp_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── Optional services ────────────────────────────────────────────
+  # Started only with: docker compose --profile <name> up
+
+  opensearch:
+    image: opensearchproject/opensearch:2
+    profiles: ["search"]
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ChangeMeNow!2024
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+
+  mailpit:
+    image: axllent/mailpit:latest
+    profiles: ["tools"]
+    restart: unless-stopped
+    ports:
+      - "1025:1025"      # SMTP
+      - "8025:8025"      # Web UI
+
+volumes:
+  postgres_data:
+  redis_data:
+  opensearch_data:

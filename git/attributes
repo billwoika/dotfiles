@@ -1,0 +1,36 @@
+# ~/.config/git/attributes
+# ─────────────────────────────────────────────────────────────────────
+# Global gitattributes — consistent line endings and diff treatment
+# for common file types across mixed-OS teams.
+# ─────────────────────────────────────────────────────────────────────
+
+# Default: normalize to LF on checkin, native on checkout
+* text=auto eol=lf
+
+# Specific line-ending enforcement
+*.sh     text eol=lf
+*.bash   text eol=lf
+*.zsh    text eol=lf
+*.ps1    text eol=crlf
+*.bat    text eol=crlf
+
+# Binary formats — never try to diff or merge
+*.pdf    binary
+*.png    binary
+*.jpg    binary
+*.webp   binary
+*.svg    binary
+*.ico    binary
+*.woff2  binary
+*.pyc    binary
+*.db     binary
+*.sqlite binary
+
+# Lockfiles: marked generated so they're collapsed by default in
+# code review UIs. Gemfile.lock and uv.lock are text, diffable but verbose;
+# bun.lock and yarn.lock are effectively opaque.
+Gemfile.lock      linguist-generated=true
+uv.lock           linguist-generated=true
+bun.lock          linguist-generated=true -diff
+package-lock.json linguist-generated=true -diff
+yarn.lock         linguist-generated=true -diff

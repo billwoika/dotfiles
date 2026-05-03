@@ -1,0 +1,90 @@
+# ~/.config/direnv/direnvrc
+# ─────────────────────────────────────────────────────────────────────
+# Standard library for project .envrc files.
+# Scope: secret loading and other sh-script-native patterns. Basic
+# env vars and venv activation live in mise.toml.
+# ─────────────────────────────────────────────────────────────────────
+
+# ── 1Password CLI integration ───────────────────────────────────────
+# Usage in .envrc:  use_1password dev
+use_1password() {
+  local vault="${1:-dev}"
+  if command -v op &>/dev/null && op account list &>/dev/null; then
+    log_status "Loading secrets from 1Password vault: $vault"
+    if [[ -f .envrc.op ]]; then
+      eval "$(op inject -i .envrc.op 2>/dev/null || true)"
+    fi
+  else
+    log_error "1Password CLI not available or not authenticated."
+  fi
+}
+
+# Load a single env var from a 1Password secret reference.
+# Usage in .envrc:  op_var STRIPE_KEY "op://dev/Stripe/test_api_key"
+op_var() {
+  local var="$1" ref="$2"
+  if command -v op &>/dev/null; then
+    local value
+    value=$(op read "$ref" 2>/dev/null)
+    [[ -n "$value" ]] && export "$var"="$value" \
+      || log_error "op read '$ref' returned empty"
+  fi
+}
+
+# ── HashiCorp Vault integration ─────────────────────────────────────
+# Usage in .envrc:  use_vault DATABASE_PASSWORD secret/dev/postgres password
+use_vault() {
+  local var="$1" path="$2" field="$3"
+  if ! command -v vault &>/dev/null; then
+    log_error "vault CLI not available"
+    return 1
+  fi
+  local value
+  value=$(vault kv get -field="$field" "$path" 2>/dev/null)
+  if [[ -n "$value" ]]; then
+    export "$var"="$value"
+  else
+    log_error "vault: $path#$field not found or auth expired"
+  fi
+}
+
+# ── age-encrypted secrets via sops ──────────────────────────────────
+# Usage in .envrc:  use_sops secrets.enc.env
+use_sops() {
+  local file="${1:-secrets.enc.env}"
+  if command -v sops &>/dev/null && [[ -f "$file" ]]; then
+    eval "$(sops -d "$file")"
+  else
+    log_error "sops unavailable or $file missing"
+  fi
+}
+
+# ── AWS profile by git branch ───────────────────────────────────────
+# Usage in .envrc:  use_aws_profile
+use_aws_profile() {
+  local branch
+  branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)
+  case "$branch" in
+    main|master)    export AWS_PROFILE="prod-readonly" ;;
+    staging*)       export AWS_PROFILE="staging" ;;
+    *)              export AWS_PROFILE="dev" ;;
+  esac
+  log_status "AWS profile: $AWS_PROFILE"
+}
+
+# ── System keychain lookup (macOS + Linux Secret Service) ───────────
+# Usage in .envrc:  use_keychain STRIPE_TEST_KEY "stripe-test-api-key"
+use_keychain() {
+  local var="$1" service="$2"
+  local value
+  if [[ "$(uname)" == "Darwin" ]]; then
+    value=$(security find-generic-password -a "$USER" -s "$service" -w 2>/dev/null)
+  else
+    value=$(secret-tool lookup service "$service" account "$USER" 2>/dev/null)
+  fi
+  if [[ -n "$value" ]]; then
+    export "$var"="$value"
+  else
+    log_error "keychain entry '$service' not found; $var not set"
+  fi
+}

@@ -1,0 +1,36 @@
+# ~/.config/git/work.config
+# ─────────────────────────────────────────────────────────────────────
+# Work identity profile. Loaded via includeIf when a repository lives
+# under ~/work/.
+#
+# SETUP: copy this file to ~/.config/git/work.config (drop the .example
+# suffix) and adjust the email, signing key, and GitHub org for your
+# own work setup. The framework's reference values use `springbig`
+# and `springbig.com` as concrete placeholders — substitute your own
+# org throughout if forking.
+# ─────────────────────────────────────────────────────────────────────
+
+[user]
+    email = dev@springbig.com
+    signingkey = ~/.ssh/id_ed25519_work.pub
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    allowedSignersFile = ~/.config/git/allowed_signers
+    # If using 1Password SSH agent for signing, point at op-ssh-sign:
+    # program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+    # Linux: program = "/opt/1Password/op-ssh-sign"
+
+# ── URL rewrites ────────────────────────────────────────────────────
+# Routes work repositories through the `github.com-work` SSH host alias
+# (see ssh/config), which uses the work identity key.
+[url "git@github.com-work:springbig/"]
+    insteadOf = https://github.com/springbig/
+    insteadOf = git@github.com:springbig/
+
+# Add additional org/user rewrites as needed:
+# [url "git@github.com-work:your-username/"]
+#     insteadOf = https://github.com/your-username/
+#     insteadOf = git@github.com:your-username/

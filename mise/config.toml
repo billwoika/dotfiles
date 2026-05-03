@@ -1,0 +1,48 @@
+# ~/.config/mise/config.toml
+# ─────────────────────────────────────────────────────────────────────
+# User-scope mise defaults. Overridden by any project-level mise.toml
+# found in the directory tree.
+# ─────────────────────────────────────────────────────────────────────
+
+min_version = "2026.4.0"
+
+# ── Runtime defaults ────────────────────────────────────────────────
+# Note: Ruby is intentionally NOT listed here. rv owns Ruby. See
+# framework doc Section 8.1 for rationale.
+[tools]
+python = "3.12"       # managed alongside uv
+bun    = "1.2"        # primary JS runtime
+node   = "22"         # retain for legacy tooling that requires Node
+uv     = "latest"     # Astral's Python package manager
+ruff   = "latest"     # Python linter/formatter
+biome  = "latest"     # JS/TS linter/formatter
+lefthook = "latest"   # git hook runner
+tmux   = "latest"     # terminal multiplexer
+delta  = "latest"     # syntax-highlighting git pager
+
+[settings]
+# Auto-install missing versions when they are referenced.
+auto_install = true
+
+# Prefer precompiled binaries over compiling from source where available.
+# Set to false for security-conscious environments.
+python.compile = false
+
+# Automatically activate uv-managed .venv when cd-ing into a uv project.
+# "create|source" creates the venv if missing, then sources it.
+python.uv_venv_auto = "create|source"
+
+# Read idiomatic version files (e.g. .python-version, .nvmrc) in addition
+# to mise.toml. Do NOT include "ruby" here — rv owns .ruby-version.
+idiomatic_version_file_enable_tools = ["python", "node"]
+
+# Verify GitHub attestations on precompiled binaries by default.
+github_attestations = true
+
+# Show informative status output on cd but suppress for scripts.
+status.show_tools = true
+status.show_env   = false
+
+[env]
+# Sensible defaults available everywhere. Project configs can override.
+EDITOR = "vim"

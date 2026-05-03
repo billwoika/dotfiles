@@ -1,0 +1,167 @@
+# mkdocs.yml — MkDocs configuration for the Developer Environment Framework
+# ─────────────────────────────────────────────────────────────────────────
+# Build:    mkdocs build
+# Serve:    mkdocs serve  (live-reload at http://127.0.0.1:8000)
+# Deploy:   pushed to master; Cloudflare Pages builds and deploys.
+#
+# SITE_URL is injected from Cloudflare Pages environment variables.
+# Local dev and CI fall back to localhost.
+
+site_name: Developer Environment Framework
+site_description: An opinionated framework for personal development environments — mise-based, XDG-compliant, dotfiles-driven.
+site_author: Bill Woika
+site_url: !ENV [SITE_URL, 'https://devdocs.billwoika.com']
+copyright: Copyright &copy; 2026 Bill Woika — Licensed under GPLv3-or-later
+
+repo_name: dotfiles
+repo_url: https://github.com/billwoika/dotfiles
+edit_uri: edit/master/docs/
+
+# ── Theme ─────────────────────────────────────────────────────────────────
+theme:
+  name: material
+  features:
+    - navigation.instant            # SPA-like navigation, faster page loads
+    - navigation.tracking            # Update URL with active section
+    - navigation.tabs                # Top-level sections as tabs
+    - navigation.sections            # Group sub-sections in the sidebar
+    - navigation.expand              # Auto-expand sidebar tree
+    - navigation.path                # Breadcrumbs above page title
+    - navigation.footer              # Prev/next links at page bottom
+    - navigation.top                 # "Back to top" button
+    - navigation.indexes             # Section index pages
+    - toc.follow                     # Highlight current heading in TOC
+    - search.highlight
+    - search.suggest
+    - content.code.copy              # Copy button on code blocks
+    - content.code.annotate          # Inline code annotations
+    - content.tabs.link              # Linked content tabs
+    - content.action.edit            # "Edit this page" link
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+
+# ── Navigation ────────────────────────────────────────────────────────────
+# Pages not listed here are excluded from the rendered nav (but still
+# indexed for search if they're in docs/). Use this to gate work-in-progress
+# content out of the published site.
+nav:
+  - Home: index.md
+  - Shell Environment:
+    - shell-environment/index.md
+    - 'Philosophy': shell-environment/philosophy.md
+    - 'Architecture': shell-environment/architecture.md
+    - 'XDG and POSIX Compliance': shell-environment/xdg-and-posix.md
+    - 'POSIX Profile': shell-environment/posix-profile.md
+    - 'Environment Layer': shell-environment/environment.md
+    - 'Performance': shell-environment/performance.md
+    - 'Installer Behavior': shell-environment/installer-behavior.md
+    - 'Terminal: iTerm2 and tmux': shell-environment/terminal.md
+    - 'Aliases and Functions': shell-environment/aliases.md
+    - 'Shell Integration Strategy': shell-environment/integration-strategy.md
+  - Tools:
+    - tools/index.md
+    - 'mise and Make': tools/mise-and-make.md
+    - 'Package Managers': tools/package-managers.md
+    - 'Code Quality': tools/code-quality.md
+    - 'Containers and Devcontainers': tools/containers.md
+    - 'Editors and IDEs': tools/editors.md
+    - 'Database and API Tools': tools/database-api.md
+  - Git:
+    - git/index.md
+    - 'Configuration': git/configuration.md
+    - 'Tool-Enforced Practices': git/tool-enforced-practices.md
+  - Operations:
+    - operations/index.md
+    - 'Secrets': operations/secrets.md
+    - 'SSH and Key Management': operations/ssh.md
+  - Handbook:
+    - handbook/index.md
+    - 'Git Conventions': handbook/git-conventions.md
+    - 'Design':
+      - handbook/design/index.md
+      - 'Separation of Concerns': handbook/design/separation-of-concerns.md
+      - 'Locality': handbook/design/locality.md
+      - 'Separation by Lifecycle': handbook/design/separation-by-lifecycle.md
+      - 'Separation by Dependency': handbook/design/separation-by-dependency.md
+      - 'Separation by Boundary': handbook/design/separation-by-boundary.md
+      - 'Separation by Variation': handbook/design/separation-by-variation.md
+      - 'Value Types': handbook/design/value-types.md
+  - Reference:
+    - reference/index.md
+    - 'Customization': reference/customization.md
+    - 'Test Suite': reference/test-suite.md
+    - 'Repository Structure': reference/repository.md
+    - 'Onboarding Runbook': reference/onboarding.md
+    - 'Troubleshooting': reference/troubleshooting.md
+
+# ── Markdown extensions ───────────────────────────────────────────────────
+# Material recommends these for the full feature set; the framework uses
+# admonitions, code blocks, and tables heavily, so all of these earn
+# their keep.
+markdown_extensions:
+  - admonition                                  # !!! note / warning / tip
+  - pymdownx.details                            # Collapsible admonitions
+  - pymdownx.superfences:                       # Nested code in admonitions
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:                            # Content tabs
+      alternate_style: true
+  - pymdownx.tasklist:                          # GitHub-style task lists
+      custom_checkbox: true
+  - pymdownx.highlight:                         # Code highlighting
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite                       # Inline code highlighting
+  - pymdownx.snippets                           # Include external files
+  - pymdownx.smartsymbols                       # -> => etc.
+  - pymdownx.keys                               # Keyboard shortcuts
+  - pymdownx.caret                              # Superscript / underline
+  - pymdownx.tilde                              # Strikethrough / subscript
+  - pymdownx.mark                               # ==highlight==
+  - attr_list                                   # Add CSS classes to elements
+  - md_in_html                                  # Markdown inside HTML
+  - footnotes
+  - tables
+  - toc:
+      permalink: true                           # Anchor links on headings
+      permalink_title: Anchor link to this section
+
+# ── Plugins ───────────────────────────────────────────────────────────────
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - tags                                        # Tag-based navigation
+  # - mike  # Future: versioning. Add when there's actually a v2 to publish.
+
+# ── Extra ─────────────────────────────────────────────────────────────────
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/billwoika
+      name: GitHub
+  # Note: this framework is licensed GPLv3-or-later. If forking, retain
+  # this copyright notice and the LICENSE file at the repo root.

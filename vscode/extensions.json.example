@@ -1,0 +1,13 @@
+{
+  "// _comment": "Reference extensions.json. VS Code prompts contributors to install these on workspace open.",
+
+  "recommendations": [
+    "biomejs.biome",
+    "charliermarsh.ruff",
+    "Shopify.ruby-lsp",
+    "tamasfe.even-better-toml",
+    "ms-azuretools.vscode-docker",
+    "EditorConfig.EditorConfig",
+    "ms-vscode-remote.remote-containers"
+  ]
+}

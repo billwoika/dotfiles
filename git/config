@@ -1,0 +1,138 @@
+# ~/.config/git/config
+# ─────────────────────────────────────────────────────────────────────
+# Main git configuration. Path-based profiles at the bottom override
+# identity-specific settings (email, signing key) based on repository
+# location.
+#
+# Replace "Your Name" with your actual name. Leave user.email, user.
+# signingkey, and any URL rewrites to the profile files — they load
+# automatically via the includeIf directives at the bottom.
+# ─────────────────────────────────────────────────────────────────────
+
+[user]
+    name = Your Name
+    # email and signingkey set per-profile below
+
+[core]
+    editor = vim
+    pager = delta
+    excludesfile = ~/.config/git/ignore
+    attributesfile = ~/.config/git/attributes
+    autocrlf = input
+    untrackedCache = true
+    bigFileThreshold = 512m
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true
+
+[push]
+    default = simple
+    autoSetupRemote = true
+    followTags = true
+
+[fetch]
+    prune = true
+    pruneTags = true
+
+[merge]
+    # Show original conflict content alongside both sides (git 2.35+)
+    conflictStyle = zdiff3
+    # Use diff3 if your git is older:
+    # conflictStyle = diff3
+
+[rebase]
+    updateRefs = true
+    autoSquash = true
+    autoStash = true
+
+[rerere]
+    enabled = true
+    autoupdate = true
+
+[diff]
+    algorithm = histogram
+    colorMoved = zebra
+    colorMovedWS = allow-indentation-change
+    submodule = log
+
+[log]
+    date = iso
+
+[status]
+    submoduleSummary = true
+    showStash = true
+
+[commit]
+    gpgsign = true
+    verbose = true
+
+[tag]
+    gpgsign = true
+
+[color]
+    ui = auto
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
+
+[help]
+    autocorrect = prompt
+
+[advice]
+    detachedHead = false
+    skippedCherryPicks = false
+
+# ── delta pager configuration ───────────────────────────────────────
+[delta]
+    navigate = true
+    line-numbers = true
+    side-by-side = false
+    syntax-theme = GitHub
+    features = decorations
+
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+    hunk-header-decoration-style = cyan box ul
+
+[interactive]
+    diffFilter = delta --color-only --features=interactive
+
+# ── Aliases ─────────────────────────────────────────────────────────
+[alias]
+    s  = status -sb
+    st = status
+    lg = log --oneline --graph --decorate --all
+    last = log -1 HEAD --stat
+    find = "!f() { git log --all --oneline --grep=\"$1\"; }; f"
+    branches = branch -vv --sort=-committerdate
+    pushf = push --force-with-lease --force-if-includes
+    fileall = "!f() { git log --all --oneline -- \"$1\"; }; f"
+    uncommit = reset --soft HEAD^
+    amend = commit --amend --no-edit
+    merged = "!git branch --merged | grep -v '\\*\\|main\\|master'"
+    cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d"
+    whoami = config --list --show-origin
+    profile = config --show-origin user.email
+
+# ── Path-based profiles ─────────────────────────────────────────────
+# Trailing slash is REQUIRED. Without it, ~/work matches only the literal
+# ~/work file, not the directory tree.
+# Profiles are evaluated in order; later matches override earlier ones.
+# ─────────────────────────────────────────────────────────────────────
+
+[includeIf "gitdir:~/work/"]
+    path = ~/.config/git/work.config
+
+[includeIf "gitdir:~/personal/"]
+    path = ~/.config/git/personal.config
+
+[includeIf "gitdir:~/opensource/"]
+    path = ~/.config/git/opensource.config

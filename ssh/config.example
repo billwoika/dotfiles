@@ -1,0 +1,93 @@
+# ~/.ssh/config
+# ─────────────────────────────────────────────────────────────────────
+# SSH client configuration — host aliases, identity scoping, connection
+# multiplexing, and multi-identity git routing.
+#
+# First-match-wins: more specific Host blocks must come BEFORE more
+# general ones. `Host *` (applies to all unmatched hosts) goes LAST.
+#
+# SETUP: copy this file to ~/.ssh/config (drop the .example suffix) and
+# customize the host entries for your own infrastructure. Private key
+# filenames (~/.ssh/id_ed25519_work, etc.) must match keys you have
+# generated locally — see framework doc Section 18.2.
+# ─────────────────────────────────────────────────────────────────────
+
+# ── GitHub multi-identity host aliases ──────────────────────────────
+# Git URLs are rewritten by the work/personal profiles in
+# ~/.config/git/*.config to route through these aliases, which select
+# the correct SSH identity.
+
+Host github.com-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_work
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+    UseKeychain yes           # macOS: store passphrase in Keychain
+
+Host github.com-personal
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_personal
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+    UseKeychain yes
+
+# ── Work infrastructure examples ────────────────────────────────────
+# The framework uses springbig.internal as the concrete placeholder
+# for an internal infrastructure domain — substitute yours when forking.
+
+Host bastion
+    HostName bastion.springbig.internal
+    User your-username
+    IdentityFile ~/.ssh/id_ed25519_work
+    IdentitiesOnly yes
+
+# Internal hosts accessed via bastion — key stays local, never forwarded.
+Host *.springbig.internal
+    User your-username
+    IdentityFile ~/.ssh/id_ed25519_work
+    IdentitiesOnly yes
+    ProxyJump bastion
+
+# ── 1Password SSH agent (uncomment if using) ────────────────────────
+# With the 1Password SSH agent active, private keys live in the vault
+# and authentication requires Touch ID per use. See framework Section 18.5.
+#
+# Host *
+#     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+#     # Linux: IdentityAgent ~/.1password/agent.sock
+
+# ── Global defaults (must come LAST) ────────────────────────────────
+Host *
+    # Critical: never offer every agent key to every server
+    IdentitiesOnly yes
+
+    # Connection health
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    TCPKeepAlive yes
+
+    # Never forward agent by default. Use ProxyJump for bastion scenarios.
+    ForwardAgent no
+
+    # Connection multiplexing: reuse a single TCP connection for
+    # subsequent ssh/scp/sftp sessions to the same host within 10 minutes.
+    # The control directory is created by conf.d/70-tools.zsh.
+    ControlMaster auto
+    ControlPath ~/.ssh/control/%C
+    ControlPersist 10m
+
+    # Known-hosts hygiene
+    HashKnownHosts yes
+    StrictHostKeyChecking accept-new
+    UpdateHostKeys yes
+
+    # macOS: let Keychain remember passphrases; agent holds decrypted keys.
+    # Benign on Linux (UseKeychain is silently ignored).
+    UseKeychain yes
+    AddKeysToAgent yes
+
+    # Default to the personal key for anything not matched above.
+    # Because IdentitiesOnly is set, only this key is tried.
+    IdentityFile ~/.ssh/id_ed25519_personal

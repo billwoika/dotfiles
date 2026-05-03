@@ -1,0 +1,134 @@
+{
+  // ─────────────────────────────────────────────────────────────────
+  // Reference launch.json template for projects following this framework.
+  // Copy to <project>/.vscode/launch.json and adapt per project.
+  //
+  // Strategy: ship a small set of pre-configured debug entries the
+  // whole team can reach for. New engineers don't have to figure out
+  // launch.json on day one; they pick a config from the dropdown and
+  // start debugging.
+  //
+  // Section 22.7 in the framework doc covers the philosophy and the
+  // logpoints-as-console.log-replacement pattern. This file is the
+  // reference implementation.
+  // ─────────────────────────────────────────────────────────────────
+
+  "version": "0.2.0",
+
+  "configurations": [
+    // ── Ruby ───────────────────────────────────────────────────────
+    // Requires the `debug` gem (default in Ruby 3.1+) and the Shopify
+    // ruby-lsp + Ruby Debug VS Code extensions.
+    {
+      "type": "ruby_lsp",
+      "name": "Ruby: Run current file",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "ruby_lsp",
+      "name": "Ruby: Run RSpec for current file",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/rspec ${file}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "ruby_lsp",
+      "name": "Ruby: Attach to running process",
+      "request": "attach",
+      "cwd": "${workspaceFolder}"
+    },
+    // For Rails projects: attach to a `bin/rails server` running with
+    //   RUBY_DEBUG_OPEN=true bin/rails server
+    // The above attach config will discover the listening debug socket.
+
+    // ── Python ─────────────────────────────────────────────────────
+    // Requires the Python extension (ms-python.python). uv-managed
+    // projects work out of the box; the interpreter path comes from
+    // the workspace's uv environment.
+    {
+      "type": "debugpy",
+      "name": "Python: Current file",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "type": "debugpy",
+      "name": "Python: pytest current file",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["${file}", "-v"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "type": "debugpy",
+      "name": "Python: Attach to remote",
+      "request": "attach",
+      "connect": { "host": "localhost", "port": 5678 },
+      "pathMappings": [
+        { "localRoot": "${workspaceFolder}", "remoteRoot": "/app" }
+      ],
+      "justMyCode": false
+    },
+
+    // ── Node / bun ─────────────────────────────────────────────────
+    // bun supports the V8 inspector protocol; node uses it natively.
+    // VS Code's built-in node debugger handles both.
+    {
+      "type": "node",
+      "name": "Node: Current file",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "type": "node",
+      "name": "bun: Current file",
+      "request": "launch",
+      "runtimeExecutable": "bun",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "name": "Node: Attach to running process",
+      "request": "attach",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    // For services started with --inspect, the above Attach config
+    // discovers them automatically once they're listening on 9229.
+
+    // ── Container attach ───────────────────────────────────────────
+    // For projects whose application runs inside a container (compose
+    // stack or devcontainer), launch the application with the language
+    // debugger waiting on a port, expose that port from the container,
+    // and attach using the language-appropriate Attach config above.
+    //
+    // Example for Python in a docker compose service:
+    //   command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client app.py
+    //   ports: ["5678:5678"]
+    // Then use the "Python: Attach to remote" config above.
+  ],
+
+  "compounds": [
+    // Compound configurations run multiple configs at once.
+    // Useful for full-stack debugging: server + client simultaneously.
+    //
+    // Example for a Rails + frontend project:
+    // {
+    //   "name": "Full stack: Rails + Node",
+    //   "configurations": ["Ruby: Attach to running process", "Node: Attach to running process"],
+    //   "stopAll": true
+    // }
+  ]
+}

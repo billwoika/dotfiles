@@ -1,0 +1,50 @@
+# ~/.profile
+# ─────────────────────────────────────────────────────────────────────
+# POSIX sh / bash login profile. Read by non-zsh subprocesses,
+# install scripts, cron, LaunchAgents, and anything that spawns
+# /bin/sh or /bin/bash as a login shell.
+#
+# SYNTAX: POSIX sh only. No [[ ]], no arrays, no typeset.
+# Must parse under dash, ash, and bash.
+# ─────────────────────────────────────────────────────────────────────
+
+# XDG base directories (same values as zsh bootstrap)
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+
+# Tool locations
+# mise is XDG-native; the paths below are for reference only. No override
+# needed unless you want non-standard locations.
+export CARGO_HOME="${XDG_DATA_HOME}/cargo"
+export RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
+export GOPATH="${XDG_DATA_HOME}/go"
+
+# Editor / locale
+export EDITOR="vim"
+export VISUAL="${EDITOR}"
+export LANG="en_US.UTF-8"
+
+# PATH baseline — same priority order as zsh conf.d/10-path.zsh.
+# POSIX-portable dedup via case pattern instead of typeset -U.
+#
+# The loop prepends each iterated directory, so the LAST one iterated
+# ends up FIRST in PATH. To match the zsh path priority (mise shims
+# wins for runtime version resolution), iterate from lowest priority
+# to highest:
+for _dir in \
+  "${HOME}/.local/bin" \
+  "${GOPATH}/bin" \
+  "${CARGO_HOME}/bin" \
+  "${XDG_DATA_HOME}/mise/shims" \
+; do
+  if [ -d "$_dir" ]; then
+    case ":${PATH}:" in
+      *":${_dir}:"*) ;;  # already present
+      *) PATH="${_dir}:${PATH}" ;;
+    esac
+  fi
+done
+unset _dir
+export PATH

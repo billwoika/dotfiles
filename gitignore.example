@@ -1,0 +1,152 @@
+# Reference .gitignore template for projects following this framework.
+# Append to <project>/.gitignore (or use as a starting point for new projects).
+#
+# This is distinct from the dotfiles repo's own .gitignore. This file is
+# what individual projects should put in their root .gitignore to handle
+# IDE state, editor caches, language artifacts, and the cross-cutting
+# concerns the framework cares about.
+
+# ── OS cruft ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+._*
+
+# ── Editor state ─────────────────────────────────────────────────────
+
+# VS Code: commit settings.json, extensions.json, launch.json, tasks.json
+# (the team-shared parts); ignore per-developer state below.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# JetBrains: see jetbrains/README.md for the full table.
+# Commit the team-shared parts; ignore per-developer state.
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+.idea/dbnavigator.xml
+.idea/httpRequests/
+.idea/replstate.xml
+
+# Some teams also want to gitignore .idea/dataSources.xml entirely;
+# uncomment if you don't want JetBrains data-source definitions in git
+# (the framework leans toward this for consistency with non-JetBrains users):
+# .idea/dataSources.xml
+
+# Vim/Neovim swap and undo
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ── Language and build artifacts ─────────────────────────────────────
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Ruby
+*.gem
+*.rbc
+.bundle/
+.config
+.yardoc
+_yardoc/
+coverage/
+InstalledFiles
+pkg/
+spec/reports/
+test/tmp/
+test/version_tmp/
+tmp/
+.byebug_history
+.rspec_status
+
+# Node / bun
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.parcel-cache/
+.turbo/
+.vite/
+coverage/
+*.tsbuildinfo
+.npm
+.eslintcache
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock  # delete this line for binary crates; keep for libraries
+
+# Go
+bin/
+pkg/
+
+# ── Environment and secrets ──────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.envrc.local
+.envrc.secrets
+*.pem
+*.key
+
+# ── direnv ────────────────────────────────────────────────────────────
+.direnv/
+
+# ── mise local overrides ─────────────────────────────────────────────
+.mise.local.toml
+mise.local.toml
+
+# ── Containers ────────────────────────────────────────────────────────
+compose.override.yml
+.docker/
+
+# ── Terraform / infra ─────────────────────────────────────────────────
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# ── Logs and runtime artifacts ───────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pids
+*.pid
+*.seed
+*.pid.lock

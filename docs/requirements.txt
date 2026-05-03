@@ -1,0 +1,10 @@
+# docs/requirements.txt
+# ─────────────────────────────────────────────────────────────────────────
+# Pinned dependencies for building the MkDocs site.
+# Used by .github/workflows/docs.yml and for local builds:
+#   pip install -r docs/requirements.txt
+#   mkdocs serve
+
+mkdocs==1.6.1
+mkdocs-material==9.7.6
+pymdown-extensions==10.21.2

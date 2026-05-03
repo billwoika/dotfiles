@@ -1,0 +1,54 @@
+{
+  // Reference devcontainer template for projects following this framework.
+  // Copy this file to <project>/.devcontainer/devcontainer.json and adapt.
+  //
+  // See framework Section 21.6 for the rationale and lifecycle.
+
+  "name": "myproject",
+
+  // Build the local Dockerfile.dev rather than depending on a pre-baked image.
+  "build": {
+    "dockerfile": "Dockerfile.dev",
+    "context": ".."
+  },
+
+  // Mount the host's dotfiles into the container so post-create.sh can
+  // bootstrap the same shell environment as the host.
+  "mounts": [
+    "source=${localEnv:HOME}/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached"
+  ],
+
+  // Forward common dev ports back to the host. Adjust per project.
+  "forwardPorts": [3000, 5173, 9292],
+
+  // Run as the non-root vscode user created by Dockerfile.dev.
+  "remoteUser": "vscode",
+
+  // After container creation, install dotfiles and project deps.
+  "postCreateCommand": "sh /workspaces/${localWorkspaceFolderBasename}/.devcontainer/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "shopify.ruby-lsp",
+        "charliermarsh.ruff",
+        "biomejs.biome",
+        "tamasfe.even-better-toml",
+        "GitHub.copilot",
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.formatOnSave": true,
+        "files.eol": "\n"
+      }
+    }
+  },
+
+  // Resource expectations \u2014 the editor warns if the host can't meet these.
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  }
+}

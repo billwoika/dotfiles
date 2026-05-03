@@ -1,0 +1,22 @@
+# Files that bootstrap.sh copies (not symlinks) because they require
+# per-user identity. Never commit these from this repo root.
+git/work.config
+git/personal.config
+git/opensource.config
+git/allowed_signers
+ssh/config
+
+# Machine-local overrides
+zsh/aliases.local.zsh
+zsh/env.local.zsh
+
+# OS / editor cruft
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+.venv
+
+site

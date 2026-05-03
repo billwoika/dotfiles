@@ -1,0 +1,46 @@
+# ~/.config/git/ignore
+# ─────────────────────────────────────────────────────────────────────
+# Global gitignore — backstop for files that should never be committed
+# from any repository, regardless of per-project .gitignore.
+# ─────────────────────────────────────────────────────────────────────
+
+# OS cruft
+.DS_Store
+Thumbs.db
+._*
+
+# Editor state
+*.swp
+*.swo
+.vscode/settings.json
+.idea/workspace.xml
+
+# Language caches
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+node_modules/
+.turbo/
+dist/
+build/
+coverage/
+
+# Environment and secrets
+.env.local
+.envrc.local
+.envrc.secrets
+
+# direnv build artifacts
+.direnv/
+
+# mise local overrides
+.mise.local.toml
+mise.local.toml
+
+# Terraform / Terragrunt state
+.terraform/
+*.tfstate
+*.tfstate.backup
