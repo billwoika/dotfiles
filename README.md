@@ -154,7 +154,7 @@ covering each tool and pattern in depth. **This is where to look if
 you have a specific question** — "how does the multi-identity git
 setup work?" or "what's the relationship between mise tasks and Make?"
 
-The site is at [billwoika.github.io/dotfiles][docs]. Or run
+The site is at [devdocs.billwoika.com][docs]. Or run
 `mkdocs serve` from this directory for local browsing.
 
 ### Layer 3 — runbooks alongside the code
