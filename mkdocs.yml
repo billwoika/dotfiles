@@ -67,42 +67,50 @@ theme:
 # content out of the published site.
 nav:
   - Home: index.md
-  - Shell Environment:
-    - shell-environment/index.md
-    - 'Philosophy': shell-environment/philosophy.md
-    - 'Architecture': shell-environment/architecture.md
-    - 'XDG and POSIX Compliance': shell-environment/xdg-and-posix.md
-    - 'POSIX Profile': shell-environment/posix-profile.md
-    - 'Environment Layer': shell-environment/environment.md
-    - 'Performance': shell-environment/performance.md
-    - 'Installer Behavior': shell-environment/installer-behavior.md
-    - 'Terminal Environment': shell-environment/terminal.md
-    - 'Aliases and Functions': shell-environment/aliases.md
-    - 'Shell Integration Strategy': shell-environment/integration-strategy.md
-  - Tools:
-    - tools/index.md
-    - 'mise and Make': tools/mise-and-make.md
-    - 'Package Managers': tools/package-managers.md
-    - 'Code Quality': tools/code-quality.md
-    - 'Containers and Devcontainers': tools/containers.md
-    - 'Editors and IDEs': tools/editors.md
-    - 'Browser Developer Tools': tools/browser-devtools.md
-    - 'Database and API Tools': tools/database-api.md
-  - Git:
-    - git/index.md
-    - 'Configuration': git/configuration.md
-    - 'Tool-Enforced Practices': git/tool-enforced-practices.md
-  - Operations:
-    - operations/index.md
-    - 'Secrets': operations/secrets.md
-    - 'SSH and Key Management': operations/ssh.md
-    - 'Networking':
-      - operations/networking.md
-      - 'VPN and Tunnels': operations/vpn.md
-      - 'DNS': operations/dns.md
-      - 'Container Networking': operations/container-networking.md
-      - 'Proxy and Traffic Capture': operations/proxy-and-capture.md
-  - Handbook:
+  - Reference:
+    - reference/index.md
+    - 'Repository Structure': reference/repository.md
+    - 'Onboarding Runbook': reference/onboarding.md
+    - 'Customization': reference/customization.md
+    - 'Test Suite': reference/test-suite.md
+    - 'Troubleshooting': reference/troubleshooting.md
+  - Framework:
+    - 'Shell Environment':
+      - shell-environment/index.md
+      - 'Philosophy': shell-environment/philosophy.md
+      - 'Architecture': shell-environment/architecture.md
+      - 'XDG and POSIX Compliance': shell-environment/xdg-and-posix.md
+      - 'POSIX Profile': shell-environment/posix-profile.md
+      - 'Environment Layer': shell-environment/environment.md
+      - 'Performance': shell-environment/performance.md
+      - 'Installer Behavior': shell-environment/installer-behavior.md
+      - 'Terminal Environment': shell-environment/terminal.md
+      - 'Aliases and Functions': shell-environment/aliases.md
+      - 'Shell Integration Strategy': shell-environment/integration-strategy.md
+    - 'Tools':
+      - tools/index.md
+      - 'mise and Make': tools/mise-and-make.md
+      - 'Package Managers': tools/package-managers.md
+      - 'Code Quality': tools/code-quality.md
+      - 'Containers and Devcontainers': tools/containers.md
+      - 'Editors and IDEs': tools/editors.md
+      - 'Browser Developer Tools': tools/browser-devtools.md
+      - 'Database and API Tools': tools/database-api.md
+    - 'Git':
+      - git/index.md
+      - 'Configuration': git/configuration.md
+      - 'Tool-Enforced Practices': git/tool-enforced-practices.md
+    - 'Operations':
+      - operations/index.md
+      - 'Secrets': operations/secrets.md
+      - 'SSH and Key Management': operations/ssh.md
+      - 'Networking':
+        - operations/networking.md
+        - 'VPN and Tunnels': operations/vpn.md
+        - 'DNS': operations/dns.md
+        - 'Container Networking': operations/container-networking.md
+        - 'Proxy and Traffic Capture': operations/proxy-and-capture.md
+  - Philosophy:
     - handbook/index.md
     - 'Git Conventions': handbook/git-conventions.md
     - 'Design':
@@ -115,13 +123,6 @@ nav:
       - 'Separation by Variation': handbook/design/separation-by-variation.md
       - 'Value Types': handbook/design/value-types.md
       - 'Platform Portability': handbook/design/platform-portability.md
-  - Reference:
-    - reference/index.md
-    - 'Customization': reference/customization.md
-    - 'Test Suite': reference/test-suite.md
-    - 'Repository Structure': reference/repository.md
-    - 'Onboarding Runbook': reference/onboarding.md
-    - 'Troubleshooting': reference/troubleshooting.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
 # Material recommends these for the full feature set; the framework uses

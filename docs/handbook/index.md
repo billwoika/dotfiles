@@ -1,14 +1,20 @@
-# Handbook
+# Philosophy
 
-The Reference section of this site covers configuration: shell, toolchain,
-git, secrets, IDE setup. Concrete recommendations bound to specific
-artifacts in the dotfiles. "Use mise. Configure git this way. Run
-lefthook for pre-commit hooks."
+The Framework section of this site covers configuration: shell,
+toolchain, git, secrets, networking, IDE setup. Concrete
+recommendations bound to specific artifacts in the dotfiles. "Use
+mise. Configure git this way. Run lefthook for pre-commit hooks."
 
-The Handbook is different. It covers **practices** — opinionated guidance
-on how to write and structure the code that the framework's environment
-supports. The audience is the same engineers, but the content is about
-judgment rather than configuration.
+This section is different. It covers **positions** — opinionated
+arguments about how to write and structure code, how to work in
+teams, and how to make engineering decisions where reasonable people
+disagree. The content here is rigorous but contestable. Every stance
+acknowledges where it is wrong or where the counter-position has
+merit.
+
+The distinction matters: Framework pages tell you what to do.
+Philosophy pages tell you how to think about decisions a linter
+cannot make for you.
 
 ## Audience
 
@@ -51,12 +57,9 @@ some pages do it better than others. The shared discipline is:
   the patterns engineers have named (factories, dependency injection,
   adapters) are answers to specific separation problems.
 
-(Future sections — debugging philosophy, AI tooling guardrails — will
-be added when their content is ready.)
-
 ## What's deliberately not here
 
-The Handbook takes positions, but it's not a treatise. A few things
+This section takes positions, but it's not a treatise. A few things
 that fall outside its scope:
 
 - **Comprehensive teaching of any pattern.** The pages assume you've
@@ -66,28 +69,28 @@ that fall outside its scope:
   source.
 - **System-level architectural guidance.** Microservices vs monolith,
   event sourcing, CQRS, distributed-system patterns — these are
-  context-dependent in ways the Handbook can't honestly take positions
-  on without a specific system in mind.
+  context-dependent in ways that cannot be honestly argued without a
+  specific system in mind.
 - **Language-specific tutorials.** The patterns translate across
-  languages but the implementations differ; the Handbook gives
-  illustrative examples but doesn't try to cover every language's
-  idiomatic implementation of every pattern.
+  languages but the implementations differ; the pages give illustrative
+  examples but don't try to cover every language's idiomatic
+  implementation of every pattern.
 - **Code style.** Naming conventions, line lengths, indentation —
-  formatters and linters handle these (see Section 17.10 in the Reference).
-  The Handbook is about decisions a linter can't make for you.
+  formatters and linters handle these. This section is about decisions
+  a linter can't make for you.
 
-## Relationship to the Reference
+## Relationship to the Framework
 
 The two sections are complementary:
 
-- **Reference** is *concrete and bound to artifacts*. Pages map to specific
-  files in the dotfiles or specific configuration in projects. The advice
-  is "do this." Engineers act on it directly.
-- **Handbook** is *opinionated and bound to judgment*. Pages take positions
-  on questions where reasonable engineers disagree. The advice is "here's
-  how to think about this and what the framework recommends." Engineers
-  apply it via decisions in their own code.
+- **Framework** is *concrete and bound to artifacts*. Pages map to
+  specific files in the dotfiles or specific configuration in
+  projects. The advice is "do this." Engineers act on it directly.
+- **Philosophy** is *opinionated and bound to judgment*. Pages take
+  positions on questions where reasonable engineers disagree. The
+  advice is "here's how to think about this and what the framework
+  recommends." Engineers apply it via decisions in their own code.
 
-A reader looking up "how do I configure my zsh prompt" goes to Reference.
-A reader thinking through "should I introduce a factory here, or is it
-overkill?" goes to Handbook.
+A reader looking up "how do I configure my zsh prompt" goes to
+Framework. A reader thinking through "should I introduce a factory
+here, or is it overkill?" goes to Philosophy.

@@ -9,24 +9,20 @@ instructions, see the [README](https://github.com/billwoika/dotfiles/blob/main/R
 
 ## What you'll find here
 
-The framework is organized by topic, mirroring how engineers actually look
-things up:
+The site is organized into three sections:
 
-- **[Shell Environment](shell-environment/index.md)** — zsh architecture, the `conf.d/` pattern,
-  how the framework keeps shell state predictable across sessions
-- **[Tools](tools/index.md)** — mise as the primary toolchain manager,
-  Make as a thin task-runner wrapper, and how they work together
-- **[Git](git/index.md)** — multi-identity setup, signing, the
-  tool-enforced practices the framework supports concretely
-- **[Operations](operations/index.md)** — secrets management with
-  1Password and direnv, environment isolation, project-level patterns
-- **[Handbook](handbook/index.md)** — opinionated guidance on practices
-  and design decisions: the separation skill, when to reach for design
-  patterns and when not to, with the Reference's configuration content
-  as the practical counterpart
-- **[Reference](reference/index.md)** — the customization placeholder
-  table, version notes, and the relationship between this site and
-  earlier framework versions
+- **[Reference](reference/index.md)** — start here. Repository
+  structure, onboarding runbook, customization guide, test suite, and
+  troubleshooting. Everything you need to clone, install, and
+  configure the dotfiles.
+- **[Framework](shell-environment/index.md)** — the detailed
+  documentation for every component: shell environment, toolchain
+  (mise, Make, containers, editors), git configuration, and operations
+  (secrets, SSH, networking). Bound to the dotfiles artifact.
+- **[Philosophy](handbook/index.md)** — opinionated arguments about
+  engineering practice and design: separation as a meta-skill, git
+  conventions, value types, platform portability. Rigorous positions,
+  honestly contestable. Decoupled from the dotfiles themselves.
 
 Pages are short, opinionated, and practical. The framework's primary
 contribution is the *coherence* of the choices — every recommendation
@@ -35,18 +31,15 @@ deviations rather than left implicit.
 
 ## Three layers, one framework
 
-The framework is structured into three deliberate layers, each with a
-distinct audience and purpose:
-
 !!! note "Layer 1 — the README"
     Short-form overview, installation instructions, the quick map. About
     a 15-minute read. If you want to know whether the framework is for
     you, start there.
 
 !!! info "Layer 2 — this docs site"
-    The detailed reference. Topic-based pages with specific patterns
-    and rationale. **This is where you look when you have a specific
-    question** — "how does the multi-identity git setup actually work?"
+    Three sections: **Reference** (install, configure, troubleshoot),
+    **Framework** (detailed documentation per component), and
+    **Philosophy** (opinionated arguments about engineering practice).
 
 !!! tip "Layer 3 — runbooks alongside code"
     Operational knowledge that's specific to a particular service or
