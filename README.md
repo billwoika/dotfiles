@@ -24,7 +24,7 @@ migrated from a Word document into [the docs site][docs].
 This README is the **short version**: enough to install the dotfiles, get
 oriented, and decide whether the rest is worth your time.
 
-[docs]: https://billwoika.github.io/dotfiles/
+[docs]: https://devdocs.billwoika.com
 
 ## What's in the box
 
@@ -256,7 +256,7 @@ dotfiles/
 ├── LICENSE                  GPLv3-or-later
 ├── README.md                You are here
 ├── mkdocs.yml               Docs site configuration
-├── docs/                    Layer-2 documentation source (rendered to gh-pages)
+├── docs/                    Layer-2 documentation source (deployed to devdocs.billwoika.com)
 ├── archive/                 Archived earlier versions of the framework
 ├── _drafts/                 Work-in-progress content, excluded from site
 │

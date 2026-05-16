@@ -160,6 +160,19 @@ run configurations for:
 - **Ruby**: RSpec current file via `bundle exec rspec`
 - **Python**: pytest current file via `uv run pytest`
 
+## Browser developer tools
+
+For web development, the browser's built-in developer tools are as
+indispensable as the IDE debugger — arguably more so, because they
+are the only tool that shows you what is actually happening at the
+boundary between your server, your frontend code, and the rendering
+engine.
+
+See the dedicated [Browser Developer Tools](browser-devtools.md) page
+for full coverage of every panel, the Chrome DevTools Protocol, and
+how to use these tools effectively for debugging everything from
+backend errors to CSS specificity conflicts to memory leaks.
+
 ## Code intelligence — the LSP contract
 
 Language Server Protocol (LSP) gives every editor the same code

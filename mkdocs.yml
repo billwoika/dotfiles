@@ -86,6 +86,7 @@ nav:
     - 'Code Quality': tools/code-quality.md
     - 'Containers and Devcontainers': tools/containers.md
     - 'Editors and IDEs': tools/editors.md
+    - 'Browser Developer Tools': tools/browser-devtools.md
     - 'Database and API Tools': tools/database-api.md
   - Git:
     - git/index.md
@@ -95,6 +96,12 @@ nav:
     - operations/index.md
     - 'Secrets': operations/secrets.md
     - 'SSH and Key Management': operations/ssh.md
+    - 'Networking':
+      - operations/networking.md
+      - 'VPN and Tunnels': operations/vpn.md
+      - 'DNS': operations/dns.md
+      - 'Container Networking': operations/container-networking.md
+      - 'Proxy and Traffic Capture': operations/proxy-and-capture.md
   - Handbook:
     - handbook/index.md
     - 'Git Conventions': handbook/git-conventions.md

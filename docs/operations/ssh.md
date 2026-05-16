@@ -19,8 +19,15 @@ The framework commits to the following defaults:
 - **One key per identity, not per host** — a single work key
   authenticates you to every work system; a single personal key
   authenticates you everywhere else.
-- **Passphrase on every private key** — no exceptions. The passphrase
-  is what makes a leaked `~/.ssh` useless to an attacker.
+- **Passphrases where they matter** — high-privilege keys (production
+  access, root, code signing) must always carry a passphrase. For
+  daily-driver keys on an encrypted disk behind strict file
+  permissions, the passphrase is defense-in-depth rather than the
+  primary security boundary — disk encryption, the agent architecture,
+  and (if using 1Password) biometric gating already protect the key
+  material. CI/CD keys are passphrase-less by definition; their
+  security comes from scoping, short lifetimes, and rotation — not a
+  secret nobody can type.
 - **Agent over persisted keys** — the private key material stays
   encrypted at rest; the agent holds decrypted material in memory only.
 - **`IdentitiesOnly yes`** — without this, SSH offers every key in your
@@ -320,7 +327,7 @@ exposing the agent — your keys never leave your machine.
 
 ## Security checklist
 
-- [ ] Ed25519 keys with passphrases
+- [ ] Ed25519 keys; passphrases on high-privilege keys, defense-in-depth elsewhere
 - [ ] `IdentitiesOnly yes` in `Host *`
 - [ ] No agent forwarding; `ProxyJump` for bastions
 - [ ] `StrictHostKeyChecking accept-new` (prompt once, then strict)
