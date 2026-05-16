@@ -76,7 +76,7 @@ nav:
     - 'Environment Layer': shell-environment/environment.md
     - 'Performance': shell-environment/performance.md
     - 'Installer Behavior': shell-environment/installer-behavior.md
-    - 'Terminal: iTerm2 and tmux': shell-environment/terminal.md
+    - 'Terminal Environment': shell-environment/terminal.md
     - 'Aliases and Functions': shell-environment/aliases.md
     - 'Shell Integration Strategy': shell-environment/integration-strategy.md
   - Tools:
@@ -107,6 +107,7 @@ nav:
       - 'Separation by Boundary': handbook/design/separation-by-boundary.md
       - 'Separation by Variation': handbook/design/separation-by-variation.md
       - 'Value Types': handbook/design/value-types.md
+      - 'Platform Portability': handbook/design/platform-portability.md
   - Reference:
     - reference/index.md
     - 'Customization': reference/customization.md

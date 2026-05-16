@@ -92,6 +92,12 @@ keychain_get() {
   if [[ "$(uname)" == "Darwin" ]]; then
     security find-generic-password -a "$USER" -s "$1" -w 2>/dev/null
   else
+    if ! command -v secret-tool &>/dev/null; then
+      echo "keychain_get: secret-tool not found." >&2
+      echo "  Debian/Ubuntu: sudo apt install libsecret-tools" >&2
+      echo "  Fedora/RHEL:   sudo dnf install libsecret" >&2
+      return 127
+    fi
     secret-tool lookup service "$1" account "$USER" 2>/dev/null
   fi
 }

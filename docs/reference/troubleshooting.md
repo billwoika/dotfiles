@@ -84,8 +84,9 @@ ssh-add -l                      # which keys are loaded in the agent?
 
 **Common causes:**
 
-- **Key not loaded.** Run `ssh-add --apple-use-keychain
-  ~/.ssh/id_ed25519_work`.
+- **Key not loaded.** On macOS: `ssh-add --apple-use-keychain
+  ~/.ssh/id_ed25519_work`. On Linux: `ssh-add
+  ~/.ssh/id_ed25519_work` (omit `--apple-use-keychain`).
 - **`IdentitiesOnly yes` not set.** Without it, SSH offers every key
   in the agent; GitHub rejects after too many attempts.
 - **Public key not registered.** Add the `.pub` file contents to
@@ -133,7 +134,8 @@ direnv status     # or: ds (alias)
 
 - **Not allowed.** Run `direnv allow` (or `da`).
 - **direnv not installed.** `command -v direnv` — install via
-  `brew install direnv`.
+  `brew install direnv` (macOS), `sudo apt install direnv`
+  (Debian/Ubuntu), or `sudo dnf install direnv` (Fedora/RHEL).
 - **mise handling the env.** If you moved env vars to `mise.toml`'s
   `[env]` block, direnv is no longer needed for those variables.
 

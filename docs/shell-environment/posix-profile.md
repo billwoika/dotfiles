@@ -88,7 +88,8 @@ export PATH
 | sh (POSIX) | Yes | Login shells read `~/.profile` unconditionally |
 | dash | Yes | Login shells read `~/.profile` (`dash` is `/bin/sh` on Debian/Ubuntu) |
 | cron | No | No login shell; use env vars in crontab or wrapper scripts |
-| LaunchAgent | No | Inherits environment from `launchd`; use `EnvironmentVariables` key |
+| LaunchAgent (macOS) | No | Inherits environment from `launchd`; use `EnvironmentVariables` key |
+| systemd user service | No | Does not spawn a login shell; use `Environment=` directives in the unit file or `~/.config/environment.d/*.conf` |
 | ssh `ForceCommand` | Varies | Depends on whether a login shell is spawned |
 
 Critically, bash reads `~/.profile` **only when `~/.bash_profile` does

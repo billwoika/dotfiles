@@ -1,14 +1,50 @@
 # Onboarding Runbook
 
-Step-by-step setup for a new machine. This runbook assumes macOS with
-Apple Silicon; Linux steps differ only for Homebrew paths and Keychain
-references.
+Step-by-step setup for a new machine. The core workflow is identical
+on macOS and Linux. Platform-specific steps (prerequisites, SSH agent,
+optional GUI tools) are presented in tabbed sections.
 
 ## Prerequisites
 
-- macOS with Command Line Tools (`xcode-select --install`)
-- A GitHub account with SSH key access
-- 1Password (recommended, not required)
+=== "macOS"
+
+    - macOS with Command Line Tools (`xcode-select --install`)
+    - A GitHub account with SSH key access
+    - 1Password (recommended, not required)
+
+=== "Debian / Ubuntu"
+
+    - Install core dependencies:
+
+        ```sh
+        sudo apt install zsh git curl
+        ```
+
+    - Set zsh as the default shell:
+
+        ```sh
+        chsh -s $(which zsh)
+        ```
+
+    - A GitHub account with SSH key access
+    - 1Password (recommended, not required)
+
+=== "Fedora / RHEL"
+
+    - Install core dependencies:
+
+        ```sh
+        sudo dnf install zsh git curl
+        ```
+
+    - Set zsh as the default shell:
+
+        ```sh
+        chsh -s $(which zsh)
+        ```
+
+    - A GitHub account with SSH key access
+    - 1Password (recommended, not required)
 
 ## Step-by-step setup
 
@@ -89,10 +125,52 @@ Add both keys to GitHub (Settings > SSH and GPG keys):
 
 Load keys into the agent:
 
-```sh
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_work
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_personal
-```
+=== "macOS"
+
+    ```sh
+    ssh-add --apple-use-keychain ~/.ssh/id_ed25519_work
+    ssh-add --apple-use-keychain ~/.ssh/id_ed25519_personal
+    ```
+
+    The `--apple-use-keychain` flag stores the passphrase in macOS
+    Keychain so the key is available across reboots without re-entry.
+
+=== "Linux"
+
+    ```sh
+    ssh-add ~/.ssh/id_ed25519_work
+    ssh-add ~/.ssh/id_ed25519_personal
+    ```
+
+    The ssh-agent must be running. On systemd-based distros, a user
+    service is the cleanest approach:
+
+    ```sh
+    mkdir -p ~/.config/systemd/user
+    cat > ~/.config/systemd/user/ssh-agent.service <<'EOF'
+    [Unit]
+    Description=SSH key agent
+
+    [Service]
+    Type=simple
+    ExecStart=/usr/bin/ssh-agent -D -a %t/ssh-agent.socket
+    Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+
+    [Install]
+    WantedBy=default.target
+    EOF
+
+    systemctl --user enable --now ssh-agent
+    ```
+
+    Then add to `~/.profile` or `~/.config/environment.d/ssh.conf`:
+
+    ```sh
+    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
+    ```
+
+    With `AddKeysToAgent yes` in `~/.ssh/config`, keys are added
+    automatically on first use for the duration of the session.
 
 ### Step 10: Validate
 
@@ -114,35 +192,89 @@ mise doctor
 
 ## Optional steps
 
-### Install Homebrew packages
+=== "macOS"
 
-```sh
-brew install --cask iterm2 textmate markedit
-# Re-run bootstrap to create CLI wrappers
-sh ~/dotfiles/bootstrap.sh
-```
+    ### Install Homebrew packages
 
-### Install direnv
+    ```sh
+    brew install --cask iterm2 textmate markedit
+    # Re-run bootstrap to create CLI wrappers
+    sh ~/dotfiles/bootstrap.sh
+    ```
 
-```sh
-brew install direnv
-# Already wired in conf.d/70-tools.zsh
-```
+    ### Install direnv
 
-### Configure file associations (macOS)
+    ```sh
+    brew install direnv
+    # Already wired in conf.d/70-tools.zsh
+    ```
 
-```sh
-brew install duti
-sh ~/dotfiles/macos/setup-file-associations.sh
-```
+    ### Configure file associations
 
-### Add mise shims to system PATH (for GUI IDEs)
+    ```sh
+    brew install duti
+    sh ~/dotfiles/macos/setup-file-associations.sh
+    ```
 
-```sh
-echo "$HOME/.local/share/mise/shims" | \
-  sudo tee /etc/paths.d/mise > /dev/null
-# Takes effect after logout/login
-```
+    ### Add mise shims to system PATH (for GUI IDEs)
+
+    ```sh
+    echo "$HOME/.local/share/mise/shims" | \
+      sudo tee /etc/paths.d/mise > /dev/null
+    # Takes effect after logout/login
+    ```
+
+=== "Debian / Ubuntu"
+
+    ### Install system packages
+
+    ```sh
+    sudo apt install direnv libsecret-tools fd-find ripgrep fzf
+    ```
+
+    `direnv` is already wired in `conf.d/70-tools.zsh`. `libsecret-tools`
+    provides `secret-tool`, used by the `keychain_get` shell function.
+
+    ### SSH agent persistence
+
+    See the systemd user service in Step 9 above. On GNOME desktops,
+    `gnome-keyring` can also serve as the SSH agent — it is enabled
+    by default in most GNOME-based distributions.
+
+    ### Add mise shims to system PATH (for GUI IDEs)
+
+    ```sh
+    mkdir -p ~/.config/environment.d
+    echo 'PATH=$HOME/.local/share/mise/shims:$PATH' > \
+      ~/.config/environment.d/mise.conf
+    # Takes effect after logout/login (systemd-based distros)
+    ```
+
+=== "Fedora / RHEL"
+
+    ### Install system packages
+
+    ```sh
+    sudo dnf install direnv libsecret fd-find ripgrep fzf
+    ```
+
+    `direnv` is already wired in `conf.d/70-tools.zsh`. `libsecret`
+    provides `secret-tool`, used by the `keychain_get` shell function.
+
+    ### SSH agent persistence
+
+    See the systemd user service in Step 9 above. On GNOME desktops,
+    `gnome-keyring` can also serve as the SSH agent — it is enabled
+    by default in Fedora Workstation.
+
+    ### Add mise shims to system PATH (for GUI IDEs)
+
+    ```sh
+    mkdir -p ~/.config/environment.d
+    echo 'PATH=$HOME/.local/share/mise/shims:$PATH' > \
+      ~/.config/environment.d/mise.conf
+    # Takes effect after logout/login (systemd-based distros)
+    ```
 
 ## Cloning a project
 
