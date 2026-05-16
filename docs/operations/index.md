@@ -19,6 +19,9 @@ credential reaches which system).
 - **[SSH and Key Management](ssh.md)** — Ed25519 keys, the
   `~/.ssh/config` reference, ssh-agent and 1Password agent, connection
   multiplexing, host aliases for multi-identity use, and ProxyJump.
+- **[Networking](networking.md)** — VPN configuration, DNS ownership
+  conflicts, container networking modes, local proxies for debugging,
+  and why these layers fight each other on a developer workstation.
 
 ## The framework's stance on operations
 
