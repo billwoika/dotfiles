@@ -1,9 +1,13 @@
 # docs/requirements.txt
 # ─────────────────────────────────────────────────────────────────────────
 # Pinned dependencies for building the MkDocs site.
-# Used by .github/workflows/docs.yml and for local builds:
-#   pip install -r docs/requirements.txt
-#   mkdocs serve
+#
+# Local builds (uv):
+#   uvx --with-requirements docs/requirements.txt mkdocs serve
+#
+# CI (.github/workflows/docs.yml) still uses pip — most GitHub Actions
+# workflows use setup-python + pip, and for three packages installed once
+# per build the runtime difference is negligible.
 
 mkdocs==1.6.1
 mkdocs-material==9.7.6

@@ -13,6 +13,12 @@ set -eu
 DOTFILES="$(cd "$(dirname "$0")" && pwd)"
 DRY_RUN=0
 
+case "$(uname -s)" in
+  Darwin) _os="macos" ;;
+  Linux)  _os="linux" ;;
+  *)      _os="unknown" ;;
+esac
+
 case "${1:-}" in
   --dry-run|-n) DRY_RUN=1 ;;
   -h|--help)
@@ -167,7 +173,9 @@ if [ -d "/Applications/TextMate.app" ]; then
 else
   log ""
   log "TextMate not installed; skipping 'mate' CLI setup."
-  log "  (Install via: brew install --cask textmate)"
+  if [ "$_os" = "macos" ]; then
+    log "  (Install via: brew install --cask textmate)"
+  fi
 fi
 
 # ── MarkEdit (auto-create wrapper if app is installed) ──────────────
@@ -191,7 +199,9 @@ MARKEDIT_WRAPPER
 else
   log ""
   log "MarkEdit not installed; skipping 'markedit' wrapper setup."
-  log "  (Install via: brew install --cask markedit)"
+  if [ "$_os" = "macos" ]; then
+    log "  (Install via: brew install --cask markedit)"
+  fi
 fi
 
 # ── Audit: scan shell startup files for rogue injections ────────────
@@ -264,22 +274,43 @@ log ""
 log "  7. Validate the ~/.profile with the POSIX test suite:"
 log "       sh ${DOTFILES}/sh/tests/profile_test.sh"
 log ""
-log "  Optional macOS-specific steps:"
-log ""
-log "  8. Install TextMate and MarkEdit if you want them:"
-log "       brew install --cask textmate markedit"
-log "     Then re-run bootstrap.sh to create their CLI shortcuts."
-log ""
-log "  9. Configure file associations interactively (requires duti):"
-log "       brew install duti"
-log "       sh ${DOTFILES}/macos/setup-file-associations.sh"
-log ""
-log "  10. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
-log "      can find mise-managed tools without being launched from a shell:"
-log "       echo \"\$HOME/.local/share/mise/shims\" | \\"
-log "         sudo tee /etc/paths.d/mise > /dev/null"
-log "      Effect takes hold after a logout/login cycle."
-log ""
+if [ "$_os" = "macos" ]; then
+  log "  Optional macOS-specific steps:"
+  log ""
+  log "  8. Install TextMate and MarkEdit if you want them:"
+  log "       brew install --cask textmate markedit"
+  log "     Then re-run bootstrap.sh to create their CLI shortcuts."
+  log ""
+  log "  9. Configure file associations interactively (requires duti):"
+  log "       brew install duti"
+  log "       sh ${DOTFILES}/macos/setup-file-associations.sh"
+  log ""
+  log "  10. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
+  log "      can find mise-managed tools without being launched from a shell:"
+  log "       echo \"\$HOME/.local/share/mise/shims\" | \\"
+  log "         sudo tee /etc/paths.d/mise > /dev/null"
+  log "      Effect takes hold after a logout/login cycle."
+  log ""
+fi
+
+if [ "$_os" = "linux" ]; then
+  log "  Optional Linux-specific steps:"
+  log ""
+  log "  8. Ensure zsh is the default shell (if not already):"
+  log "       chsh -s \$(which zsh)"
+  log ""
+  log "  9. Install libsecret for the keychain_get shell function:"
+  log "       Debian/Ubuntu: sudo apt install libsecret-tools"
+  log "       Fedora/RHEL:   sudo dnf install libsecret"
+  log ""
+  log "  10. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
+  log "      can find mise-managed tools without being launched from a shell:"
+  log "       mkdir -p ~/.config/environment.d"
+  log "       echo 'PATH=\$HOME/.local/share/mise/shims:\$PATH' > \\"
+  log "         ~/.config/environment.d/mise.conf"
+  log "      Effect takes hold after a logout/login cycle (systemd-based distros)."
+  log ""
+fi
 log "  Reference templates for projects:"
 log ""
 log "    Copy these into individual project repositories as starting points."

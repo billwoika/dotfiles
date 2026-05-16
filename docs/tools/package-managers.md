@@ -135,6 +135,30 @@ shells. When the `python.uv_venv_auto` mise setting is enabled, the
 `.venv/bin` directory is prepended to PATH automatically on `cd`,
 making explicit activation unnecessary for most workflows.
 
+### When requirements.txt still makes sense
+
+This framework advocates uv for every Python workflow, and the
+framework's own docs site uses `uvx --with-requirements` for local
+builds. But `docs/requirements.txt` persists in the repo because CI
+consumes it via `pip install -r` — and that is a defensible choice,
+not a contradiction.
+
+Most GitHub Actions workflows use `setup-python` + `pip`. Astral
+publishes a `setup-uv` action, but many teams have not adopted it,
+and for a build step that installs three packages and runs once per
+push, the runtime difference between pip and uv is negligible. The
+value of uv is in developer-facing workflows where resolution speed,
+lockfile determinism, and virtual environment management compound
+across hundreds of daily invocations. A CI step that runs `pip
+install -r requirements.txt` once and exits is not that workflow.
+
+The practical guidance: use `uvx` or `uv run` locally, keep
+`requirements.txt` as the lowest-common-denominator format that every
+CI platform and deployment pipeline can consume, and do not lose sleep
+over the inconsistency. It is the same pragmatism that keeps a
+`Makefile` in the repo alongside `mise tasks` — the native tool is
+better, but the universal one has value at the boundary.
+
 ## bun — JavaScript and TypeScript
 
 bun is the JavaScript runtime, package manager, bundler, and test

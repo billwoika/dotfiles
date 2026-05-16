@@ -37,9 +37,9 @@ oriented, and decide whether the rest is worth your time.
 | JavaScript | [bun](https://bun.com) | Drop-in replacement for Node + npm + yarn that's an order of magnitude faster |
 | Build orchestration | [mise tasks](https://mise.jdx.dev/tasks/) + Make wrapper | mise tasks for the project's actual build logic; a thin Makefile for `make test` universal recognition |
 | Git multi-identity | per-directory `includeIf` rules | Work and personal commits use different signing keys, automatically, based on which directory the repo lives in |
-| Terminal | iTerm2 (macOS) + tmux | Native macOS feel where possible, tmux for session persistence and multi-host work |
+| Terminal | iTerm2 (macOS), WezTerm / Kitty / Alacritty (Linux) + tmux | Native terminal emulator per platform, tmux for session persistence and multi-host work |
 | Containers | runtime-agnostic (Podman / Docker / Colima / OrbStack) | Use whichever container runtime works for your environment; the framework's patterns don't care |
-| Editors | vim (`$EDITOR`), VS Code, JetBrains, plus native macOS GUI editors | Multi-editor reality, with the framework ensuring all of them participate in the same reproducibility contract |
+| Editors | vim (`$EDITOR`), VS Code, JetBrains, plus native GUI editors (macOS: TextMate, MarkEdit) | Multi-editor reality, with the framework ensuring all of them participate in the same reproducibility contract |
 | Secrets | 1Password CLI, with Vault and sops as alternatives | Credentials live in vaults, never on disk; the shell pulls them via `op read` references in `.envrc` |
 
 ## What's not in the box
@@ -134,6 +134,25 @@ sh ~/dotfiles/macos/setup-file-associations.sh
 # Add mise shims to GUI app PATH (so VS Code, JetBrains see mise tools
 # even when launched from Finder, not the terminal)
 echo "$HOME/.local/share/mise/shims" | sudo tee /etc/paths.d/mise > /dev/null
+# Effect takes hold after the next login.
+```
+
+### Linux-specific opt-in steps
+
+```sh
+# Ensure zsh is the default shell (if not already)
+chsh -s $(which zsh)
+
+# Install libsecret for the keychain_get shell function
+# Debian/Ubuntu:
+sudo apt install libsecret-tools
+# Fedora/RHEL:
+sudo dnf install libsecret
+
+# Add mise shims to GUI app PATH (systemd-based distros)
+mkdir -p ~/.config/environment.d
+echo 'PATH=$HOME/.local/share/mise/shims:$PATH' > \
+  ~/.config/environment.d/mise.conf
 # Effect takes hold after the next login.
 ```
 
@@ -255,6 +274,7 @@ dotfiles/
 ├── vscode/                  VS Code workspace templates (settings, extensions, launch)
 ├── jetbrains/               JetBrains reference templates and runConfigurations
 ├── macos/                   macOS-specific opt-in helpers
+├── linux/                   Linux-specific opt-in helpers
 ├── devcontainer/            Reference templates for project devcontainers
 │
 ├── .editorconfig.example    Cross-editor formatting reference

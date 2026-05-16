@@ -11,10 +11,9 @@ Read `.claude-context.md` for the full project history, locked-in decisions, rej
 ## Build and validation commands
 
 ```sh
-# MkDocs site
-pip install -r docs/requirements.txt     # one-time setup
-mkdocs serve                              # live-reload at http://127.0.0.1:8000
-mkdocs build --strict                     # production build; warnings are errors
+# MkDocs site (local dev — use uv, not pip)
+uvx --with-requirements docs/requirements.txt mkdocs serve    # live-reload at http://127.0.0.1:8000
+uvx --with-requirements docs/requirements.txt mkdocs build --strict  # production build; warnings are errors
 
 # Shell syntax validation
 zsh -n zsh/**/*.zsh                       # all zsh files

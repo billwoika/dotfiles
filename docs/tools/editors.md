@@ -63,6 +63,10 @@ for single files.
 `markedit` wrapper in `~/.local/bin/` since MarkEdit doesn't ship a
 CLI.
 
+On Linux, lightweight native GUI editors (gedit, GNOME Text Editor,
+Kate) fill a similar role. The framework does not configure them — they
+are lightweight enough to need no framework integration.
+
 ## .editorconfig
 
 EditorConfig is the non-negotiable baseline for polyglot projects —
@@ -105,13 +109,27 @@ The framework's defenses:
 1. **mise shims on the system PATH.** The `~/.profile` adds
    `~/.local/share/mise/shims` to PATH. IDE-spawned processes that
    inherit the base system PATH find mise-managed tools via shims.
-2. **The `/etc/paths.d/mise` opt-in.** For GUI-launched IDEs that
-   bypass all shell profiles, add mise shims to the macOS
-   system-level PATH:
-   ```sh
-   echo "$HOME/.local/share/mise/shims" | \
-     sudo tee /etc/paths.d/mise > /dev/null
-   ```
+2. **The system-level PATH opt-in.** For GUI-launched IDEs that
+   bypass all shell profiles, add mise shims to the system PATH:
+
+    === "macOS"
+
+        ```sh
+        echo "$HOME/.local/share/mise/shims" | \
+          sudo tee /etc/paths.d/mise > /dev/null
+        ```
+
+    === "Linux"
+
+        ```sh
+        mkdir -p ~/.config/environment.d
+        echo 'PATH=$HOME/.local/share/mise/shims:$PATH' > \
+          ~/.config/environment.d/mise.conf
+        ```
+
+        This works on systemd-based distributions (Debian 12+,
+        Fedora, RHEL 9+). On non-systemd distributions, add the
+        export to `~/.profile` instead.
 3. **Launch the IDE from the terminal.** `code .` or `idea .` from a
    mise-activated directory inherits the full shell environment.
 

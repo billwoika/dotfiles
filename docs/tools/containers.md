@@ -20,9 +20,12 @@ Containers are not free. For a developer's interactive workflow there
 are three real costs:
 
 - **Filesystem performance overhead on macOS** — every container engine
-  runs a Linux VM with bind-mounts across that boundary.
+  on macOS runs a Linux VM with bind-mounts across that boundary.
   Filesystem-heavy operations (Rails asset compilation, large monorepo
-  grep, Node module dependency resolution) are measurably slower.
+  grep, Node module dependency resolution) are measurably slower. On
+  Linux, containers run natively on the host kernel — filesystem
+  bind-mount performance is near-native and this concern does not
+  apply.
 - **Host-service integration friction** — the 1Password agent, system
   Keychain, Tailscale, VPN clients, and editor servers all live on the
   host. Reaching them from inside a container is per-tool fiddly.
@@ -57,7 +60,7 @@ run directly on the host kernel. On macOS, every option is a Linux VM.
 | **Docker Desktop** | Free < 250 employees/$10M; paid otherwise | Teams with existing subscriptions, GUI dependency |
 | **Podman** | Apache 2.0, always free | License-unrestricted, rootless-by-default security |
 | **Colima** | MIT, always free | CLI-only, simple Docker-API compatibility |
-| **OrbStack** | Commercial (free personal) | Fastest macOS performance, best Apple Silicon integration |
+| **OrbStack** | Commercial (free personal) | Fastest macOS performance, best Apple Silicon integration (macOS only) |
 
 **Docker Desktop** is the reference implementation — every tutorial
 assumes it. The licensing model is the constraint: not free for
@@ -206,7 +209,9 @@ shell configuration, aliases, and tool setup as your host.
 
 ## Performance tuning
 
-Filesystem performance is the primary concern on macOS. Options:
+Filesystem performance is the primary concern on macOS. On Linux,
+containers run natively and these tuning steps are unnecessary. Options
+for macOS:
 
 - **Named volumes** for dependencies (`node_modules/`, `.bundle/`,
   `.venv/`) — stored inside the VM, not bind-mounted

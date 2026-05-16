@@ -76,15 +76,21 @@ Homebrew's bin directory (`/opt/homebrew/bin` on Apple Silicon,
 `/usr/local/bin` on Intel) is already on PATH via `/etc/paths` and
 macOS's `path_helper`. Verify with `which brew` after installation.
 
+On Linux, use `apt` (Debian/Ubuntu) or `dnf` (Fedora/RHEL) for system
+tools. The distribution package manager is the natural choice — better
+integrated, faster, and one fewer dependency to maintain. Homebrew on
+Linux exists but adds complexity without meaningful benefit when the
+same packages are available natively.
+
 ```sh
-# Standard Homebrew installation (no special flags needed).
+# Standard Homebrew installation (macOS only; no special flags needed).
 # This spawns /bin/bash regardless of your default shell.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Verify brew is on PATH (should be via /etc/paths on macOS)
 which brew
 
-# If `which brew` fails (Linux, or non-standard prefix):
+# If `which brew` fails (non-standard prefix on macOS):
 # Add to conf.d/70-tools.zsh:
 #   if [[ -d /opt/homebrew ]]; then
 #     eval "$(/opt/homebrew/bin/brew shellenv)"

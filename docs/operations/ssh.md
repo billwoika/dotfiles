@@ -71,10 +71,25 @@ SSH and GPG keys > New SSH key), GitLab, or a server's
 for both authentication and signing — once with the "Authentication
 Key" type, once with "Signing Key."
 
-```sh
-# Copy public key to clipboard (macOS)
-pbcopy < ~/.ssh/id_ed25519_work.pub
+=== "macOS"
 
+    ```sh
+    pbcopy < ~/.ssh/id_ed25519_work.pub
+    ```
+
+=== "Linux (X11)"
+
+    ```sh
+    xclip -selection clipboard < ~/.ssh/id_ed25519_work.pub
+    ```
+
+=== "Linux (Wayland)"
+
+    ```sh
+    wl-copy < ~/.ssh/id_ed25519_work.pub
+    ```
+
+```sh
 # Copy to a remote server in one step
 ssh-copy-id -i ~/.ssh/id_ed25519_work.pub user@host
 ```
@@ -164,6 +179,48 @@ also triggers an agent load and a Keychain save — you can skip the
 `ssh-add` step and just `git push`, answer the passphrase prompt once,
 and be done.
 
+## ssh-agent on Linux
+
+Linux does not ship a managed ssh-agent by default. The cleanest
+approach on systemd-based distributions is a user service:
+
+```sh
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/ssh-agent.service <<'EOF'
+[Unit]
+Description=SSH key agent
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-agent -D -a %t/ssh-agent.socket
+Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user enable --now ssh-agent
+```
+
+Then export the socket in `~/.profile` or
+`~/.config/environment.d/ssh.conf`:
+
+```sh
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
+```
+
+With `AddKeysToAgent yes` in `~/.ssh/config`, keys are added to the
+agent automatically on first use for the duration of the session.
+
+On GNOME desktops, `gnome-keyring` can also serve as the SSH agent —
+it is enabled by default in most GNOME-based distributions and
+provides the same "passphrase remembered across reboots" behavior as
+macOS Keychain.
+
+The `UseKeychain yes` directive in the SSH config is silently ignored
+on Linux (OpenSSH 7.2+). It is safe to leave in a shared config that
+targets both platforms.
+
 ## 1Password SSH agent (recommended alternative)
 
 If you already use 1Password, the 1Password SSH agent is a substantial
@@ -178,12 +235,21 @@ machine using the 1Password agent, your `~/.ssh` directory contains
 In the 1Password desktop app: Settings > Developer > Use the SSH
 agent. Point SSH at it:
 
-```ssh-config
-# In ~/.ssh/config, under Host *:
-Host *
-    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-    # Linux: IdentityAgent ~/.1password/agent.sock
-```
+=== "macOS"
+
+    ```ssh-config
+    # In ~/.ssh/config, under Host *:
+    Host *
+        IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    ```
+
+=== "Linux"
+
+    ```ssh-config
+    # In ~/.ssh/config, under Host *:
+    Host *
+        IdentityAgent ~/.1password/agent.sock
+    ```
 
 The `IdentityFile` directives still matter — they tell SSH which public
 key to present, and the agent looks up the matching private key in the
