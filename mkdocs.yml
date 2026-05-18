@@ -70,12 +70,17 @@ nav:
   - Reference:
     - reference/index.md
     - 'Repository Structure': reference/repository.md
-    - 'Fedora Workstation Setup': reference/fedora-setup.md
+    - 'Platform Setup':
+      - reference/platform-setup/index.md
+      - 'macOS': reference/platform-setup/macos.md
+      - 'Fedora': reference/platform-setup/fedora.md
+      - 'Debian / Ubuntu': reference/platform-setup/debian-ubuntu.md
     - 'Onboarding Runbook': reference/onboarding.md
     - 'Customization': reference/customization.md
     - 'Test Suite': reference/test-suite.md
     - 'Troubleshooting': reference/troubleshooting.md
   - Framework:
+    - 'Platform Portability': framework-platform-portability.md
     - 'Shell Environment':
       - shell-environment/index.md
       - 'Philosophy': shell-environment/philosophy.md
@@ -123,7 +128,6 @@ nav:
       - 'Separation by Boundary': handbook/design/separation-by-boundary.md
       - 'Separation by Variation': handbook/design/separation-by-variation.md
       - 'Value Types': handbook/design/value-types.md
-      - 'Platform Portability': handbook/design/platform-portability.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
 # Material recommends these for the full feature set; the framework uses

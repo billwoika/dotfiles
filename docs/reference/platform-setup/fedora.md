@@ -2,7 +2,7 @@
 
 This page covers the machine-level setup that makes a fresh Fedora
 Workstation installation ready for development work. It is the
-prerequisite to the [Onboarding Runbook](onboarding.md) — everything
+prerequisite to the [Onboarding Runbook](../onboarding.md) — everything
 here happens before `bootstrap.sh` runs.
 
 The goal is a fast, secure, well-configured workstation with firmware
@@ -209,7 +209,7 @@ the specific port, test, remove it.
 
 ### SSH agent as a user service
 
-The [Onboarding Runbook](onboarding.md) covers the full ssh-agent
+The [Onboarding Runbook](../onboarding.md) covers the full ssh-agent
 systemd service. Ensure it starts on login:
 
 ```sh
@@ -230,7 +230,7 @@ docker info   # should work (via podman's compatibility API)
 ```
 
 This avoids the manual socket symlink documented on the
-[Containers](../tools/containers.md) page and integrates with systemd's
+[Containers](../../tools/containers.md) page and integrates with systemd's
 socket activation (zero idle resource use).
 
 ### Journal size management
@@ -387,7 +387,7 @@ sudo dnf install code
 ## After this page
 
 Once the machine is configured per the guidance above, proceed to the
-[Onboarding Runbook](onboarding.md) to install the framework itself.
+[Onboarding Runbook](../onboarding.md) to install the framework itself.
 The onboarding page handles `bootstrap.sh`, mise, SSH key generation,
 and git identity configuration — the framework-specific steps that
 build on top of the system-level setup documented here.
