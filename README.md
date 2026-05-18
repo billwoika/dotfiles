@@ -34,11 +34,11 @@ oriented, and decide whether the rest is worth your time.
 | Toolchain version management | [mise](https://mise.jdx.dev) | Replaces asdf, nvm, rbenv, pyenv, and several others with one tool. Polyglot, fast, and honest about its own limits |
 | Python | [uv](https://github.com/astral-sh/uv) | The fastest Python package and project manager. Replaces pip, virtualenv, pip-tools, pipx, and poetry for most projects |
 | Ruby | [rv](https://github.com/spinel-coop/rv) | Modern Ruby version + gem manager; uv-influenced design, faster than rbenv and bundler |
-| JavaScript | [bun](https://bun.com) | Drop-in replacement for Node + npm + yarn that's an order of magnitude faster |
+| JavaScript | [bun](https://bun.com) (package manager) + Node (runtime) | bun for installs and lockfile (10-100x faster than npm); Node as the runtime for ecosystem compatibility with native bindings |
 | Build orchestration | [mise tasks](https://mise.jdx.dev/tasks/) + Make wrapper | mise tasks for the project's actual build logic; a thin Makefile for `make test` universal recognition |
 | Git multi-identity | per-directory `includeIf` rules | Work and personal commits use different signing keys, automatically, based on which directory the repo lives in |
 | Terminal | iTerm2 (macOS), WezTerm / Kitty / Alacritty (Linux) + tmux | Native terminal emulator per platform, tmux for session persistence and multi-host work |
-| Containers | runtime-agnostic (Podman / Docker / Colima / OrbStack) | Use whichever container runtime works for your environment; the framework's patterns don't care |
+| Containers | [Podman](https://podman.io) (preferred), Docker / Colima / OrbStack where required | Rootless, daemonless, always free; CLI-compatible with Docker so all commands transfer |
 | Editors | vim (`$EDITOR`), VS Code, JetBrains, plus native GUI editors (macOS: TextMate, MarkEdit) | Multi-editor reality, with the framework ensuring all of them participate in the same reproducibility contract |
 | Secrets | 1Password CLI, with Vault and sops as alternatives | Credentials live in vaults, never on disk; the shell pulls them via `op read` references in `.envrc` |
 

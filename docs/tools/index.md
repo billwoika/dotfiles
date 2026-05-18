@@ -38,10 +38,13 @@ have 3.3.4 installed.
 **2. Modern alternatives over legacy when they're mature.** The
 framework prefers uv over pip+virtualenv+pip-tools+pipx, biome over
 ESLint+Prettier, ruff over pylint+black+isort+pyflakes, bun over
-npm+yarn, podman over Docker for free use. The replacements are
-faster, simpler, and more cohesive than the tools they replace. The
-framework recommends them when they're production-mature, not when
-they're trendy.
+npm/yarn/pnpm for package management (with Node as the runtime),
+Podman over Docker (rootless, daemonless, always free). The
+replacements are faster, simpler, and more cohesive than the tools
+they replace. The framework
+recommends them when they're production-mature, not when they're
+trendy — and is honest about where maturity claims are premature
+(see the bun runtime caveat in the package managers page).
 
 **3. Discoverability matters as much as correctness.** A project's
 build commands should be reachable through `make <target>`, `mise run
