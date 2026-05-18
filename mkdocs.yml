@@ -70,6 +70,7 @@ nav:
   - Reference:
     - reference/index.md
     - 'Repository Structure': reference/repository.md
+    - 'Fedora Workstation Setup': reference/fedora-setup.md
     - 'Onboarding Runbook': reference/onboarding.md
     - 'Customization': reference/customization.md
     - 'Test Suite': reference/test-suite.md
