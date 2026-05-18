@@ -215,7 +215,7 @@ core configuration, tmux, direnv, starship, zoxide, fzf — all of
 these work identically on macOS and Linux. Adding platform-conditional
 branches for tools that behave the same on both platforms is ceremony.
 It is the same failure mode the
-[Design section introduction](index.md) warns about: a factory that
+[Design section introduction](handbook/design/index.md) warns about: a factory that
 does nothing the constructor wouldn't, overhead with no payoff.
 
 Containers are the strongest version of this argument. When the

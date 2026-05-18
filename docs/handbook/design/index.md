@@ -78,12 +78,13 @@ The pages in this section each address a specific kind of separation:
   context; the operationalizing concepts include constants, enums,
   and value objects.
 
-- **[Platform Portability](platform-portability.md)** — separation
-  between platform-specific behavior and platform-independent
-  behavior. The problem statement is a framework that promises
-  portability through POSIX and XDG compliance but only delivers it
-  for one platform; the operationalizing patterns include runtime
-  detection, guard clauses, and parallel documentation.
+- **[Platform Portability](../../framework-platform-portability.md)** —
+  separation between platform-specific behavior and platform-independent
+  behavior. Now positioned at the top of the Framework section (it
+  applies to every component that follows). The problem statement is a
+  framework that promises portability through POSIX and XDG compliance
+  but only delivers it for one platform; the operationalizing patterns
+  include runtime detection, guard clauses, and parallel documentation.
 
 ## How to read this section
 

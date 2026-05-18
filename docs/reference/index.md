@@ -8,10 +8,12 @@ bound directly to the repository artifact.
 
 - **[Repository Structure](repository.md)** — the full file layout,
   what `bootstrap.sh` does, and the symlinked-vs-copied distinction.
-- **[Fedora Workstation Setup](fedora-setup.md)** — machine-level
-  optimization for a fresh Fedora install: dnf, firmware, codecs,
-  SELinux, firewall, GNOME tuning, and developer prerequisites.
-  Run this before the Onboarding Runbook.
+- **[Platform Setup](platform-setup/index.md)** — machine-level
+  optimization for a fresh OS install. Covers
+  [macOS](platform-setup/macos.md),
+  [Fedora](platform-setup/fedora.md), and
+  [Debian/Ubuntu](platform-setup/debian-ubuntu.md). Run before the
+  Onboarding Runbook.
 - **[Onboarding Runbook](onboarding.md)** — step-by-step new-machine
   setup from clone through validation.
 - **[Customization](customization.md)** — the placeholder string
