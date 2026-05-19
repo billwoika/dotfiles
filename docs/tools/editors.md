@@ -122,15 +122,21 @@ changes:
 1. **Pre-commit hook on staged lines only.** Tools like lefthook,
    lint-staged, and husky can run the formatter only on lines that are
    part of the current commit. This formats what you changed without
-   touching what you did not.
+   touching what you did not. The hook should be overridable
+   (`--no-verify`) but loud about being skipped — the engineer who
+   wrote the code is best positioned to judge whether a formatting
+   transformation is safe.
 2. **Dedicated formatting commits.** When a file or module needs a
    formatting pass, do it as a standalone commit with no logic changes.
    The commit message says "reformat" and reviewers know to skim it.
    `git blame` can be configured to ignore these commits via
    `.git-blame-ignore-revs`.
-3. **CI enforcement.** A CI check that runs the formatter and fails if
-   the output differs from the committed code. This catches formatting
-   errors without mixing them into logic diffs.
+3. **CI visibility, not CI blocking.** A CI check that reports
+   "formatting differs from the project standard" as a visible
+   annotation — not a pipeline failure — gives the team the signal
+   without blocking deploys over stylistic choices. See the
+   [code quality argument](../handbook/code-quality-argument.md) for
+   the full rationale.
 
 ### Configuring the editors
 

@@ -56,6 +56,20 @@ depth). Trust engineers to develop the judgment.
   of the commit is rarely read in practice; using the subject line
   allows for quick grepping of log outputs to isolate the linkage
   between tickets and commits.
+- **ASCII only — no emoji, no Unicode symbols, no line art.** Commit
+  messages are a permanent ledger. They are read in `git log`, in
+  terminal output, in email notifications, in CI logs, and in blame
+  annotations — contexts where rendering is plaintext and monospaced.
+  Emoji in commit subjects (`fix: :bug: resolve null pointer`) adds
+  visual noise that degrades scannability, breaks `grep` workflows,
+  and communicates nothing the words do not already say. The gitmoji
+  convention is particularly egregious — it encodes semantic
+  information in symbols that are invisible to search, inconsistently
+  rendered across terminals, and unreadable in any non-GUI context.
+  Unicode is essential for commit messages written in non-Latin
+  languages — Japanese, Chinese, Korean, Arabic, Cyrillic. That is
+  its purpose. Decorative emoji and ASCII box-drawing characters in
+  an English-language commit message are not that use case.
 
 ### Body
 
@@ -110,13 +124,35 @@ professional. If adopting, the framework can enforce the format via
 
 ### Naming
 
-- **Use a short, descriptive slug.** `add-user-search` not
-  `feature/add-user-search-PROJ-1234-final-v2`.
+- **Include the ticket identifier.** In any team setting, work happens
+  against a ticket. The branch name should include it:
+  `PROJ-1234-add-user-search`, not `add-user-search`. The ticket ID
+  is the link between the code change, the PR, the issue tracker, and
+  the conversation that motivated the work. Without it, tracing a
+  branch back to its origin requires searching commit messages or PR
+  descriptions — information that is one click away when the ticket
+  ID is in the branch name itself. Many CI systems and issue trackers
+  (Jira, Linear, ClickUp, GitHub Issues) auto-link branches to
+  tickets when the identifier appears in the branch name.
+- **Ticket first, then a short descriptive slug.** `PROJ-1234-add-user-search`
+  reads naturally, sorts well, and the ticket ID is visible in
+  truncated displays (`git branch` output, GitHub PR sidebar).
+- **Conventional prefixes are optional.** Some teams use
+  `feature/PROJ-1234-add-user-search` or `fix/PROJ-1234-null-check`.
+  The framework does not require or discourage them — adopt the
+  convention if it helps the team, skip it if the politics of
+  classifying every change as a bug, feature, enhancement, or chore
+  creates more friction than clarity. The ticket ID is the
+  non-negotiable part; the prefix is a team decision.
 - **Lowercase, hyphens, no underscores.** Match the conventions of
   GitHub URLs and most CI systems.
+- **ASCII only.** Branch names must contain only ASCII characters. No
+  emoji, no Unicode symbols, no decorative characters. The same rule
+  applies to commit messages (see below). Git history is a ledger of
+  work done, not a text message.
 - **Personal branches in personal namespace.** Engineers can use
-  `bill/scratch-test` for personal exploration; team branches are
-  `add-user-search` without a prefix.
+  `bill/scratch-test` for personal exploration; team branches carry
+  the ticket ID.
 - **No long-running feature branches.** Branch lifetime should be
   measured in days, not weeks. Branches that live longer than a week
   drift from master and create progressively harder rebases.
