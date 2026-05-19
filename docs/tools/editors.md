@@ -76,14 +76,168 @@ indent (4 for Python, tabs for Makefiles), final newline, and trim
 trailing whitespace (except `.md`). See the
 [code quality page](code-quality.md) for the full reference.
 
+## Disable format on save
+
+Most modern IDEs promote or default to formatting the entire file
+every time you save. VS Code enables `editor.formatOnSave` in many
+extension packs. JetBrains offers "Reformat code" as a save action.
+Prettier's documentation recommends it. **Turn it off.**
+
+The problem is not formatting. The problem is formatting mixed with
+logic changes in the same commit. When format-on-save is active,
+every save rewrites every line the formatter touches — regardless of
+whether those lines are related to the work in progress. The
+consequences compound:
+
+- **PR noise.** A three-line bug fix produces a 40-line diff because
+  the formatter reflowed a function two screens away. The reviewer
+  now has to mentally separate "what changed" from "what got
+  reformatted," and the effort is not trivial — formatting changes
+  can mask logic changes hiding in the same hunk.
+- **Blame pollution.** `git blame` on any reformatted line now points
+  to the unrelated commit that happened to save the file, not to the
+  commit that wrote the logic. The archaeological value of blame —
+  the primary tool for understanding *why* code is the way it is —
+  degrades with every format-on-save commit.
+- **Merge conflict multiplication.** Two engineers working on
+  different parts of the same file both trigger format-on-save.
+  Neither touched the other's code, but the formatter rewrote the
+  same whitespace in both branches. The resulting merge conflict is
+  on lines neither engineer intentionally changed, in code neither
+  engineer needs to review, consuming time that produces zero value.
+- **Legacy codebase risk.** On codebases with inconsistent formatting
+  history, the first engineer to open a file with format-on-save
+  enabled rewrites the entire file. Every line shows as changed. The
+  actual fix is buried. If the reformatting introduces a regression
+  (and reformatting *can* change behavior — Python's Black has done
+  it, Prettier has done it with template literals), the blast radius
+  is every line the formatter touched, not the three lines the
+  engineer intended to change.
+
+### The correct alternative
+
+Formatting belongs in **its own dedicated pass**, separated from logic
+changes:
+
+1. **Pre-commit hook on staged lines only.** Tools like lefthook,
+   lint-staged, and husky can run the formatter only on lines that are
+   part of the current commit. This formats what you changed without
+   touching what you did not.
+2. **Dedicated formatting commits.** When a file or module needs a
+   formatting pass, do it as a standalone commit with no logic changes.
+   The commit message says "reformat" and reviewers know to skim it.
+   `git blame` can be configured to ignore these commits via
+   `.git-blame-ignore-revs`.
+3. **CI enforcement.** A CI check that runs the formatter and fails if
+   the output differs from the committed code. This catches formatting
+   errors without mixing them into logic diffs.
+
+### Configuring the editors
+
+**VS Code** — in workspace `settings.json`:
+
+```json
+{
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false
+}
+```
+
+**JetBrains** — Settings > Tools > Actions on Save: uncheck "Reformat
+code" and "Optimize imports."
+
+**vim/nvim** — do not add `autocmd BufWritePre * :Format` or
+equivalent to your config.
+
+The framework's `settings.json.example` template ships with
+`formatOnSave` disabled.
+
+### The same problem wears other masks
+
+Format-on-save is the most common offender, but it is one instance of
+a broader antipattern: **the IDE silently modifying code you did not
+intend to change.** Several other features produce the same class of
+problems — noisy diffs, spurious conflicts, unintended behavior
+changes — and should be treated with the same suspicion.
+
+**Organize imports on save.** VS Code's
+`editor.codeActionsOnSave: { "source.organizeImports": "explicit" }` and
+JetBrains' "Optimize imports" save action reorder, add, or remove
+import statements every time you save. On a file you touched one
+function in, the diff now shows 15 import lines shuffled. Worse: in
+languages where import order has side effects (Python, Ruby `require`
+ordering in legacy code, CSS `@import` cascade), the reordering can
+change runtime behavior silently.
+
+**Auto-import insertion.** IntelliSense and LSP completions that
+automatically add an import statement when you accept a suggestion are
+convenient in greenfield code and dangerous in legacy code. The
+auto-import picks the resolution *it* thinks is correct — which may
+be the wrong module when multiple exports share a name, or a barrel
+file re-export that changes the dependency graph in ways the build
+tool notices but the developer does not. Review every auto-inserted
+import before committing; better yet, disable automatic insertion and
+add imports deliberately:
+
+```json
+{
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.suggest.autoImports": false,
+  "javascript.suggest.autoImports": false
+}
+```
+
+JetBrains: Settings > Editor > General > Auto Import — uncheck "Add
+unambiguous imports on the fly" for languages where you have
+experienced incorrect resolutions.
+
+**LSP code actions on save.** Beyond formatting, LSP servers can
+apply "quick fixes" automatically — adding missing type annotations,
+inserting explicit return types, converting `require` to `import`. VS
+Code's `editor.codeActionsOnSave` supports arbitrary code action kinds.
+Each one is a transformation applied to code you may not have touched,
+producing diffs you did not author. Disable all automatic code actions
+on save. Run them manually and deliberately when you want them:
+
+```json
+{
+  "editor.codeActionsOnSave": {}
+}
+```
+
+**IntelliSense aggressive completions.** Autocomplete that inserts
+boilerplate on Tab or Enter — function signatures with placeholder
+arguments, entire interface implementations, generated doc blocks —
+puts code in your file that you did not write and may not have read.
+The generated code may compile, but it often does not match the actual
+intent. Configure completions to *suggest* without *inserting*:
+
+```json
+{
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.suggest.insertMode": "replace"
+}
+```
+
+JetBrains: Settings > Editor > General > Code Completion — disable
+"Insert selected variant by pressing dot, space, etc."
+
+**The unifying principle:** every automatic code transformation that
+fires on save, on keystroke, or on completion acceptance is a tool
+making decisions on your behalf. In isolation, each one saves a few
+keystrokes. In aggregate, they produce commits where the engineer
+cannot confidently say "I wrote every line in this diff and I
+understand why each one changed." That confidence is the minimum
+standard for a reviewable PR.
+
 ## IDE configuration as part of the environment contract
 
 The framework ships reference templates in the `vscode/` and
 `jetbrains/` directories:
 
 **VS Code:**
-- `settings.json.example` — workspace settings (formatOnSave, ruler,
-  language-specific formatters)
+- `settings.json.example` — workspace settings (ruler,
+  language-specific formatters, formatOnSave explicitly disabled)
 - `extensions.json.example` — recommended extensions
 - `launch.json.example` — debug configurations
 

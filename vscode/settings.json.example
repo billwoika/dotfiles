@@ -5,9 +5,14 @@
   // Workspace settings should capture team decisions only. Personal
   // preferences (theme, font, keybindings) belong in user settings.
 
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {},
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "typescript.suggest.autoImports": false,
+  "javascript.suggest.autoImports": false,
 
-  // Per-language formatter overrides
+  // Per-language formatter overrides (invoked manually or via pre-commit hook)
   "[typescript]":   { "editor.defaultFormatter": "biomejs.biome" },
   "[javascript]":   { "editor.defaultFormatter": "biomejs.biome" },
   "[json]":         { "editor.defaultFormatter": "biomejs.biome" },
