@@ -119,6 +119,7 @@ nav:
   - Philosophy:
     - handbook/index.md
     - 'Git Conventions': handbook/git-conventions.md
+    - 'The Case for Code Quality': handbook/code-quality-argument.md
     - 'Design':
       - handbook/design/index.md
       - 'Separation of Concerns': handbook/design/separation-of-concerns.md

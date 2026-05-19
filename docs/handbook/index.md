@@ -52,6 +52,11 @@ some pages do it better than others. The shared discipline is:
 - **[Git Conventions](git-conventions.md)** — commit message style, PR
   conventions, branching strategy, code review etiquette, and mistake
   recovery. The norms that tools can't enforce and teams must adopt.
+- **[The Case for Code Quality](code-quality-argument.md)** — why
+  automated formatting, linting, and static type checking are worth the
+  friction they impose. Engages the counter-position (that linters block
+  deploys over stylistic trivia) honestly and explains where it is right,
+  where it is wrong, and where the real value lies.
 - **[Design](design/index.md)** — separation as the underlying meta-skill.
   How to decide what code lives together, what code lives apart, and how
   the patterns engineers have named (factories, dependency injection,
