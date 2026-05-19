@@ -5,7 +5,7 @@ XDG-compliant, dotfiles-driven, designed to be reproducible across machines
 and honest about its choices.
 
 This site is the in-depth reference. For a quick overview and install
-instructions, see the [README](https://github.com/billwoika/dotfiles/blob/main/README.md).
+instructions, see the [README](https://github.com/billwoika/dotfiles/blob/master/README.md).
 
 ## What you'll find here
 
@@ -60,7 +60,7 @@ work has been:
   migration to MkDocs (this site)
 
 Older versions are preserved as Word document snapshots in the
-[archive directory](https://github.com/billwoika/dotfiles/tree/main/archive)
+[archive directory](https://github.com/billwoika/dotfiles/tree/master/archive)
 of the repo.
 
 ## License

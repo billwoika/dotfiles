@@ -283,7 +283,7 @@ not what you want and can cause loops.
 curl --proxy http://localhost:8080 https://api.example.com/v1/data
 
 # git (for debugging git HTTP operations)
-git -c http.proxy=http://localhost:8080 push origin main
+git -c http.proxy=http://localhost:8080 fetch origin
 
 # npm/yarn
 npm config set proxy http://localhost:8080
