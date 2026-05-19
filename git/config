@@ -23,7 +23,7 @@
     bigFileThreshold = 512m
 
 [init]
-    defaultBranch = main
+    defaultBranch = master
 
 [pull]
     rebase = true

@@ -88,7 +88,7 @@ pre-commit:
 
 pre-push:
   commands:
-    # Run the full test suite before a push to main.
+    # Run the full test suite before a push to master.
     # Use `git push --no-verify` to skip in true emergencies.
     test:
       run: mise run test
@@ -231,16 +231,18 @@ script that sets the team's policy on the protected branch:
 ```sh
 #!/bin/sh
 # .github/branch-protection.sh
-# Set branch protection on main to match the team's policy.
+# Set branch protection on master to match the team's policy.
 # Run once after repo creation or after policy changes.
+# Adjust the branch name if your repo uses a different default.
 set -eu
 
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+BRANCH="master"
 
 gh api \
   --method PUT \
   -H "Accept: application/vnd.github+json" \
-  "/repos/${REPO}/branches/main/protection" \
+  "/repos/${REPO}/branches/${BRANCH}/protection" \
   -f required_status_checks[strict]=true \
   -f required_status_checks[contexts][]=ci/test \
   -f required_status_checks[contexts][]=ci/lint \
@@ -253,7 +255,7 @@ gh api \
   -f allow_deletions=false \
   -f required_linear_history=true
 
-echo "Branch protection set on ${REPO}:main"
+echo "Branch protection set on ${REPO}:${BRANCH}"
 ```
 
 What this enforces:
@@ -262,9 +264,9 @@ What this enforces:
 - Status checks (CI: test, CI: lint) must pass before merge.
 - Stale reviews are dismissed when new commits land — a reviewer who
   approved a PR three commits ago must re-review the latest version.
-- Force-push to main is blocked. Engineers cannot accidentally rewrite
-  shared history.
-- Branch deletion is blocked. The main branch cannot be removed even
+- Force-push to master is blocked. Engineers cannot accidentally
+  rewrite shared history.
+- Branch deletion is blocked. The default branch cannot be removed even
   by a repo admin.
 - Linear history is required — PRs must be rebased or squash-merged,
   not merge-committed. This keeps `git log --oneline` readable

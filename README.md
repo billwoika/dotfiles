@@ -287,7 +287,7 @@ dotfiles/
 
 The framework is versioned via the docs site, not the dotfiles. Dotfile
 changes that break compatibility get noted in the relevant docs page;
-otherwise the dotfiles are continuously developed on `main`.
+otherwise the dotfiles are continuously developed on `master`.
 
 Earlier framework versions (when the manuscript was a Word document)
 are preserved in [archive/](archive/). The most recent of those is

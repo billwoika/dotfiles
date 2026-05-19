@@ -54,6 +54,7 @@ Key settings worth calling out:
 
 | Section | Setting | Why |
 |---------|---------|-----|
+| `[init]` | `defaultBranch = master` | Default branch name for `git init`. See note below |
 | `[pull]` | `rebase = true` | Rebase on pull rather than merge — cleaner history |
 | `[push]` | `autoSetupRemote = true` | Auto-create remote branch on first push |
 | `[fetch]` | `prune = true` | Remove local refs for branches deleted on remote |
@@ -70,6 +71,39 @@ Key settings worth calling out:
 | `[help]` | `autocorrect = prompt` | Never auto-execute a suggested command |
 
 The full config is at `git/config` in the dotfiles repository.
+
+### On `defaultBranch = master`
+
+In 2020, GitHub changed its default branch name from `master` to
+`main`. The term `master` in the context of version control predates
+the English language in its etymological roots — it derives from the
+concept of a master copy or master record, the same usage found in
+master recording, master key, and master plan. It has no relationship
+to the connotation GitHub's rename was responding to.
+
+This framework uses `master` for three reasons:
+
+1. **It is git's original convention.** Git itself still defaults to
+   `master` unless overridden. The rename was a GitHub platform
+   decision, not a git project decision.
+2. **The rename introduced real cost for symbolic benefit.** Every
+   existing repository, script, CI pipeline, tutorial, and Stack
+   Overflow answer that referenced `master` became slightly wrong
+   overnight. The schism between pre-2020 and post-2020 repositories
+   is permanent — there is no migration path that does not touch every
+   downstream consumer. This was the absolute least a company of
+   Microsoft's scale could do, and the friction it imposed landed
+   entirely on the users.
+3. **Consistency with existing repositories matters.** The majority of
+   repositories in active production use predate the rename. A
+   framework that defaults to `main` for new repos while working
+   daily in `master` repos creates exactly the kind of muscle-memory
+   split and scripting fragility that a dotfiles framework should
+   eliminate.
+
+The framework's git aliases (`merged`, `cleanup`) handle both `main`
+and `master` for interoperability with repos that use either
+convention. The position is practical, not political.
 
 ## Profile files
 
