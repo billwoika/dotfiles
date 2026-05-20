@@ -37,80 +37,55 @@ factory is wrong when there's no separation problem and the pattern is
 ceremony — overhead with no payoff. The skill the Handbook tries to
 build is recognizing the difference.
 
-## Forms of separation
+## Pages
 
-The pages in this section each address a specific kind of separation:
+Four pages, each addressing a distinct form of the separation question:
 
 - **[Separation of Concerns](separation-of-concerns.md)** — the
-  foundational vocabulary. What "concerns" means concretely, how mixed
-  concerns produce god classes, and the cost of code where unrelated
-  things are entangled.
+  foundational vocabulary. What "concerns" means concretely (defined
+  by change-drivers, not abstract responsibilities), how mixed
+  concerns produce god classes, the cost of entangled code, and the
+  equally important cost of premature separation.
 
 - **[Locality](locality.md)** — separation in *space*. Where in the
   file tree should code live? Co-located by feature, separated by
   layer, or some hybrid? When does directory structure communicate
   the system's design, and when does it obscure it?
 
-- **[Separation by Lifecycle](separation-by-lifecycle.md)** —
-  separation between *constructing* an object and *using* it. The
-  problem statement is constructors that do too much; the
-  operationalizing pattern is factories.
+- **[Decoupling Patterns](decoupling-patterns.md)** — the four
+  coupling types an engineer encounters in practice, and the patterns
+  that address each: construction coupling (factories), dependency
+  coupling (dependency injection), boundary coupling (adapters), and
+  variation coupling (strategy). Treated as four facets of one skill
+  rather than four separate topics, because the underlying question
+  is always the same: "this code is coupled to something it shouldn't
+  be coupled to — what kind of coupling is it, and what is the
+  minimum intervention that decouples it?"
 
-- **[Separation by Dependency](separation-by-dependency.md)** —
-  separation between code and the things it depends on. The problem
-  statement is hardcoded collaborators that make code untestable in
-  isolation; the operationalizing pattern is dependency injection.
+- **[Value Types](value-types.md)** — separation applied to *data*.
+  The problem is stringly-typed code where a string can mean five
+  different things depending on context; the operationalizing concepts
+  include constants, enums, and value objects.
 
-- **[Separation by Boundary](separation-by-boundary.md)** —
-  separation between the domain you control and the external world
-  you don't. The problem statement is business logic entangled with
-  third-party APIs; the operationalizing pattern is the adapter.
-
-- **[Separation by Variation](separation-by-variation.md)** —
-  separation between code that's stable and code that varies. The
-  problem statement is switch statements that grow forever; the
-  operationalizing patterns include strategy and the factory's
-  variant-selection role.
-
-- **[Value Types](value-types.md)** — a more specific case of the
-  above, applied to data. The problem statement is stringly-typed
-  code where a string can mean five different things depending on
-  context; the operationalizing concepts include constants, enums,
-  and value objects.
+One page from the original outline has been promoted:
 
 - **[Platform Portability](../../framework-platform-portability.md)** —
-  separation between platform-specific behavior and platform-independent
-  behavior. Now positioned at the top of the Framework section (it
-  applies to every component that follows). The problem statement is a
-  framework that promises portability through POSIX and XDG compliance
-  but only delivers it for one platform; the operationalizing patterns
-  include runtime detection, guard clauses, and parallel documentation.
+  now positioned at the top of the Framework section, because it
+  applies to every component that follows. It remains linked here as
+  a worked example of Separation by Variation applied to the
+  infrastructure layer.
 
 ## How to read this section
 
 If you're encountering these patterns for the first time, the pages
-read in order. Earlier pages establish vocabulary and habits of mind
-that later pages build on.
+read in order. Separation of Concerns establishes vocabulary; Locality
+applies it to spatial organization; Decoupling Patterns covers the
+mechanical tools; Value Types applies the thinking to data.
 
-If you already know the patterns and are looking for the framework's
-position on a specific one, jump to the relevant page directly. Each
-page is structured the same way:
-
-1. **Problem statement.** A specific, recognizable scenario from real
-   codebases.
-2. **What's wrong.** Concrete consequences, not abstract principles.
-3. **The principle.** Stated in terms of separation.
-4. **The pattern(s) that operationalize the principle.** With realistic
-   examples in Ruby or Python.
-5. **When this is the right reach.** Specific situations.
-6. **When this is the wrong reach.** Equally specific.
-7. **Common antipatterns.** Named failure modes.
-8. **Questions to ask before reaching for it.** A short evaluation
-   checklist.
-
-The structure is repetitive across pages because the discipline is
-repetitive: every separation decision benefits from the same set of
-questions, asked with reference to the specific situation.
+If you already know the patterns, jump to the relevant page directly.
+Each page follows a consistent structure: a concrete problem statement,
+the consequences of ignoring it, the principle and patterns that
+address it, when to apply them, and — with equal weight — when not to.
 
 ## What this section is not
 

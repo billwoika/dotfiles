@@ -124,10 +124,7 @@ nav:
       - handbook/design/index.md
       - 'Separation of Concerns': handbook/design/separation-of-concerns.md
       - 'Locality': handbook/design/locality.md
-      - 'Separation by Lifecycle': handbook/design/separation-by-lifecycle.md
-      - 'Separation by Dependency': handbook/design/separation-by-dependency.md
-      - 'Separation by Boundary': handbook/design/separation-by-boundary.md
-      - 'Separation by Variation': handbook/design/separation-by-variation.md
+      - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
       - 'Value Types': handbook/design/value-types.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
