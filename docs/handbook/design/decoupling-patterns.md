@@ -706,6 +706,423 @@ over-engineering. An `elif` chain for twenty payment methods added by
 external partners is under-engineering. The right mechanism is the one
 whose complexity matches the problem's complexity — no more, no less.
 
+## The testing signal
+
+Testing is often treated as an afterthought — something bolted on
+after the design is complete. But testability is one of the strongest
+signals that a design's boundaries are correctly drawn. If a component
+cannot be tested without scaffolding the entire system around it, the
+component does not have real boundaries. Its implementation has leaked
+into its dependencies, or its dependencies have leaked into it, and
+the test is forced to reproduce the entire entangled context to
+exercise any single behavior.
+
+### The untestable design
+
+Consider a Rails controller that enrolls a customer. The controller
+sets attribute accessor flags on the model to control which callbacks
+fire, because the model's callback chain triggers different side
+effects depending on the context of the save:
+
+```ruby
+class EnrollmentsController < ApplicationController
+  def create
+    @customer = Customer.find(params[:customer_id])
+    @customer.skip_crm_sync = true
+    @customer.skip_messaging_provision = false
+    @customer.enrolled_by_admin = current_user.admin?
+    @customer.suppress_welcome_email = params[:silent].present?
+    @customer.enrolled = true
+    @customer.enrolled_at = Time.current
+    @customer.save!
+    redirect_to customer_path(@customer)
+  end
+end
+```
+
+Testing this controller requires:
+
+- A real (or carefully mocked) database with a customer record, a
+  tenant, and tenant configuration
+- The `Customer` model's full callback chain to be loaded, because the
+  test must verify which callbacks fired and which were suppressed
+- External service stubs for CRM, messaging provider, and email
+  delivery — because any callback that was *not* suppressed will call
+  them
+- Tenant fixture data, because some callbacks are conditional on
+  tenant configuration
+- Knowledge of which `attr_accessor` flags interact — does
+  `skip_crm_sync` affect the audit log callback? Does
+  `enrolled_by_admin` change the welcome email logic?
+
+```ruby
+RSpec.describe EnrollmentsController, type: :controller do
+  let(:tenant) { create(:tenant, messaging_enabled: true, double_opt_in: false) }
+  let(:customer) { create(:customer, tenant: tenant, enrolled: false) }
+
+  before do
+    stub_crm_sync
+    stub_messaging_provider
+    stub_email_delivery
+    sign_in(create(:admin_user))
+  end
+
+  it "enrolls the customer" do
+    post :create, params: { customer_id: customer.id }
+    customer.reload
+    expect(customer.enrolled).to be true
+    expect(customer.enrolled_at).to be_present
+  end
+
+  it "skips CRM sync" do
+    expect(CrmSync).not_to receive(:push)
+    post :create, params: { customer_id: customer.id }
+  end
+
+  it "does not skip messaging provision" do
+    expect(MessagingProvider).to receive(:provision)
+    post :create, params: { customer_id: customer.id }
+  end
+
+  it "suppresses welcome email when silent" do
+    expect(WelcomeMailer).not_to receive(:enrollment_email)
+    post :create, params: { customer_id: customer.id, silent: "1" }
+  end
+end
+```
+
+The test must know the *internals* of the model — which flags suppress
+which side effects — to verify the controller's behavior. When a new
+callback is added to the model, every controller test that saves a
+customer must be re-evaluated: does the new callback need a new flag?
+Does the existing flag configuration accidentally trigger or suppress
+it?
+
+The complexity grows exponentially. If there are five flags and ten
+controllers that save customers, each with different flag
+configurations, the interaction matrix is fifty cells — each of which
+represents a potential bug when any callback changes. The `attr_
+accessor` flags are the symptom. The disease is that the controller
+is reaching into the model's internal state-management mechanism to
+control behavior that should not be the controller's responsibility.
+
+### Dependency injection as design discipline
+
+The fix is not "write better tests." The fix is a design that does
+not require the test to reproduce the entangled context. Dependency
+injection is the mechanism, but the value is not testability alone —
+it is the design discipline that DI enforces.
+
+Returning to the payment processor example in Python:
+
+```python
+class PaymentWorkflow:
+    def __init__(
+        self,
+        processor: PaymentProcessor,
+        transaction_store: TransactionStore,
+        receipt_sender: ReceiptSender,
+        event_bus: EventBus,
+    ):
+        self.processor = processor
+        self.transaction_store = transaction_store
+        self.receipt_sender = receipt_sender
+        self.event_bus = event_bus
+
+    def execute(self, order, details):
+        self.processor.validate(details)
+        response = self.processor.process(order, details)
+        fee = self.processor.calculate_fee(order, details)
+
+        self.transaction_store.record(
+            order=order,
+            method=self.processor.method_name,
+            response=response,
+            fee=fee,
+        )
+
+        receipt = self.processor.format_receipt(order, details)
+        self.receipt_sender.send(order.customer, receipt)
+        self.event_bus.publish("payment.completed", {"order_id": order.id})
+
+        return response
+```
+
+Every dependency is explicit. The workflow does not instantiate its own
+transaction store, does not know which receipt delivery mechanism is in
+use, does not reach into a global event bus. It receives what it needs
+through its constructor.
+
+Testing with an in-memory substitute:
+
+```python
+class InMemoryTransactionStore:
+    def __init__(self):
+        self.transactions = []
+
+    def record(self, order, method, response, fee):
+        self.transactions.append({
+            "order_id": order.id,
+            "method": method,
+            "response": response,
+            "fee": fee,
+        })
+
+
+class InMemoryReceiptSender:
+    def __init__(self):
+        self.sent = []
+
+    def send(self, customer, receipt):
+        self.sent.append({"customer": customer, "receipt": receipt})
+
+
+class InMemoryEventBus:
+    def __init__(self):
+        self.published = []
+
+    def publish(self, event_type, payload):
+        self.published.append({"type": event_type, "payload": payload})
+
+
+def test_payment_workflow_records_transaction():
+    store = InMemoryTransactionStore()
+    sender = InMemoryReceiptSender()
+    bus = InMemoryEventBus()
+    processor = StoreCreditProcessor()
+
+    workflow = PaymentWorkflow(
+        processor=processor,
+        transaction_store=store,
+        receipt_sender=sender,
+        event_bus=bus,
+    )
+
+    order = Order(id=1, total_cents=5000, customer=Customer(id=1))
+    workflow.execute(order, {})
+
+    assert len(store.transactions) == 1
+    assert store.transactions[0]["fee"] == 0
+    assert store.transactions[0]["method"] == "store_credit"
+
+
+def test_payment_workflow_publishes_event():
+    store = InMemoryTransactionStore()
+    sender = InMemoryReceiptSender()
+    bus = InMemoryEventBus()
+    processor = StoreCreditProcessor()
+
+    workflow = PaymentWorkflow(
+        processor=processor,
+        transaction_store=store,
+        receipt_sender=sender,
+        event_bus=bus,
+    )
+
+    order = Order(id=1, total_cents=5000, customer=Customer(id=1))
+    workflow.execute(order, {})
+
+    assert len(bus.published) == 1
+    assert bus.published[0]["type"] == "payment.completed"
+```
+
+No database. No external service stubs. No mocking framework. No
+setup that must be re-evaluated when an unrelated component changes.
+The in-memory array is as effective as a transactional database for
+verifying the workflow's behavior — because the workflow's contract
+with `TransactionStore` is "call `record` with these arguments." It
+does not care how `record` is implemented. An array, a PostgreSQL
+table, a Redis stream — the workflow behaves identically.
+
+### The canary
+
+The in-memory substitutes work *because the boundary is honored.* The
+workflow interacts with `TransactionStore` through a defined interface
+— `record(order, method, response, fee)` — and never reaches past it.
+
+The moment a design starts to depend on a dependency's internal state,
+the in-memory substitute breaks:
+
+```python
+# This test would fail with InMemoryTransactionStore
+def test_transaction_ordering():
+    store = InMemoryTransactionStore()
+    # ...
+    workflow.execute(order_1, {})
+    workflow.execute(order_2, {})
+
+    # BAD: depending on auto-increment IDs from the store
+    assert store.transactions[1]["id"] > store.transactions[0]["id"]
+
+    # BAD: depending on the store's timestamp behavior
+    assert store.transactions[0]["recorded_at"] < store.transactions[1]["recorded_at"]
+
+    # BAD: depending on the store's deduplication logic
+    workflow.execute(order_1, {})  # same order again
+    assert len(store.transactions) == 2  # expects store to deduplicate
+```
+
+Each of these assertions depends on behavior that belongs to the
+*store's internals* — auto-increment sequencing, timestamp
+generation, deduplication logic. The in-memory array does not
+implement these because they are not part of the contract. The test
+failure is the canary: it signals that the workflow has coupled itself
+to implementation details that it has no business knowing about.
+
+This is why testability is a design signal, not just a testing
+concern. When a test requires elaborate setup, mocked internal state,
+or knowledge of a dependency's implementation to pass, the code under
+test has a boundary violation. The test is not too hard to write —
+the design is too entangled to test.
+
+### Factories and builders
+
+Dependency injection solves the wiring problem — how does the
+`PaymentWorkflow` get its dependencies? In a test, the answer is
+obvious: the test constructs them. In production, the answer is a
+factory:
+
+```python
+class PaymentWorkflowFactory:
+    def __init__(self, config):
+        self.config = config
+
+    def build(self, method: str) -> PaymentWorkflow:
+        processor = PaymentProcessor.for_method(method)
+        return PaymentWorkflow(
+            processor=processor,
+            transaction_store=PostgresTransactionStore(self.config.db_url),
+            receipt_sender=self._build_receipt_sender(),
+            event_bus=RabbitMQEventBus(self.config.amqp_url),
+        )
+
+    def _build_receipt_sender(self):
+        if self.config.receipt_mode == "email":
+            return EmailReceiptSender(self.config.smtp_config)
+        elif self.config.receipt_mode == "sms":
+            return SmsReceiptSender(self.config.twilio_config)
+        return NoOpReceiptSender()
+```
+
+The factory centralizes construction decisions. The workflow does not
+know whether it is talking to PostgreSQL or an in-memory array. It
+does not know whether receipts go by email or SMS. It does not know
+whether events go to RabbitMQ or a test bus. The factory decides, and
+the workflow operates against the contract.
+
+For complex object graphs where construction has multiple steps,
+conditional logic, or shared dependencies, the builder pattern
+provides a fluent construction interface:
+
+```python
+class PaymentWorkflowBuilder:
+    def __init__(self):
+        self._processor = None
+        self._store = None
+        self._sender = None
+        self._bus = None
+
+    def with_processor(self, processor):
+        self._processor = processor
+        return self
+
+    def with_store(self, store):
+        self._store = store
+        return self
+
+    def with_receipt_sender(self, sender):
+        self._sender = sender
+        return self
+
+    def with_event_bus(self, bus):
+        self._bus = bus
+        return self
+
+    def build(self):
+        return PaymentWorkflow(
+            processor=self._processor,
+            transaction_store=self._store or InMemoryTransactionStore(),
+            receipt_sender=self._sender or NoOpReceiptSender(),
+            event_bus=self._bus or NoOpEventBus(),
+        )
+```
+
+The builder makes construction explicit and composable. A test that
+only cares about transaction recording can build a workflow with
+defaults for everything else:
+
+```python
+def test_fee_calculation():
+    store = InMemoryTransactionStore()
+    workflow = (
+        PaymentWorkflowBuilder()
+        .with_processor(CreditCardProcessor())
+        .with_store(store)
+        .build()
+    )
+    order = Order(id=1, total_cents=10000, customer=Customer(id=1))
+    workflow.execute(order, {"card_number": "4111111111111111", "expiry": "12/27", "cvv": "123"})
+
+    assert store.transactions[0]["fee"] == 10000 * 0.029 + 30
+```
+
+### Production-optimized, not test-optimized
+
+The factory and builder patterns are not testing utilities. They are
+production architecture. The factory that wires `PostgresTransaction
+Store` in production and `InMemoryTransactionStore` in tests is the
+same factory that wires `SmsReceiptSender` for one tenant and
+`EmailReceiptSender` for another. The builder that lets tests omit
+irrelevant dependencies is the same builder that lets a background job
+construct a workflow without a receipt sender because the job does not
+send receipts.
+
+The design is production-optimized. The testability is a consequence,
+not a goal. When a system is built from components with explicit
+dependencies and defined contracts, testing becomes simple because
+the design *is* simple — each component does one thing, receives what
+it needs, and is agnostic to how those needs are fulfilled.
+
+This reinforces strict boundaries in a way that no other practice
+does. If a dependency's internal state starts to become part of your
+implementation — if you find yourself checking the database's
+auto-increment counter, or relying on the event bus's ordering
+guarantee, or depending on the receipt sender's retry logic — the
+in-memory substitute surfaces the violation immediately. The test
+fails not because the test is wrong but because the code has reached
+past a boundary.
+
+It also promotes idempotency naturally. When your component receives
+its dependencies rather than reaching for global state, it is less
+tempted to depend on *where* in a sequence it runs. It processes the
+order it is given, records the transaction it is told to record,
+sends the receipt it is told to send. Whether it runs first or last,
+once or twice, in a test or in production — the behavior is the same,
+because the behavior depends only on the inputs and the contracts, not
+on accumulated state in systems it does not control.
+
+Thinking back to the Rails `attr_accessor` pattern: the controller
+that sets five flags before saving a customer is a controller that has
+absorbed knowledge of the model's internal callback orchestration. It
+cannot be tested without reproducing that orchestration. It cannot be
+reasoned about without understanding which flags interact. Every new
+controller that saves a customer must learn the flag protocol —
+which flags to set, in which combination, for which context. The
+complexity grows exponentially with the number of controllers and
+models, because each controller-model pair represents a unique
+configuration of internal state that must be held in the programmer's
+head.
+
+The DI-based design eliminates this entirely. The enrollment workflow
+receives its dependencies. The controller calls the workflow. The
+controller does not know what the workflow does internally — it does
+not set flags, does not suppress callbacks, does not configure
+internal state. It provides inputs and receives outputs. If the
+enrollment workflow changes its internal behavior — adds a new side
+effect, removes an old one, reorders its operations — no controller
+changes. The boundary holds. The contract holds. The system remains
+composable.
+
 ## The living system
 
 There is a qualitative difference between a program that enumerates
