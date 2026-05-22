@@ -612,6 +612,55 @@ teachable through rules. It is developed through practice, through
 getting it wrong and paying the cost, through studying systems that
 got it right and understanding why.
 
+### Encapsulation as entailed consequence
+
+If the preceding assertions are accepted — that boundaries should be
+drawn at natural seams, that contracts should be explicit, that each
+module should maintain internal coherence — then encapsulation is not
+an additional principle to argue for. It is an inescapable consequence
+of those principles taken seriously.
+
+Encapsulation means that only the interface is exposed. The internal
+implementation — the data structures, the algorithms, the helper
+functions, the state management — is private to the boundary. The
+module's consumers interact with the contract and nothing else. This
+is least privilege applied to code architecture: a consumer is given
+access to exactly what it needs (the interface) and nothing more (the
+internals).
+
+The stability advantage is direct. If only interfaces are exposed,
+then internal implementations can be updated, refactored, rewritten,
+or optimized within their own boundaries without risk to consumers.
+The contract holds; the internals change freely. A module can replace
+its database query with a cache lookup, rewrite a recursive algorithm
+as an iterative one, swap a dependency for a faster alternative — none
+of this is visible to the outside, none of it breaks callers, none of
+it requires coordinated changes across the codebase.
+
+The moment a design pushes you to pry open the internals of a
+self-contained module — to reach past its interface and depend on how
+it works rather than what it promises — you are introducing coupling
+where none should exist. This is not a judgment call. It is not a
+trade-off to be evaluated. If the boundary was correctly drawn and the
+contract is sufficient, reaching past it is always wrong. If the
+contract is *not* sufficient — if a consumer genuinely needs something
+the interface does not provide — the correct response is to extend the
+contract, not to bypass it.
+
+This distinction is what makes encapsulation violations qualitatively
+different from other design decisions. Most of the guidance on this
+page involves trade-offs: co-location vs. hierarchy, layered vs.
+hexagonal, when to extract vs. when to inline. Reasonable engineers
+disagree, and the right answer depends on context. Encapsulation is
+not in this category. If the premises hold — boundaries exist,
+contracts are defined, modules maintain internal coherence — then the
+advantages of encapsulation are not a position to be argued. They are
+a certainty that follows from the premises. And the pitfalls of
+violating encapsulation — invisible coupling, fragile dependencies,
+implementations that cannot change without coordinated rewrites — are
+not risks to be weighed. They are consequences that are guaranteed to
+arrive.
+
 ## Boundary violations in practice
 
 Rails is instructive here because its conventions actively shape where
