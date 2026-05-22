@@ -125,6 +125,7 @@ nav:
       - 'Separation of Concerns': handbook/design/separation-of-concerns.md
       - 'Locality': handbook/design/locality.md
       - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
+      - 'A Small Detour: The Metaprogramming Trap': handbook/design/metaprogramming-trap.md
       - 'Value Types': handbook/design/value-types.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
