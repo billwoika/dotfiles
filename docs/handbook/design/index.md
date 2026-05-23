@@ -39,7 +39,8 @@ build is recognizing the difference.
 
 ## Pages
 
-Four pages, each addressing a distinct form of the separation question:
+Five pages and a detour, each addressing a distinct form of the
+separation question:
 
 - **[Separation of Concerns](separation-of-concerns.md)** — the
   foundational vocabulary. What "concerns" means concretely (defined
@@ -52,20 +53,34 @@ Four pages, each addressing a distinct form of the separation question:
   layer, or some hybrid? When does directory structure communicate
   the system's design, and when does it obscure it?
 
-- **[Decoupling Patterns](decoupling-patterns.md)** — the four
-  coupling types an engineer encounters in practice, and the patterns
-  that address each: construction coupling (factories), dependency
-  coupling (dependency injection), boundary coupling (adapters), and
-  variation coupling (strategy). Treated as four facets of one skill
-  rather than four separate topics, because the underlying question
-  is always the same: "this code is coupled to something it shouldn't
-  be coupled to — what kind of coupling is it, and what is the
-  minimum intervention that decouples it?"
+- **[Decoupling Patterns](decoupling-patterns.md)** — the transition
+  from programs that enumerate their behaviors to systems that
+  discover them. Follows a single payment-processing example through
+  its full evolution: from branching to extracted functions, to class
+  hierarchies, to self-registering registries and protocol-based
+  dispatch. Covers factories, dependency injection, and the builder
+  pattern as production architecture that enforces boundaries — with
+  testability as the strongest signal that boundaries are correctly
+  drawn.
+
+- **[A Small Detour: The Metaprogramming Trap](metaprogramming-trap.md)**
+  — an aside on the seduction of metaprogramming. The patterns in
+  Decoupling Patterns make systems adaptive through explicit
+  contracts; metaprogramming makes systems adaptive through implicit
+  magic. The detour examines why the latter is almost always the wrong
+  reach in application code, and why the measure of code quality is
+  not cleverness but whether the team can work with it.
 
 - **[Value Types](value-types.md)** — separation applied to *data*.
-  The problem is stringly-typed code where a string can mean five
-  different things depending on context; the operationalizing concepts
-  include constants, enums, and value objects.
+  The problem is modeling values by what they look like (strings,
+  numbers, floats) rather than how they are used (statuses, IDs,
+  currency). Walks through TypeScript's progression from bare strings
+  to union types, enums, and branded types — with a direct treatment
+  of `as any`, type assertions, and `@ts-ignore` as type-system
+  violations equivalent to disabling CI checks. Covers composite
+  domain types as the mechanism through which domain understanding
+  enters the codebase, and makes the case that typing discipline is
+  where technical craft meets subject-matter expertise.
 
 One page from the original outline has been promoted:
 
@@ -79,8 +94,10 @@ One page from the original outline has been promoted:
 
 If you're encountering these patterns for the first time, the pages
 read in order. Separation of Concerns establishes vocabulary; Locality
-applies it to spatial organization; Decoupling Patterns covers the
-mechanical tools; Value Types applies the thinking to data.
+applies it to spatial organization and boundaries; Decoupling Patterns
+covers the mechanical tools and the design disciplines that enforce
+them; the Metaprogramming Trap is a necessary aside before continuing;
+Value Types applies the thinking to data.
 
 If you already know the patterns, jump to the relevant page directly.
 Each page follows a consistent structure: a concrete problem statement,

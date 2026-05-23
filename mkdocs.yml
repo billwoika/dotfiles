@@ -122,11 +122,13 @@ nav:
     - 'The Case for Code Quality': handbook/code-quality-argument.md
     - 'Design':
       - handbook/design/index.md
-      - 'Separation of Concerns': handbook/design/separation-of-concerns.md
-      - 'Locality': handbook/design/locality.md
-      - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
-      - 'A Small Detour: The Metaprogramming Trap': handbook/design/metaprogramming-trap.md
-      - 'Value Types': handbook/design/value-types.md
+      - 'Foundations':
+        - 'Separation of Concerns': handbook/design/separation-of-concerns.md
+        - 'Locality': handbook/design/locality.md
+      - 'Patterns':
+        - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
+        - 'A Small Detour: The Metaprogramming Trap': handbook/design/metaprogramming-trap.md
+        - 'Value Types': handbook/design/value-types.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
 # Material recommends these for the full feature set; the framework uses
