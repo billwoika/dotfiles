@@ -48,9 +48,11 @@ This is where the architectural decisions live.
 **Shell Environment** covers the full zsh startup chain from
 `~/.zshenv` through `conf.d/` fragments, the POSIX profile that
 serves as the subprocess shim for non-zsh processes, XDG compliance,
-environment variable layering, performance constraints, and the
-strategy for handling tool installers that want to inject lines into
-shell startup files.
+environment variable layering, performance constraints, the strategy
+for handling tool installers that want to inject lines into shell
+startup files, and a command-line techniques reference covering
+piping, redirection, heredocs, grep, sed, awk, xargs, printf, and
+the macOS/Linux coreutils divergences that break shell scripts.
 
 **Tools** documents the framework's positions on mise as a polyglot
 runtime manager, Make as a thin task-runner wrapper, package managers

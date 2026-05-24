@@ -93,6 +93,7 @@ nav:
       - 'Terminal Environment': shell-environment/terminal.md
       - 'Aliases and Functions': shell-environment/aliases.md
       - 'Shell Integration Strategy': shell-environment/integration-strategy.md
+      - 'Command-Line Techniques': shell-environment/command-line-techniques.md
     - 'Tools':
       - tools/index.md
       - 'mise and Make': tools/mise-and-make.md
