@@ -36,7 +36,7 @@ theme:
     - content.code.copy              # Copy button on code blocks
     - content.code.annotate          # Inline code annotations
     - content.tabs.link              # Linked content tabs
-    - content.action.edit            # "Edit this page" link
+    #- content.action.edit            # "Edit this page" link
   palette:
     # Light mode
     - media: "(prefers-color-scheme: light)"
@@ -120,6 +120,7 @@ nav:
     - handbook/index.md
     - 'Git Conventions': handbook/git-conventions.md
     - 'The Case for Code Quality': handbook/code-quality-argument.md
+    - 'Logging': handbook/logging.md
     - 'Design':
       - handbook/design/index.md
       - 'Foundations':

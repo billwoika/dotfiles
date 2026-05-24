@@ -34,17 +34,17 @@ Host github.com-personal
     UseKeychain yes
 
 # ── Work infrastructure examples ────────────────────────────────────
-# The framework uses springbig.internal as the concrete placeholder
+# The framework uses zftadvancements.internal as the concrete placeholder
 # for an internal infrastructure domain — substitute yours when forking.
 
 Host bastion
-    HostName bastion.springbig.internal
+    HostName bastion.zftadvancements.internal
     User your-username
     IdentityFile ~/.ssh/id_ed25519_work
     IdentitiesOnly yes
 
 # Internal hosts accessed via bastion — key stays local, never forwarded.
-Host *.springbig.internal
+Host *.zftadvancements.internal
     User your-username
     IdentityFile ~/.ssh/id_ed25519_work
     IdentitiesOnly yes

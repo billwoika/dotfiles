@@ -47,7 +47,7 @@ and private key and is the only way to distinguish keys years later.
 ```sh
 # Work key
 ssh-keygen -t ed25519 \
-  -C "dev@springbig.com (work, MBP 16\" M4, 2026-04)" \
+  -C "dev@zftadvancements.com (work, MBP 16\" M4, 2026-04)" \
   -f ~/.ssh/id_ed25519_work
 
 # Personal key
@@ -127,13 +127,13 @@ Host github.com-personal
 
 # ── Work infrastructure ──────────────────────────────────────
 Host bastion
-    HostName bastion.springbig.internal
+    HostName bastion.zftadvancements.internal
     User your-username
     IdentityFile ~/.ssh/id_ed25519_work
     IdentitiesOnly yes
 
 # Internal hosts via bastion — no agent forwarding
-Host *.springbig.internal
+Host *.zftadvancements.internal
     User your-username
     IdentityFile ~/.ssh/id_ed25519_work
     IdentitiesOnly yes
@@ -302,10 +302,10 @@ through the correct alias based on repository path.
 
 The end-to-end flow:
 
-1. Clone `~/work/springbig/api` — git sees
+1. Clone `~/work/zftadvancements/api` — git sees
    `includeIf "gitdir:~/work/"`, loads `work.config`
-2. `work.config` rewrites `github.com:springbig/` to
-   `github.com-work:springbig/`
+2. `work.config` rewrites `github.com:zftadvancements/` to
+   `github.com-work:zftadvancements/`
 3. SSH resolves `github.com-work` to `github.com` + work identity file
 4. The correct key is presented; the commit is signed with the work key
 
@@ -316,7 +316,7 @@ For reaching internal hosts through a bastion, **always use
 `ForwardAgent yes`):
 
 ```ssh-config
-Host *.springbig.internal
+Host *.zftadvancements.internal
     ProxyJump bastion
 ```
 

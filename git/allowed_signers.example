@@ -10,9 +10,9 @@
 # .example suffix) and replace the placeholders with your real public
 # keys. Generate each line with:
 #
-#   echo "dev@springbig.com $(cat ~/.ssh/id_ed25519_work.pub)" \
+#   echo "dev@zftadvancements.com $(cat ~/.ssh/id_ed25519_work.pub)" \
 #     >> ~/.config/git/allowed_signers
 # ─────────────────────────────────────────────────────────────────────
 
-dev@springbig.com    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...REPLACE_ME
+dev@zftadvancements.com    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...REPLACE_ME
 you@billwoika.com    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...REPLACE_ME

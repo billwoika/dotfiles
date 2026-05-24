@@ -192,21 +192,21 @@ enough to grep without colliding with unrelated content.
 
 | Placeholder | Substitute with |
 |-------------|-----------------|
-| `springbig` (org name) | Your organization's slug |
-| `springbig.com` (org domain) | Your organization's domain |
-| `springbig.internal` (internal infra) | Your internal-network suffix |
-| `bastion.springbig.internal` | Your bastion host |
+| `zftadvancements` (org name) | Your organization's slug |
+| `zftadvancements.com` (org domain) | Your organization's domain |
+| `zftadvancements.internal` (internal infra) | Your internal-network suffix |
+| `bastion.zftadvancements.internal` | Your bastion host |
 | `billwoika.com` (personal domain) | Your personal domain |
-| `dev@springbig.com` (work email) | Your work email |
+| `dev@zftadvancements.com` (work email) | Your work email |
 | `you@billwoika.com` (personal email) | Your personal email |
 | `your-username` | Your GitHub / SSH username |
 
 A blanket `sed` pass after cloning gets most of the way:
 
 ```sh
-grep -rl 'springbig\|billwoika\|your-username' . | \
+grep -rl 'zftadvancements\|billwoika\|your-username' . | \
   xargs sed -i \
-    -e 's/springbig/your-org/g' \
+    -e 's/zftadvancements/your-org/g' \
     -e 's/billwoika/your-domain/g' \
     -e 's/your-username/your-user/g'
 ```
