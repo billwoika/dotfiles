@@ -5,13 +5,13 @@
 #
 # SETUP: copy this file to ~/.config/git/work.config (drop the .example
 # suffix) and adjust the email, signing key, and GitHub org for your
-# own work setup. The framework's reference values use `springbig`
-# and `springbig.com` as concrete placeholders — substitute your own
+# own work setup. The framework's reference values use `zftadvancements`
+# and `zftadvancements.com` as concrete placeholders — substitute your own
 # org throughout if forking.
 # ─────────────────────────────────────────────────────────────────────
 
 [user]
-    email = dev@springbig.com
+    email = dev@zftadvancements.com
     signingkey = ~/.ssh/id_ed25519_work.pub
 
 [gpg]
@@ -26,9 +26,9 @@
 # ── URL rewrites ────────────────────────────────────────────────────
 # Routes work repositories through the `github.com-work` SSH host alias
 # (see ssh/config), which uses the work identity key.
-[url "git@github.com-work:springbig/"]
-    insteadOf = https://github.com/springbig/
-    insteadOf = git@github.com:springbig/
+[url "git@github.com-work:zftadvancements/"]
+    insteadOf = https://github.com/zftadvancements/
+    insteadOf = git@github.com:zftadvancements/
 
 # Add additional org/user rewrites as needed:
 # [url "git@github.com-work:your-username/"]

@@ -13,7 +13,7 @@ check-cert() {
     openssl x509 -noout -subject -issuer -dates -ext subjectAltName
 }
 # check-cert github.com
-# check-cert internal.springbig.internal:8443
+# check-cert internal.zftadvancements.internal:8443
 
 # ── claude-sync-path: refresh Claude Code settings.json PATH ────────
 # Claude Code spawns subprocesses with a snapshot env; when mise adds new

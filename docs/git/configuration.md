@@ -114,7 +114,7 @@ Keep them short.
 ```ini
 # ~/.config/git/work.config
 [user]
-    email = dev@springbig.com
+    email = dev@zftadvancements.com
     signingkey = ~/.ssh/id_ed25519_work.pub
 
 [gpg]
@@ -125,9 +125,9 @@ Keep them short.
 
 # Work repos use git@github.com-work to route through a work-specific
 # SSH identity (see SSH page for host alias setup).
-[url "git@github.com-work:springbig/"]
-    insteadOf = https://github.com/springbig/
-    insteadOf = git@github.com:springbig/
+[url "git@github.com-work:zftadvancements/"]
+    insteadOf = https://github.com/zftadvancements/
+    insteadOf = git@github.com:zftadvancements/
 ```
 
 ```ini
@@ -179,7 +179,7 @@ The `allowed_signers` file maps email addresses to public keys. Git
 uses it to verify commit signatures:
 
 ```
-dev@springbig.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...
+dev@zftadvancements.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...
 you@billwoika.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...
 ```
 

@@ -100,7 +100,7 @@ exec zsh                         # reload the shell
 4. **Generate SSH keys** (replace placeholders):
    ```sh
    ssh-keygen -t ed25519 \
-     -C "dev@springbig.com (work, $(hostname -s), $(date +%Y-%m))" \
+     -C "dev@zftadvancements.com (work, $(hostname -s), $(date +%Y-%m))" \
      -f ~/.ssh/id_ed25519_work
 
    ssh-keygen -t ed25519 \

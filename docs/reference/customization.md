@@ -8,21 +8,21 @@ enough to grep without colliding with unrelated content.
 
 | Placeholder | Used for | Substitute with |
 |-------------|----------|-----------------|
-| `springbig` | Org name, repo paths, kebab-case identifiers | Your org's slug |
-| `springbig.com` | Email domain, public URLs | Your org's domain |
-| `springbig.internal` | Internal infrastructure suffix | Your internal-network suffix |
-| `bastion.springbig.internal` | Specific bastion host | Your bastion host |
-| `staging-db.springbig.internal` | Specific internal DB host | Your staging DB host |
+| `zftadvancements` | Org name, repo paths, kebab-case identifiers | Your org's slug |
+| `zftadvancements.com` | Email domain, public URLs | Your org's domain |
+| `zftadvancements.internal` | Internal infrastructure suffix | Your internal-network suffix |
+| `bastion.zftadvancements.internal` | Specific bastion host | Your bastion host |
+| `staging-db.zftadvancements.internal` | Specific internal DB host | Your staging DB host |
 | `billwoika.com` | Personal domain | Your personal domain |
-| `dev@springbig.com` | Work email / git identity | Your work email |
+| `dev@zftadvancements.com` | Work email / git identity | Your work email |
 | `you@billwoika.com` | Personal email / git identity | Your personal email |
 | `your-username` | SSH user, GitHub username | Your username |
 
 ## Why these specific strings
 
-Distinctive real strings (`springbig`, `billwoika`) are easier to
+Distinctive real strings (`zftadvancements`, `billwoika`) are easier to
 find-and-replace than generic placeholders precisely because they
-don't collide with anything else. A `sed` pass replacing `springbig`
+don't collide with anything else. A `sed` pass replacing `zftadvancements`
 with `acme` will only touch the framework's placeholder text, not
 something inside an unrelated config or comment.
 
@@ -36,9 +36,9 @@ placeholders is clean.
 A blanket `sed` pass after cloning gets most of the way:
 
 ```sh
-grep -rl 'springbig\|billwoika\|your-username' . | \
+grep -rl 'zftadvancements\|billwoika\|your-username' . | \
   xargs sed -i \
-    -e 's/springbig/your-org/g' \
+    -e 's/zftadvancements/your-org/g' \
     -e 's/billwoika/your-domain/g' \
     -e 's/your-username/your-user/g'
 ```
@@ -47,7 +47,7 @@ Then audit the result:
 
 ```sh
 # Confirm nothing was missed
-grep -rn 'springbig\|billwoika\|your-username' . || echo "Clean."
+grep -rn 'zftadvancements\|billwoika\|your-username' . || echo "Clean."
 ```
 
 ## What's deliberately not parameterized
@@ -60,7 +60,7 @@ variables. The reasoning:
   IDE preview, terminal `less`). Templated variables don't render
   usefully without a build step.
 - **`grep` works.** Finding "where is the org name referenced?" is
-  `grep -r springbig`. Finding "where is `{{ org.name }}` referenced?"
+  `grep -r zftadvancements`. Finding "where is `{{ org.name }}` referenced?"
   works too, but the literal-string version is more concrete.
 - **Substitution is a one-time forking action**, not a per-build step.
   The framework expects you to fork once, customize, then maintain

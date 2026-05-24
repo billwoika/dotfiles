@@ -57,6 +57,11 @@ some pages do it better than others. The shared discipline is:
   friction they impose. Engages the counter-position (that linters block
   deploys over stylistic trivia) honestly and explains where it is right,
   where it is wrong, and where the real value lies.
+- **[Logging](logging.md)** — the case for structured logging as the only
+  reliable form of operational output. Covers twelve-factor log management,
+  the separation between application events and infrastructure routing,
+  distributed tracing via OpenTelemetry, and the vendor lock-in cost of
+  proprietary instrumentation SDKs.
 - **[Design](design/index.md)** — separation as the underlying meta-skill.
   How to decide what code lives together, what code lives apart, and how
   the patterns engineers have named (factories, dependency injection,

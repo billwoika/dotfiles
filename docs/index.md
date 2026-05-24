@@ -1,72 +1,139 @@
+---
+hide:
+  - navigation
+---
+
 # Developer Environment Framework
 
-An opinionated framework for personal development environments — mise-based,
-XDG-compliant, dotfiles-driven, designed to be reproducible across machines
-and honest about its choices.
+An opinionated framework for personal development environments —
+mise-based, XDG-compliant, dotfiles-driven, designed to be
+reproducible across machines and honest about its choices.
+
+Most dotfiles repositories are collections of configuration files with
+a bootstrap script. This framework is that too, but it is also a set
+of documented positions about how a development environment should
+work and why. The dotfiles are the implementation. The documentation
+is the reasoning. Both ship together because the reasoning is what
+makes the implementation coherent rather than arbitrary.
 
 This site is the in-depth reference. For a quick overview and install
-instructions, see the [README](https://github.com/billwoika/dotfiles/blob/master/README.md).
+instructions, see the
+[README](https://github.com/billwoika/dotfiles/blob/master/README.md).
 
 ## What you'll find here
 
-The site is organized into three sections:
+The site is organized into three sections. Each serves a different
+audience and a different purpose.
 
-- **[Reference](reference/index.md)** — start here. Repository
-  structure, onboarding runbook, customization guide, test suite, and
-  troubleshooting. Everything you need to clone, install, and
-  configure the dotfiles.
-- **[Framework](shell-environment/index.md)** — the detailed
-  documentation for every component: shell environment, toolchain
-  (mise, Make, containers, editors), git configuration, and operations
-  (secrets, SSH, networking). Bound to the dotfiles artifact.
-- **[Philosophy](handbook/index.md)** — opinionated arguments about
-  engineering practice and design: separation as a meta-skill, git
-  conventions, value types, platform portability. Rigorous positions,
-  honestly contestable. Decoupled from the dotfiles themselves.
+### [Reference](reference/index.md)
 
-Pages are short, opinionated, and practical. The framework's primary
-contribution is the *coherence* of the choices — every recommendation
-fits with the others, and deviations are flagged as deliberate
-deviations rather than left implicit.
+Start here. The Reference section is the operational manual for the
+dotfiles themselves: repository structure, platform-specific setup
+guides (macOS, Fedora, Debian/Ubuntu), an onboarding runbook that
+takes a fresh machine to a working development environment, the
+customization guide for making the framework your own, the test suite
+that validates POSIX profile compliance, and troubleshooting for when
+things go wrong.
 
-## Three layers, one framework
+If the question is "how do I install this, configure this, or fix
+this," the answer is in Reference. Every page is bound to a specific
+artifact in the repository — a config file, a script, a directory
+structure — and stays current with the code.
 
-!!! note "Layer 1 — the README"
-    Short-form overview, installation instructions, the quick map. About
-    a 15-minute read. If you want to know whether the framework is for
-    you, start there.
+### [Framework](shell-environment/index.md)
 
-!!! info "Layer 2 — this docs site"
-    Three sections: **Reference** (install, configure, troubleshoot),
-    **Framework** (detailed documentation per component), and
-    **Philosophy** (opinionated arguments about engineering practice).
+The detailed documentation for every component the framework manages.
+This is where the architectural decisions live.
 
-!!! tip "Layer 3 — runbooks alongside code"
-    Operational knowledge that's specific to a particular service or
-    deployment doesn't live here — it lives in the project repo that
-    owns those operations. The framework provides patterns; runbooks
-    instantiate them.
+**Shell Environment** covers the full zsh startup chain from
+`~/.zshenv` through `conf.d/` fragments, the POSIX profile that
+serves as the subprocess shim for non-zsh processes, XDG compliance,
+environment variable layering, performance constraints, the strategy
+for handling tool installers that want to inject lines into shell
+startup files, and a command-line techniques reference covering
+piping, redirection, heredocs, grep, sed, awk, xargs, printf, and
+the macOS/Linux coreutils divergences that break shell scripts.
 
-## Stability
+**Tools** documents the framework's positions on mise as a polyglot
+runtime manager, Make as a thin task-runner wrapper, package managers
+(Homebrew, apt, dnf), code quality tooling (linters and formatters
+with the distinction between them), containers and devcontainers,
+editor and IDE configuration, browser developer tools, and database
+and API tooling.
 
-The framework is on its 7th major iteration as of 2026. The recent
-work has been:
+**Git** covers the framework's git configuration (aliases, merge
+strategy, diff tooling) and the tool-enforced practices that keep
+repositories clean: lefthook for pre-commit and pre-push hooks,
+branch protection as policy, and commit hygiene as habit.
 
-- **v2.4** — Container chapter (runtime-agnostic Docker / Podman / OrbStack)
-- **v2.5** — Make as a thin wrapper around mise tasks
-- **v2.6** — Editor and IDE chapter (50+ pages covering VS Code, JetBrains,
-  the IDE-spawned subprocess problem, debugging, LSP, source control, DDL)
-- **v2.7** — Tool-enforced git practices (lefthook, branch protection),
-  migration to MkDocs (this site)
+**Operations** addresses the infrastructure layer: secrets management,
+SSH and key management, and networking (VPN, DNS, container
+networking, proxy and traffic capture).
 
-Older versions are preserved as Word document snapshots in the
-[archive directory](https://github.com/billwoika/dotfiles/tree/master/archive)
-of the repo.
+Each page explains not just the what but the why — the trade-offs
+considered, the alternatives rejected, and the conditions under which
+the framework's choice would be wrong.
+
+### [Philosophy](handbook/index.md)
+
+Opinionated arguments about engineering practice and design, decoupled
+from the dotfiles themselves. These pages are the framework's
+positions on how software should be built, not how a development
+environment should be configured.
+
+**Git Conventions** makes the case for specific commit, branching, and
+review practices — not as rules to memorize but as habits that
+compound over the life of a codebase.
+
+**The Case for Code Quality** argues that linting and formatting are
+not style preferences but engineering practices with measurable
+returns, and draws the distinction between the two.
+
+**Logging** makes the case that structured logging is the only
+reliable form of operational output. Covers twelve-factor log
+management (application writes to stdout, infrastructure routes),
+trace ID generation and hierarchical correlation, enumerated event
+types and named exceptions, PII redaction discipline, distributed
+tracing via OpenTelemetry, and the vendor lock-in cost of
+proprietary instrumentation SDKs.
+
+**Design** is the largest section in the handbook, organized around a
+single underlying question asked at multiple scales: *what code
+belongs together, and what code belongs apart?*
+
+The Design section is split into two parts. **Foundations** covers
+Separation of Concerns (the vocabulary of change-drivers, god
+classes, and the cost of both entangled code and premature
+separation) and Locality (file organization strategies, boundaries
+and contracts, the discipline that makes any strategy work, and
+encapsulation as an entailed consequence of sound boundary design).
+**Patterns** covers Decoupling Patterns (the evolution from
+enumerating behaviors to discovering them — registries, factories,
+dependency injection, and the builder pattern as production
+architecture with testability as the diagnostic signal), a detour
+into the Metaprogramming Trap (why implicit magic is almost always
+the wrong reach in application code), and Value Types (modeling data
+by how it is used rather than what it looks like, TypeScript's type
+system as a contract that must be honored, and domain expertise as
+the foundation of typing discipline).
+
+Every position acknowledges where it is wrong. The framework's stance
+is that patterns are tools to be evaluated, not orthodoxies to be
+defended — opinionated, but more interested in helping the reader
+decide than in declaring what is correct.
+
+## How this site is built
+
+The documentation is a [MkDocs](https://www.mkdocs.org/) site using
+the [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
+theme. The source lives in the `docs/` directory of the
+[dotfiles repository](https://github.com/billwoika/dotfiles). The
+site builds and deploys automatically on push to `master`.
 
 ## License
 
 [GPLv3-or-later](https://www.gnu.org/licenses/gpl-3.0.html).
-Copyright © 2026 Bill Woika.
+Copyright 2026 Bill Woika.
 
 GPLv3 was chosen deliberately. Internal use within an organization is
 unrestricted; distribution of derivatives requires preserving the same

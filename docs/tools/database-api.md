@@ -73,7 +73,7 @@ environment *without secrets*:
 - Password: `app` (compose.yml; not a secret)
 
 ### Staging
-- Host:     staging-db.springbig.internal (via bastion)
+- Host:     staging-db.zftadvancements.internal (via bastion)
 - Password: `op://eng/Staging DB/password`
 ```
 

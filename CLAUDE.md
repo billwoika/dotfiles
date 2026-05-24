@@ -55,7 +55,7 @@ Every content push must pass: `mkdocs build --strict`, `zsh -n` on all zsh files
 
 ## Placeholder convention
 
-Distinctive real strings as placeholders — `springbig`, `billwoika.com`, etc. Fork the framework with a single `sed` pass. Full table in `docs/reference/customization.md`. Do not use Jinja templating or generic placeholders.
+Distinctive real strings as placeholders — `zftadvancements`, `billwoika.com`, etc. Fork the framework with a single `sed` pass. Full table in `docs/reference/customization.md`. Do not use Jinja templating or generic placeholders.
 
 ## Formatting
 

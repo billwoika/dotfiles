@@ -96,7 +96,7 @@ This installs the tools declared in `~/.config/mise/config.toml`.
 ```sh
 # Work key
 ssh-keygen -t ed25519 \
-  -C "dev@springbig.com (work, $(hostname), $(date +%Y-%m))" \
+  -C "dev@zftadvancements.com (work, $(hostname), $(date +%Y-%m))" \
   -f ~/.ssh/id_ed25519_work
 
 # Personal key
