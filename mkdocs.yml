@@ -124,6 +124,7 @@ nav:
     - 'Logging': handbook/logging.md
     - 'Tactical Posture': handbook/tactical-posture.md
     - 'The Layers': handbook/layers.md
+    - 'Testing': handbook/testing.md
     - 'Design':
       - handbook/design/index.md
       - 'Foundations':
