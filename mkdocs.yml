@@ -122,6 +122,7 @@ nav:
     - 'Git Conventions': handbook/git-conventions.md
     - 'The Case for Code Quality': handbook/code-quality-argument.md
     - 'Logging': handbook/logging.md
+    - 'Tactical Posture': handbook/tactical-posture.md
     - 'Design':
       - handbook/design/index.md
       - 'Foundations':

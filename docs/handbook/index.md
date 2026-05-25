@@ -62,6 +62,12 @@ some pages do it better than others. The shared discipline is:
   the separation between application events and infrastructure routing,
   distributed tracing via OpenTelemetry, and the vendor lock-in cost of
   proprietary instrumentation SDKs.
+- **[Tactical Posture](tactical-posture.md)** — how to approach a codebase:
+  understanding the global context before making local changes, the
+  propagation problem (code spreads and its damage compounds silently),
+  the one-liner illusion, the refactoring trap, and why understanding the
+  superstructure — the business, the users, the contracts — is what
+  separates engineers from linters.
 - **[Design](design/index.md)** — separation as the underlying meta-skill.
   How to decide what code lives together, what code lives apart, and how
   the patterns engineers have named (factories, dependency injection,
