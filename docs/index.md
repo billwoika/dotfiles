@@ -97,6 +97,15 @@ types and named exceptions, PII redaction discipline, distributed
 tracing via OpenTelemetry, and the vendor lock-in cost of
 proprietary instrumentation SDKs.
 
+**Tactical Posture** addresses how to approach a codebase — the habit
+of understanding global context before making local changes. Covers
+the propagation problem (code spreads and its damage compounds
+silently over time), the one-liner illusion (textual size is not
+behavioral size), the refactoring trap (fixing everything at once
+instead of scoping to what is needed), and the superstructure beyond
+the code: the business vertical, the user expectations, and the
+contracts that the codebase serves.
+
 **Design** is the largest section in the handbook, organized around a
 single underlying question asked at multiple scales: *what code
 belongs together, and what code belongs apart?*

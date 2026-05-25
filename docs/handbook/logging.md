@@ -97,8 +97,8 @@ interpolated values that must be parsed with regex to extract fields.
 # Wrong: unstructured, unparseable
 logger.info(f"Enrolled customer {customer_id} in {duration}ms")
 
-# Right: structured, queryable
-logger.info("enrollment.completed", extra={
+# Right: structured, queryable, event is a symbol from a known set
+logger.info(Event.ENROLLMENT_COMPLETED, extra={
     "customer_id": customer_id,
     "duration_ms": duration,
     "tenant_id": tenant_id,
@@ -109,9 +109,9 @@ logger.info("enrollment.completed", extra={
 # Wrong
 Rails.logger.info "Processing payment for order #{order.id}"
 
-# Right
+# Right: event name is a constant, not an arbitrary string
 Rails.logger.info({
-  event: "payment.processing",
+  event: Events::PAYMENT_PROCESSING,
   order_id: order.id,
   amount_cents: order.total_cents,
   method: payment_method,
@@ -123,9 +123,9 @@ Rails.logger.info({
 // Wrong
 console.log(`User ${userId} logged in`)
 
-// Right
+// Right: event is an enum member, not a string literal
 logger.info({
-  event: "user.authenticated",
+  event: Event.UserAuthenticated,
   userId,
   method: "oauth",
   provider: "google",
@@ -297,7 +297,7 @@ structlog.configure(
 )
 
 logger = structlog.get_logger()
-logger.info("enrollment.completed", customer_id=4821, duration_ms=47)
+logger.info(Event.ENROLLMENT_COMPLETED, customer_id=4821, duration_ms=47)
 ```
 
 The application emits a JSON line to stdout. It does not know whether
@@ -502,7 +502,7 @@ def enroll_customer(customer_id, tenant_id):
         reference_id = str(uuid.uuid4())[:8]
 
         logger.error(
-            "enrollment.failed",
+            Event.ENROLLMENT_FAILED,
             customer_id=customer_id,
             tenant_id=tenant_id,
             error_class=type(exc).__name__,
@@ -557,7 +557,15 @@ logs `enrollment_error`, a third logs `enroll.fail`. All three mean
 the same thing. A dashboard counting enrollment failures misses two
 of the three.
 
-Predefined event types eliminate this:
+Predefined event types eliminate this. Event names are **symbols** —
+members of a known, finite set — not arbitrary strings. They are
+enums, constants, or symbols depending on the language. The
+distinction matters: a string is unbounded (any sequence of
+characters is valid), while a symbol is constrained (only the
+declared members exist). The type system enforces the constraint,
+the compiler or linter catches a misspelling, and the set of valid
+events is discoverable by reading one definition rather than
+grepping the entire codebase.
 
 ```python
 from enum import StrEnum
@@ -578,13 +586,48 @@ class Event(StrEnum):
 logger.info(Event.ENROLLMENT_COMPLETED, customer_id=4821, duration_ms=47)
 ```
 
+```ruby
+module Events
+  REQUEST_RECEIVED    = "request.received"
+  ENROLLMENT_STARTED  = "enrollment.started"
+  ENROLLMENT_COMPLETED = "enrollment.completed"
+  ENROLLMENT_FAILED   = "enrollment.failed"
+  PAYMENT_PROCESSING  = "payment.processing"
+  PAYMENT_COMPLETED   = "payment.completed"
+  PAYMENT_FAILED      = "payment.failed"
+end
+
+Rails.logger.info({ event: Events::ENROLLMENT_COMPLETED, customer_id: 4821 }.to_json)
+```
+
+```typescript
+enum Event {
+  RequestReceived = "request.received",
+  EnrollmentStarted = "enrollment.started",
+  EnrollmentCompleted = "enrollment.completed",
+  EnrollmentFailed = "enrollment.failed",
+  PaymentInitiated = "payment.initiated",
+  PaymentCompleted = "payment.completed",
+  PaymentFailed = "payment.failed",
+  UserAuthenticated = "user.authenticated",
+}
+
+logger.info({ event: Event.EnrollmentCompleted, customerId: 4821, durationMs: 47 })
+```
+
 The event vocabulary is centralized, greppable, and enforced by the
-type system. An engineer cannot invent a new event name at a call
-site — they add it to the enum, which makes the addition visible in
-code review and discoverable by anyone building a dashboard or alert.
-If the enum does not have an event for what just happened, that is a
-signal: either the event should be added (a deliberate, reviewed
-decision) or it does not warrant a log entry.
+type system in every language. An engineer cannot invent a new event
+name at a call site — they add it to the enum, which makes the
+addition visible in code review and discoverable by anyone building
+a dashboard or alert. If the enum does not have an event for what
+just happened, that is a signal: either the event should be added
+(a deliberate, reviewed decision) or it does not warrant a log entry.
+
+The same principle from the [Value Types](design/value-types.md) page
+applies here: an event name is not a string. It is a member of a
+known set. Treating it as a string — passing `"enrollment.completed"`
+as a bare literal at the call site — reintroduces the same class of
+typo and inconsistency bugs that the enum was meant to eliminate.
 
 ### Enumerated exceptions
 
