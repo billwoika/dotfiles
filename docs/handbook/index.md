@@ -106,6 +106,12 @@ some pages do it better than others. The shared discipline is:
   tautology problem, the testing hierarchy, RSpec pitfalls, coverage
   thresholds, and time-dependent heisentests.
 
+- **[Technical Debt](technical-debt.md)** — what technical debt
+  actually is (and what it is not). Three forms: deliberate trade-offs,
+  entropy, and ignorance. How to make the business case for addressing
+  it, the spreadsheet test for whether the argument is ready, and when
+  the rational decision is to let debt ride.
+
 - **[Git Conventions](git-conventions.md)** — commit message style, PR
   conventions, branching strategy, code review etiquette, and mistake
   recovery.

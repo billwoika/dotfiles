@@ -77,7 +77,7 @@ the framework's choice would be wrong.
 ### [Philosophy](handbook/index.md)
 
 Opinionated arguments about engineering practice and design, decoupled
-from the dotfiles themselves. Twelve pages covering how to think about
+from the dotfiles themselves. Thirteen pages covering how to think about
 software — not how to configure a development environment.
 
 **Tactical Posture** addresses how to approach a codebase: understand
@@ -127,6 +127,13 @@ vendor lock-in.
 maintaining. Contract enforcement, the tautology problem, the testing
 hierarchy, RSpec pitfalls, coverage thresholds, and time-dependent
 heisentests.
+
+**Technical Debt** defines what the term actually means — and what it
+does not. Three forms of real debt (deliberate trade-offs, entropy,
+ignorance) distinguished from the fourth thing that gets called debt
+but is actually a design preference. Covers how to make the business
+case in the language of cost, risk, and opportunity, and when the
+rational decision is to accept the debt rather than repay it.
 
 **Git Conventions** covers commit style, PR conventions, branching
 strategy, code review, and mistake recovery.
