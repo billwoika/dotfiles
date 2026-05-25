@@ -130,6 +130,7 @@ nav:
     - 'The Case for Code Quality': handbook/code-quality-argument.md
     - 'Logging': handbook/logging.md
     - 'Testing': handbook/testing.md
+    - 'Technical Debt': handbook/technical-debt.md
     - 'Git Conventions': handbook/git-conventions.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
