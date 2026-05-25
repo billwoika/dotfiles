@@ -47,43 +47,68 @@ some pages do it better than others. The shared discipline is:
   primarily, with Node where it illustrates a pattern better. No
   pseudocode, no contrived `Square extends Shape` examples.
 
-## Sections
+## Pages
+
+- **[Tactical Posture](tactical-posture.md)** — how to approach a
+  codebase: understanding the global context before making local changes,
+  the propagation problem (code spreads and its damage compounds
+  silently), the one-liner illusion, the refactoring trap, and why
+  understanding the superstructure — the business, the users, the
+  contracts — is what separates engineers from linters.
+
+- **[The Layers](layers.md)** — an illustrative five-layer model
+  (infrastructure, data, application logic, presentation, observability)
+  for thinking about software systems. Covers dependency direction,
+  blast radius, the data layer's coupling to infrastructure, and the
+  industry's flattening of layers through managed services and
+  database-as-API products.
+
+- **[Design Principles](design/index.md)** — the framework's position
+  that patterns are tools, not goods, and the meta-skill of recognizing
+  which kind of separation problem you are facing.
+
+- **[Separation of Concerns](design/separation-of-concerns.md)** — the
+  foundational vocabulary. What "concerns" means concretely, how mixed
+  concerns produce god classes, and the equally important cost of
+  premature separation.
+
+- **[Locality](design/locality.md)** — separation in space. File
+  organization strategies, boundaries and contracts, encapsulation as
+  an entailed consequence, and boundary violations in Rails.
+
+- **[Decoupling Patterns](design/decoupling-patterns.md)** — the
+  transition from programs that enumerate their behaviors to systems
+  that discover them. Registries, factories, dependency injection, and
+  the builder pattern as production architecture — with testability as
+  the strongest signal that boundaries are correctly drawn.
+
+- **[A Small Detour: The Metaprogramming Trap](design/metaprogramming-trap.md)**
+  — the seduction of metaprogramming, why implicit magic is almost
+  always the wrong reach in application code, and why the measure of
+  code quality is not cleverness but whether the team can work with it.
+
+- **[Value Types](design/value-types.md)** — modeling values by how
+  they are used rather than what they look like. TypeScript's type system
+  as a contract, escape hatches as type-system violations, and domain
+  expertise as the foundation of typing discipline.
+
+- **[The Case for Code Quality](code-quality-argument.md)** — why
+  automated formatting, linting, and static type checking are worth the
+  friction they impose.
+
+- **[Logging](logging.md)** — structured logging as the only reliable
+  form of operational output. Twelve-factor log management, trace ID
+  generation, enumerated events, PII redaction, distributed tracing
+  via OpenTelemetry, and vendor lock-in.
+
+- **[Testing](testing.md)** — an honest treatment of testing as
+  ceremony worth maintaining. Tests as contract enforcers, the
+  tautology problem, the testing hierarchy, RSpec pitfalls, coverage
+  thresholds, and time-dependent heisentests.
 
 - **[Git Conventions](git-conventions.md)** — commit message style, PR
   conventions, branching strategy, code review etiquette, and mistake
-  recovery. The norms that tools can't enforce and teams must adopt.
-- **[The Case for Code Quality](code-quality-argument.md)** — why
-  automated formatting, linting, and static type checking are worth the
-  friction they impose. Engages the counter-position (that linters block
-  deploys over stylistic trivia) honestly and explains where it is right,
-  where it is wrong, and where the real value lies.
-- **[Logging](logging.md)** — the case for structured logging as the only
-  reliable form of operational output. Covers twelve-factor log management,
-  the separation between application events and infrastructure routing,
-  distributed tracing via OpenTelemetry, and the vendor lock-in cost of
-  proprietary instrumentation SDKs.
-- **[Tactical Posture](tactical-posture.md)** — how to approach a codebase:
-  understanding the global context before making local changes, the
-  propagation problem (code spreads and its damage compounds silently),
-  the one-liner illusion, the refactoring trap, and why understanding the
-  superstructure — the business, the users, the contracts — is what
-  separates engineers from linters.
-- **[The Layers](layers.md)** — an illustrative five-layer model
-  (infrastructure, data, application logic, presentation, observability)
-  for thinking about software systems. Covers dependency direction, blast
-  radius, and the industry's flattening of layers through managed services
-  and database-as-API products — the commercial incentives behind the
-  flattening and the coupling it reintroduces.
-- **[Testing](testing.md)** — an honest treatment of testing as ceremony
-  worth maintaining. Tests as contract enforcers, the tautology problem,
-  what makes a test useful, the testing hierarchy (unit, integration, e2e)
-  with frank assessments of each level's failure modes. Includes an
-  RSpec-specific pitfalls guide covering context nesting, before blocks,
-  let vs. create, subject misuse, collection matchers, and Sidekiq testing.
-- **[Design](design/index.md)** — separation as the underlying meta-skill.
-  How to decide what code lives together, what code lives apart, and how
-  the patterns engineers have named (factories, dependency injection,
-  adapters) are answers to specific separation problems.
+  recovery.
 
 ## What's deliberately not here
 

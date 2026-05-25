@@ -77,71 +77,59 @@ the framework's choice would be wrong.
 ### [Philosophy](handbook/index.md)
 
 Opinionated arguments about engineering practice and design, decoupled
-from the dotfiles themselves. These pages are the framework's
-positions on how software should be built, not how a development
-environment should be configured.
+from the dotfiles themselves. Twelve pages covering how to think about
+software — not how to configure a development environment.
 
-**Git Conventions** makes the case for specific commit, branching, and
-review practices — not as rules to memorize but as habits that
-compound over the life of a codebase.
+**Tactical Posture** addresses how to approach a codebase: understand
+the global context before making the local change. The propagation
+problem, the one-liner illusion, the refactoring trap, and why
+understanding the superstructure — the business, the users, the
+contracts — is what separates engineers from linters.
+
+**The Layers** presents an illustrative five-layer model
+(infrastructure, data, application logic, presentation,
+observability) for reasoning about software systems. Dependency
+direction and blast radius, the data layer's coupling to
+infrastructure (including the `AT TIME ZONE` inversion between
+PostgreSQL and Redshift), the document store validation problem, and
+the industry's flattening of layers through managed services and
+database-as-API products.
+
+**Design Principles** establishes the framework's position that
+patterns are tools, not goods — and that the meta-skill is
+recognizing which kind of separation problem you are facing.
+Five pages follow, each addressing a distinct form of the question
+*what code belongs together, and what code belongs apart?*
+
+- **Separation of Concerns** — change-drivers, god classes, the cost
+  of entangled code and premature separation.
+- **Locality** — file organization, boundaries and contracts,
+  encapsulation, boundary violations in Rails.
+- **Decoupling Patterns** — registries, factories, dependency
+  injection, the builder pattern, testability as the diagnostic
+  signal.
+- **The Metaprogramming Trap** — why implicit magic is the wrong
+  reach in application code, and why the measure of quality is
+  whether the team can work with it.
+- **Value Types** — modeling values by usage not representation,
+  TypeScript's type system as a contract, domain expertise as the
+  foundation of typing discipline.
 
 **The Case for Code Quality** argues that linting and formatting are
-not style preferences but engineering practices with measurable
-returns, and draws the distinction between the two.
+engineering practices with measurable returns, not style preferences.
 
-**Logging** makes the case that structured logging is the only
-reliable form of operational output. Covers twelve-factor log
-management (application writes to stdout, infrastructure routes),
-trace ID generation and hierarchical correlation, enumerated event
-types and named exceptions, PII redaction discipline, distributed
-tracing via OpenTelemetry, and the vendor lock-in cost of
-proprietary instrumentation SDKs.
+**Logging** covers structured logging as the only reliable operational
+output. Twelve-factor log management, trace ID generation, enumerated
+events, PII redaction, distributed tracing via OpenTelemetry, and
+vendor lock-in.
 
-**Tactical Posture** addresses how to approach a codebase — the habit
-of understanding global context before making local changes. Covers
-the propagation problem (code spreads and its damage compounds
-silently over time), the one-liner illusion (textual size is not
-behavioral size), the refactoring trap (fixing everything at once
-instead of scoping to what is needed), and the superstructure beyond
-the code: the business vertical, the user expectations, and the
-contracts that the codebase serves.
+**Testing** is an honest treatment of testing as ceremony worth
+maintaining. Contract enforcement, the tautology problem, the testing
+hierarchy, RSpec pitfalls, coverage thresholds, and time-dependent
+heisentests.
 
-**The Layers** presents an illustrative five-layer model for thinking
-about software systems — infrastructure, data, application logic,
-presentation, and observability. Examines how dependency direction
-determines blast radius, how the industry has systematically
-flattened layers through managed services and database-as-API
-products (Prisma, Firebase, MongoDB), and why the commercial
-incentive to minimize time-to-first-feature often reintroduces the
-coupling that layers were designed to prevent.
-
-**Testing** is an honest treatment of testing as necessary ceremony.
-Covers tests as contract enforcers (not coverage metrics), the
-tautology problem (tests that assert what was just constructed), the
-testing hierarchy with frank assessments of each level's failure
-modes, and an RSpec-specific pitfalls guide covering context nesting,
-invisible setup, lazy evaluation traps, collection matcher selection,
-and async job testing.
-
-**Design** is the largest section in the handbook, organized around a
-single underlying question asked at multiple scales: *what code
-belongs together, and what code belongs apart?*
-
-The Design section is split into two parts. **Foundations** covers
-Separation of Concerns (the vocabulary of change-drivers, god
-classes, and the cost of both entangled code and premature
-separation) and Locality (file organization strategies, boundaries
-and contracts, the discipline that makes any strategy work, and
-encapsulation as an entailed consequence of sound boundary design).
-**Patterns** covers Decoupling Patterns (the evolution from
-enumerating behaviors to discovering them — registries, factories,
-dependency injection, and the builder pattern as production
-architecture with testability as the diagnostic signal), a detour
-into the Metaprogramming Trap (why implicit magic is almost always
-the wrong reach in application code), and Value Types (modeling data
-by how it is used rather than what it looks like, TypeScript's type
-system as a contract that must be honored, and domain expertise as
-the foundation of typing discipline).
+**Git Conventions** covers commit style, PR conventions, branching
+strategy, code review, and mistake recovery.
 
 Every position acknowledges where it is wrong. The framework's stance
 is that patterns are tools to be evaluated, not orthodoxies to be
