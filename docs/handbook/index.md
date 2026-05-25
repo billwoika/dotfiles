@@ -74,6 +74,12 @@ some pages do it better than others. The shared discipline is:
   radius, and the industry's flattening of layers through managed services
   and database-as-API products — the commercial incentives behind the
   flattening and the coupling it reintroduces.
+- **[Testing](testing.md)** — an honest treatment of testing as ceremony
+  worth maintaining. Tests as contract enforcers, the tautology problem,
+  what makes a test useful, the testing hierarchy (unit, integration, e2e)
+  with frank assessments of each level's failure modes. Includes an
+  RSpec-specific pitfalls guide covering context nesting, before blocks,
+  let vs. create, subject misuse, collection matchers, and Sidekiq testing.
 - **[Design](design/index.md)** — separation as the underlying meta-skill.
   How to decide what code lives together, what code lives apart, and how
   the patterns engineers have named (factories, dependency injection,

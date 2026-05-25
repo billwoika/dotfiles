@@ -115,6 +115,14 @@ products (Prisma, Firebase, MongoDB), and why the commercial
 incentive to minimize time-to-first-feature often reintroduces the
 coupling that layers were designed to prevent.
 
+**Testing** is an honest treatment of testing as necessary ceremony.
+Covers tests as contract enforcers (not coverage metrics), the
+tautology problem (tests that assert what was just constructed), the
+testing hierarchy with frank assessments of each level's failure
+modes, and an RSpec-specific pitfalls guide covering context nesting,
+invisible setup, lazy evaluation traps, collection matcher selection,
+and async job testing.
+
 **Design** is the largest section in the handbook, organized around a
 single underlying question asked at multiple scales: *what code
 belongs together, and what code belongs apart?*
