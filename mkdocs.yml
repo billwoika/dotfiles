@@ -119,21 +119,18 @@ nav:
         - 'Proxy and Traffic Capture': operations/proxy-and-capture.md
   - Philosophy:
     - handbook/index.md
-    - 'Git Conventions': handbook/git-conventions.md
-    - 'The Case for Code Quality': handbook/code-quality-argument.md
-    - 'Logging': handbook/logging.md
     - 'Tactical Posture': handbook/tactical-posture.md
     - 'The Layers': handbook/layers.md
+    - 'Design Principles': handbook/design/index.md
+    - 'Separation of Concerns': handbook/design/separation-of-concerns.md
+    - 'Locality': handbook/design/locality.md
+    - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
+    - 'A Small Detour: The Metaprogramming Trap': handbook/design/metaprogramming-trap.md
+    - 'Value Types': handbook/design/value-types.md
+    - 'The Case for Code Quality': handbook/code-quality-argument.md
+    - 'Logging': handbook/logging.md
     - 'Testing': handbook/testing.md
-    - 'Design':
-      - handbook/design/index.md
-      - 'Foundations':
-        - 'Separation of Concerns': handbook/design/separation-of-concerns.md
-        - 'Locality': handbook/design/locality.md
-      - 'Patterns':
-        - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
-        - 'A Small Detour: The Metaprogramming Trap': handbook/design/metaprogramming-trap.md
-        - 'Value Types': handbook/design/value-types.md
+    - 'Git Conventions': handbook/git-conventions.md
 
 # ── Markdown extensions ───────────────────────────────────────────────────
 # Material recommends these for the full feature set; the framework uses
