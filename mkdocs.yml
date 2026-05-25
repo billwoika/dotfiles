@@ -123,6 +123,7 @@ nav:
     - 'The Case for Code Quality': handbook/code-quality-argument.md
     - 'Logging': handbook/logging.md
     - 'Tactical Posture': handbook/tactical-posture.md
+    - 'The Layers': handbook/layers.md
     - 'Design':
       - handbook/design/index.md
       - 'Foundations':

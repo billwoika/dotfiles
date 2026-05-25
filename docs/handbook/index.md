@@ -68,6 +68,12 @@ some pages do it better than others. The shared discipline is:
   the one-liner illusion, the refactoring trap, and why understanding the
   superstructure — the business, the users, the contracts — is what
   separates engineers from linters.
+- **[The Layers](layers.md)** — an illustrative five-layer model
+  (infrastructure, data, application logic, presentation, observability)
+  for thinking about software systems. Covers dependency direction, blast
+  radius, and the industry's flattening of layers through managed services
+  and database-as-API products — the commercial incentives behind the
+  flattening and the coupling it reintroduces.
 - **[Design](design/index.md)** — separation as the underlying meta-skill.
   How to decide what code lives together, what code lives apart, and how
   the patterns engineers have named (factories, dependency injection,

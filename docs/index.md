@@ -106,6 +106,15 @@ instead of scoping to what is needed), and the superstructure beyond
 the code: the business vertical, the user expectations, and the
 contracts that the codebase serves.
 
+**The Layers** presents an illustrative five-layer model for thinking
+about software systems — infrastructure, data, application logic,
+presentation, and observability. Examines how dependency direction
+determines blast radius, how the industry has systematically
+flattened layers through managed services and database-as-API
+products (Prisma, Firebase, MongoDB), and why the commercial
+incentive to minimize time-to-first-feature often reintroduces the
+coupling that layers were designed to prevent.
+
 **Design** is the largest section in the handbook, organized around a
 single underlying question asked at multiple scales: *what code
 belongs together, and what code belongs apart?*
