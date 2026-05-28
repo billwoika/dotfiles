@@ -77,7 +77,7 @@ the framework's choice would be wrong.
 ### [Philosophy](handbook/index.md)
 
 Opinionated arguments about engineering practice and design, decoupled
-from the dotfiles themselves. Thirteen pages covering how to think about
+from the dotfiles themselves. Fourteen pages covering how to think about
 software — not how to configure a development environment.
 
 **Tactical Posture** addresses how to approach a codebase: understand
@@ -114,6 +114,16 @@ Five pages follow, each addressing a distinct form of the question
 - **Value Types** — modeling values by usage not representation,
   TypeScript's type system as a contract, domain expertise as the
   foundation of typing discipline.
+
+**The Case Against Least Privilege** is a deliberately heterodox
+argument that the principle of least privilege as practiced today
+produces the opposite of its intended outcome. The implementation has
+drifted from restricting write access to production systems (where the
+risk lives) to restricting read access to everything (where the cost
+is invisible). Knowledge silos, organizational amnesia, the IAM
+paradox, and the elitist architecture that results when the people who
+design access policies give themselves all access and do not
+experience the friction they impose on everyone else.
 
 **The Case for Code Quality** argues that linting and formatting are
 engineering practices with measurable returns, not style preferences.

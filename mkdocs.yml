@@ -127,6 +127,7 @@ nav:
     - 'Decoupling Patterns': handbook/design/decoupling-patterns.md
     - 'A Small Detour: The Metaprogramming Trap': handbook/design/metaprogramming-trap.md
     - 'Value Types': handbook/design/value-types.md
+    - 'The Case Against Least Privilege': handbook/least-privilege.md
     - 'The Case for Code Quality': handbook/code-quality-argument.md
     - 'Logging': handbook/logging.md
     - 'Testing': handbook/testing.md

@@ -92,6 +92,14 @@ some pages do it better than others. The shared discipline is:
   as a contract, escape hatches as type-system violations, and domain
   expertise as the foundation of typing discipline.
 
+- **[The Case Against Least Privilege](least-privilege.md)** — a
+  deliberately heterodox argument that the principle of least privilege
+  as practiced in most organizations today produces the opposite of its
+  intended outcome. Knowledge silos, organizational amnesia, growth
+  suppression, and the IAM paradox — where engineers cannot even
+  articulate what they need access to because the information required
+  to describe the request is itself gated behind access controls.
+
 - **[The Case for Code Quality](code-quality-argument.md)** — why
   automated formatting, linting, and static type checking are worth the
   friction they impose.
