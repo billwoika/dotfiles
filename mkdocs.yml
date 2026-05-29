@@ -129,8 +129,10 @@ nav:
     - 'Value Types': handbook/design/value-types.md
     - 'The Case Against Least Privilege': handbook/least-privilege.md
     - 'The Case for Code Quality': handbook/code-quality-argument.md
+    - 'Error Handling': handbook/error-handling.md
     - 'Logging': handbook/logging.md
     - 'Testing': handbook/testing.md
+    - 'Code Review': handbook/code-review.md
     - 'Technical Debt': handbook/technical-debt.md
     - 'Git Conventions': handbook/git-conventions.md
 
