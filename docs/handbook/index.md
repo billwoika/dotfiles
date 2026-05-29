@@ -104,6 +104,15 @@ some pages do it better than others. The shared discipline is:
   automated formatting, linting, and static type checking are worth the
   friction they impose.
 
+- **[Error Handling](error-handling.md)** — errors and exceptions as
+  the highest-priority signal in the system. Catch quickly, present
+  appropriately: blocking errors get human-friendly messages and
+  support references, non-blocking errors are absorbed and reported
+  internally. Fail fast vs graceful degradation, error boundaries by
+  architectural layer, the exception vs return-value debate, the
+  swallowed-error anti-pattern, and alert fatigue — the compounding
+  cost of noise that lets real failures hide in plain sight.
+
 - **[Logging](logging.md)** — structured logging as the only reliable
   form of operational output. Twelve-factor log management, trace ID
   generation, enumerated events, PII redaction, distributed tracing
@@ -113,6 +122,16 @@ some pages do it better than others. The shared discipline is:
   ceremony worth maintaining. Tests as contract enforcers, the
   tautology problem, the testing hierarchy, RSpec pitfalls, coverage
   thresholds, and time-dependent heisentests.
+
+- **[Code Review](code-review.md)** — code review as a design
+  conversation, not a gatekeeping exercise. The reviewer's dilemma:
+  responsible for every line the team ships, but rewriting every commit
+  in your own image defeats the purpose of having a team. What to
+  review (contracts and boundaries, design decisions, knowledge gaps)
+  and what not to (style, preferences, mechanical changes). How to
+  give reviews that teach, how to receive reviews without defensiveness,
+  the speed and size questions, and the failure modes — rubber stamps,
+  rewrites, nitpick avalanches, stale PRs, and adversarial reviews.
 
 - **[Technical Debt](technical-debt.md)** — what technical debt
   actually is (and what it is not). Three forms: deliberate trade-offs,

@@ -77,7 +77,7 @@ the framework's choice would be wrong.
 ### [Philosophy](handbook/index.md)
 
 Opinionated arguments about engineering practice and design, decoupled
-from the dotfiles themselves. Fourteen pages covering how to think about
+from the dotfiles themselves. Sixteen pages covering how to think about
 software — not how to configure a development environment.
 
 **Tactical Posture** addresses how to approach a codebase: understand
@@ -128,6 +128,16 @@ experience the friction they impose on everyone else.
 **The Case for Code Quality** argues that linting and formatting are
 engineering practices with measurable returns, not style preferences.
 
+**Error Handling** treats errors and exceptions as the highest-priority
+signal in the system. Catch quickly, present appropriately: blocking
+errors get human-friendly messages and support references,
+non-blocking errors are absorbed and reported internally. Fail fast
+vs graceful degradation, error boundaries by architectural layer,
+the exception vs return-value debate, the swallowed-error
+anti-pattern, and alert fatigue — including the vendor whose expired
+SSL certificates went unnoticed for months because the daily failure
+was indistinguishable from the noise floor.
+
 **Logging** covers structured logging as the only reliable operational
 output. Twelve-factor log management, trace ID generation, enumerated
 events, PII redaction, distributed tracing via OpenTelemetry, and
@@ -137,6 +147,15 @@ vendor lock-in.
 maintaining. Contract enforcement, the tautology problem, the testing
 hierarchy, RSpec pitfalls, coverage thresholds, and time-dependent
 heisentests.
+
+**Code Review** addresses the hardest management skill disguised as a
+technical practice. The reviewer's dilemma: responsible for every line
+the team ships, but rewriting every commit in your own image defeats
+the purpose of having a team. The resolution is reviewing at the right
+layer — contracts and design decisions get scrutiny, implementation
+details get trust. How to give reviews that teach rather than police,
+how to receive them without defensiveness, and the failure modes that
+turn review into either a rubber stamp or a bottleneck.
 
 **Technical Debt** defines what the term actually means — and what it
 does not. Three forms of real debt (deliberate trade-offs, entropy,
