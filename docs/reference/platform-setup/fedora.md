@@ -13,7 +13,28 @@ base that any development environment needs.
 ## Post-install checklist (first boot)
 
 Run these immediately after a fresh Fedora Workstation install, before
-doing anything else:
+doing anything else.
+
+### Set the hostname
+
+The installer may set a default hostname like `localhost` or
+`fedora`. Set a meaningful hostname before configuring SSH keys,
+git identity, or anything that embeds the machine name:
+
+```sh
+# Set the hostname (all three levels: static, pretty, transient)
+sudo hostnamectl set-hostname fedora-workstation
+
+# Verify
+hostnamectl
+```
+
+Choose a hostname that identifies the machine — `thinkpad-t14`,
+`desk-ryzen`, `fedora-dev` — not `localhost` or `fedora`. The
+hostname appears in SSH key comments, shell prompts, and log
+output.
+
+### System update and RPM Fusion
 
 ```sh
 # 1. System update (reboot after — kernel and firmware)
@@ -49,6 +70,9 @@ skip_if_unavailable=True
 
 # Performance
 max_parallel_downloads=10
+# Note: fastestmirror and deltarpm are dnf4 options. On Fedora 41+
+# (dnf5), mirror selection is automatic and deltarpm is not supported.
+# These lines are harmless on dnf5 but have no effect.
 fastestmirror=True
 deltarpm=True
 
@@ -116,14 +140,17 @@ for development:
 # Check current subvolume layout
 sudo btrfs subvolume list /
 
-# Disable copy-on-write for VM images and database files
+# Disable copy-on-write for VM images and container storage
 # (CoW causes fragmentation and write amplification on large files)
+# The +C attribute applies to NEW files only — set it before
+# populating these directories.
+mkdir -p ~/VMs
 chattr +C ~/VMs
-chattr +C ~/.local/share/containers
-```
 
-The `+C` attribute applies to new files in the directory, not
-retroactively to existing ones. Set it before populating these paths.
+# Container storage — must be created before podman writes to it
+sudo mkdir -p /var/lib/containers
+sudo chattr +C /var/lib/containers
+```
 
 !!! note "Snapshots"
 
@@ -207,14 +234,25 @@ the specific port, test, remove it.
 
 ## Systemd services for development
 
-### SSH agent as a user service
+### SSH agent
 
-The [Onboarding Runbook](../onboarding.md) covers the full ssh-agent
-systemd service. Ensure it starts on login:
+On Fedora Workstation with GNOME, `gnome-keyring` provides an SSH
+agent automatically — no additional setup is required. The agent
+starts with the desktop session, and `SSH_AUTH_SOCK` is set by
+GNOME's session manager.
+
+Verify it is running:
 
 ```sh
-systemctl --user enable --now ssh-agent
+echo $SSH_AUTH_SOCK
+# Should print something like: /run/user/1000/keyring/ssh
+ssh-add -l
+# Should print "The agent has no identities." (not an error)
 ```
+
+For non-GNOME Fedora setups (Sway, i3, Fedora Server), the
+[Onboarding Runbook](../onboarding.md) documents a custom systemd
+ssh-agent user service as an alternative.
 
 ### Podman socket (for Docker-compatible tooling)
 
@@ -225,8 +263,7 @@ a systemd user service:
 systemctl --user enable --now podman.socket
 
 # Verify
-export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
-docker info   # should work (via podman's compatibility API)
+podman info
 ```
 
 This avoids the manual socket symlink documented on the
@@ -301,13 +338,59 @@ gsettings set org.gnome.settings-daemon.plugins.color night-light-temperature 35
 ## Power management (laptops)
 
 For Fedora on laptops, power management is the difference between a
-productive mobile session and a three-hour battery life:
+productive mobile session and a three-hour battery life.
+
+### The power management landscape on Fedora
+
+Three tools compete for the same kernel power tunables (sysfs
+nodes). They are mutually exclusive — running any two simultaneously
+produces unpredictable behavior, often worse than either alone.
+
+**tuned + tuned-ppd** is the Fedora default since Fedora 41.
+`tuned` is a plugin-based power management daemon with many
+profiles. `tuned-ppd` is a shim that exposes the same D-Bus API as
+the older `power-profiles-daemon`, so GNOME's power settings panel
+works without modification. This is the recommended approach for
+most users:
 
 ```sh
-# Install TLP (advanced power management, replaces power-profiles-daemon)
+# Check current profile (uses the same CLI as the old PPD)
+powerprofilesctl list
+
+# Switch profiles — GNOME's Settings panel also does this
+powerprofilesctl set power-saver
+powerprofilesctl set balanced
+powerprofilesctl set performance
+```
+
+**power-profiles-daemon (PPD)** was the Fedora default through
+Fedora 40. It provided the same three profiles over D-Bus. Fedora
+41+ replaced it with `tuned-ppd`, and the two packages conflict at
+the RPM level — they own the same D-Bus service path. If upgrading
+from Fedora 40 or earlier, `dnf` handles the replacement
+automatically.
+
+**TLP** provides the most granular control: per-device USB
+autosuspend, PCIe ASPM policy, disk APM, WiFi power save, and
+battery charge thresholds on ThinkPads. However, TLP has no D-Bus
+API, so GNOME's power settings panel will not work with it. TLP
+conflicts with both `tuned`/`tuned-ppd` and `power-profiles-daemon`.
+
+If TLP's granular control is needed, the installation must remove
+the conflicting packages:
+
+```sh
+# Remove the default power management stack
+sudo dnf remove tuned tuned-ppd
+
+# Install TLP
 sudo dnf install tlp tlp-rdw
+
+# Mask rfkill services (TLP manages radio devices directly)
+sudo systemctl mask systemd-rfkill.service systemd-rfkill.socket
+
+# Enable and start TLP
 sudo systemctl enable --now tlp
-sudo systemctl mask power-profiles-daemon  # conflicts with TLP
 
 # Verify
 sudo tlp-stat -s
@@ -323,43 +406,95 @@ sudo dnf install kernel-devel akmod-acpi_call
 echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
 ```
 
+For most development workstations, the recommendation is to stay
+with the Fedora default (`tuned` + `tuned-ppd`). TLP is only worth
+the friction if its per-device controls are specifically needed and
+the loss of GNOME power panel integration is acceptable.
+
 ## Developer prerequisites
 
-These packages should be installed before running `bootstrap.sh`.
-They provide the system-level dependencies that the framework and its
-tools expect:
+These packages must be installed before running `bootstrap.sh`.
+They provide the system-level dependencies that the framework and
+its tools expect.
 
 ```sh
 sudo dnf install \
-  zsh git curl wget \
+  zsh git curl wget util-linux-user \
   gcc gcc-c++ make cmake \
   openssl-devel zlib-devel readline-devel \
   libffi-devel libyaml-devel \
   sqlite-devel postgresql-devel \
-  fd-find ripgrep fzf jq bat \
+  fd-find ripgrep fzf jq bat gh \
   direnv \
-  libsecret \
-  podman podman-compose buildah skopeo \
+  libsecret-tools \
+  podman podman-compose podman-docker buildah skopeo \
   ShellCheck
 ```
 
 Why each group:
 
 - **zsh, git, curl, wget** — framework hard dependencies.
+- **util-linux-user** — provides `chsh` on Fedora. Without this
+  package, changing the default shell fails with "command not found."
 - **gcc, make, cmake, openssl-devel, etc.** — build toolchain for
   native extensions (Ruby gems, Python C extensions, Node native
   addons). Without these, `rv install` and `uv sync` fail on packages
   that compile from source.
-- **fd-find, ripgrep, fzf, jq, bat** — the modern CLI tools the
-  framework's aliases and functions expect.
+- **fd-find, ripgrep, fzf, jq, bat, gh** — the modern CLI tools
+  the framework's aliases and functions expect. `gh` is the GitHub
+  CLI; its completions are wired in the shell startup chain.
 - **direnv** — already wired in `conf.d/70-tools.zsh`.
-- **libsecret** — provides `secret-tool`, used by the `keychain_get`
-  shell function.
-- **podman, podman-compose, buildah, skopeo** — the full container
-  toolchain. `buildah` for image building, `skopeo` for registry
-  inspection without pulling.
+- **libsecret-tools** — provides `secret-tool`, used by the
+  `keychain_get` shell function. Note: `libsecret` (without
+  `-tools`) installs only the shared library, not the CLI.
+- **podman, podman-compose, podman-docker, buildah, skopeo** — the
+  full container toolchain. `podman-docker` provides a `docker`
+  command that wraps podman, enabling compatibility with tools that
+  expect the Docker CLI. `buildah` for image building, `skopeo` for
+  registry inspection without pulling.
 - **ShellCheck** — static analysis for shell scripts. Used by the
   framework's lefthook pre-commit configuration.
+
+## Set zsh as the default shell
+
+Fedora ships with bash as the default login shell. The framework
+requires zsh. This step must happen before running `bootstrap.sh`
+because the bootstrap script symlinks zsh configuration files that
+expect `$ZDOTDIR` to be set by the zsh startup chain.
+
+```sh
+# Change the login shell to zsh
+chsh -s $(which zsh)
+```
+
+**This does not take effect in the current session.** The login
+shell is read from `/etc/passwd` at login time. To activate zsh:
+
+- **Option A (recommended):** Log out of the desktop session and
+  log back in. Every new terminal will open zsh.
+- **Option B (immediate, current terminal only):** Run `zsh` to
+  start a zsh session inside the current bash session. This works
+  for running `bootstrap.sh` and `mise install` immediately, but
+  new terminal windows will still open bash until you log out and
+  back in.
+
+Verify the shell change took effect:
+
+```sh
+echo $SHELL
+# Should print: /usr/bin/zsh
+
+echo $0
+# Should print: -zsh (login shell) or zsh
+```
+
+If `$SHELL` still shows `/bin/bash` after logging back in, verify
+that `/etc/passwd` was updated:
+
+```sh
+grep $(whoami) /etc/passwd
+# Should end with: /usr/bin/zsh
+```
 
 ## Flatpak considerations
 

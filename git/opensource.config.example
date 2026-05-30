@@ -1,0 +1,25 @@
+# ~/.config/git/opensource.config
+# ─────────────────────────────────────────────────────────────────────
+# Open-source identity profile. Loaded via includeIf when a repository
+# lives under ~/opensource/.
+#
+# SETUP: copy this file to ~/.config/git/opensource.config (drop the
+# .example suffix) and fill in your real email and signing key.
+# ─────────────────────────────────────────────────────────────────────
+
+[user]
+    email = you@billwoika.com
+    signingkey = ~/.ssh/id_ed25519_personal.pub
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    allowedSignersFile = ~/.config/git/allowed_signers
+
+# ── URL rewrites ────────────────────────────────────────────────────
+# Route github.com URLs through the personal SSH identity for
+# open-source contributions.
+[url "git@github.com-personal:"]
+    insteadOf = https://github.com/
+    insteadOf = git@github.com:
