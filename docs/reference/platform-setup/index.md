@@ -38,6 +38,11 @@ for symmetry.
 
 ## Pages
 
+- **[Disk and Partition Strategy](disk-strategy.md)** — partition
+  schemes, LVM configuration, filesystem selection (ext4, Btrfs, XFS,
+  ZFS), RAID, swap strategy, and encryption layout for development
+  workstations. Read this before installing — these decisions are
+  hardest to change after the fact.
 - **[macOS](macos.md)** — Xcode CLT, Homebrew, system preferences for
   developers, Rosetta, disk encryption verification.
 - **[Fedora](fedora.md)** — dnf optimization, RPM Fusion, codecs,

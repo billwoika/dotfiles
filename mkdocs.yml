@@ -72,9 +72,24 @@ nav:
     - 'Repository Structure': reference/repository.md
     - 'Platform Setup':
       - reference/platform-setup/index.md
+      - 'Disk and Partition Strategy': reference/platform-setup/disk-strategy.md
       - 'macOS': reference/platform-setup/macos.md
       - 'Fedora': reference/platform-setup/fedora.md
       - 'Debian / Ubuntu': reference/platform-setup/debian-ubuntu.md
+    - 'Firmware and UEFI':
+      - reference/firmware/index.md
+      - 'Hardware Topology': reference/firmware/hardware-topology.md
+      - 'ACPI': reference/firmware/acpi.md
+      - 'Secure Boot': reference/firmware/secure-boot.md
+      - 'Virtualization': reference/firmware/virtualization.md
+      - 'TPM': reference/firmware/tpm.md
+      - 'Storage': reference/firmware/storage.md
+      - 'USB and Thunderbolt': reference/firmware/usb.md
+      - 'PCI and PCIe': reference/firmware/pcie.md
+      - 'Power and Thermal': reference/firmware/power-thermal.md
+      - 'Boot Management': reference/firmware/boot-management.md
+      - 'GRUB': reference/firmware/grub.md
+      - 'Firmware Updates': reference/firmware/firmware-updates.md
     - 'Onboarding Runbook': reference/onboarding.md
     - 'Customization': reference/customization.md
     - 'Test Suite': reference/test-suite.md
@@ -177,6 +192,10 @@ plugins:
       separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - tags                                        # Tag-based navigation
   # - mike  # Future: versioning. Add when there's actually a v2 to publish.
+
+# ── Custom CSS ────────────────────────────────────────────────────────────
+extra_css:
+  - stylesheets/custom.css
 
 # ── Extra ─────────────────────────────────────────────────────────────────
 extra:

@@ -1,0 +1,44 @@
+/* Center mermaid diagrams and add breathing room */
+.md-content .mermaid {
+  text-align: center;
+  margin: 1.5em auto;
+}
+
+.md-content .mermaid svg {
+  max-width: 100%;
+}
+
+/* Increase inner padding on mermaid nodes */
+.md-content .mermaid .node .label {
+  padding: 8px 16px;
+}
+
+.md-content .mermaid .nodeLabel {
+  padding: 8px 16px;
+}
+
+/* Remove borders and backgrounds from mermaid edge labels.
+   Mermaid renders labels inside SVG foreignObject. Target every
+   possible wrapper: the g.edgeLabel, the div.labelBkg inside
+   foreignObject, the span.edgeLabel, and any rect siblings. */
+[class*="edgeLabel"],
+[class*="labelBkg"],
+.edgeLabel,
+.labelBkg,
+g.edgeLabel rect,
+g.edgeLabel polygon,
+.edgeLabel .label,
+.edgeLabel foreignObject > div,
+.edgeLabel foreignObject > div > span,
+.edgeLabel foreignObject > div.labelBkg {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-style: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  fill: transparent !important;
+  stroke: none !important;
+}
