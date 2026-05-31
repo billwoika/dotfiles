@@ -3,9 +3,9 @@
 # Tier 1 only: live activation hooks that must inspect runtime state
 # at every prompt or every cd.
 #
-# Deterministic init/completion output (starship, zoxide, fzf, gh,
-# kubectl, mise/uv/bun completions, iTerm2 shell integration) is
-# handled by 25-tool-cache.zsh — see framework doc Appendix C.
+# Deterministic init/completion output (fzf, gh, kubectl, mise/uv/bun
+# completions, iTerm2 shell integration) is handled by
+# 25-tool-cache.zsh — see framework doc Appendix C.
 # ─────────────────────────────────────────────────────────────────────
 
 # ── mise ────────────────────────────────────────────────────────────
@@ -13,7 +13,7 @@
 # This is faster than shims for interactive use. Shims (in conf.d/10-path.zsh)
 # remain available for subprocesses that inherit a clean env.
 if command -v mise &>/dev/null; then
-  eval "$(mise activate zsh)"
+  eval "$(mise activate zsh --quiet 2>/dev/null)"
 fi
 
 # ── rv (Ruby) ───────────────────────────────────────────────────────

@@ -26,6 +26,18 @@ export EDITOR="vim"
 export VISUAL="${EDITOR}"
 export LANG="en_US.UTF-8"
 
+# SSH agent socket (Linux only)
+# On GNOME desktops, gnome-keyring provides the SSH agent and sets
+# SSH_AUTH_SOCK automatically. On non-GNOME setups using a custom
+# systemd ssh-agent.service, the socket lives at this path.
+if [ -z "${SSH_AUTH_SOCK}" ]; then
+  _ssh_sock="${XDG_RUNTIME_DIR}/ssh-agent.socket"
+  if [ -S "$_ssh_sock" ]; then
+    export SSH_AUTH_SOCK="$_ssh_sock"
+  fi
+  unset _ssh_sock
+fi
+
 # PATH baseline — same priority order as zsh conf.d/10-path.zsh.
 # POSIX-portable dedup via case pattern instead of typeset -U.
 #
