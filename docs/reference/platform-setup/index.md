@@ -43,6 +43,12 @@ for symmetry.
   ZFS), RAID, swap strategy, and encryption layout for development
   workstations. Read this before installing — these decisions are
   hardest to change after the fact.
+- **[Firmware Checklist](firmware-checklist.md)** — the actionable
+  subset of the [Firmware and UEFI](../firmware/index.md) section,
+  distilled into a first-boot checklist. What to verify before the OS
+  installer runs (boot mode, storage mode, Secure Boot, virtualization),
+  what to check after installation (sleep states, TPM, Thunderbolt),
+  and what to tune later.
 - **[macOS](macos.md)** — Xcode CLT, Homebrew, system preferences for
   developers, Rosetta, disk encryption verification.
 - **[Fedora](fedora.md)** — dnf optimization, RPM Fusion, codecs,

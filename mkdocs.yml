@@ -73,6 +73,7 @@ nav:
     - 'Platform Setup':
       - reference/platform-setup/index.md
       - 'Disk and Partition Strategy': reference/platform-setup/disk-strategy.md
+      - 'Firmware Checklist': reference/platform-setup/firmware-checklist.md
       - 'macOS': reference/platform-setup/macos.md
       - 'Fedora': reference/platform-setup/fedora.md
       - 'Debian / Ubuntu': reference/platform-setup/debian-ubuntu.md
