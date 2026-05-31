@@ -12,10 +12,8 @@
 # Multiple entries can point to the same binary (e.g., a tool's init
 # is separate from its completion output).
 typeset -gA _ZSHTOOL_CACHE_ENTRIES=(
-  starship       "starship init zsh"
-  zoxide         "zoxide init zsh --cmd cd"
   fzf            "fzf --zsh"
-  mise-comp      "mise completion zsh"
+  mise-comp      "command -v usage >/dev/null && mise completion zsh"
   uv-comp        "uv generate-shell-completion zsh"
   uvx-comp       "uvx --generate-shell-completion zsh"
   bun-comp       "bun completions"
@@ -23,12 +21,11 @@ typeset -gA _ZSHTOOL_CACHE_ENTRIES=(
   kubectl-comp   "kubectl completion zsh"
   rv-comp        "rv completions zsh"
   docker-comp    "docker completion zsh"
+  podman-comp    "podman completion zsh"
 )
 
 # Map of cache-entry-key → binary to check on PATH.
 typeset -gA _ZSHTOOL_CACHE_BINARY=(
-  starship      starship
-  zoxide        zoxide
   fzf           fzf
   mise-comp     mise
   uv-comp       uv
@@ -38,6 +35,7 @@ typeset -gA _ZSHTOOL_CACHE_BINARY=(
   kubectl-comp  kubectl
   rv-comp       rv
   docker-comp   docker
+  podman-comp   podman
 )
 
 # ── Cache directory ─────────────────────────────────────────────────
@@ -62,7 +60,7 @@ _zshtool_cache_load() {
 
   local ver
   ver=$("$bin" --version 2>/dev/null | "$hasher" | cut -c1-12)
-  [[ -z "$ver" ]] && { eval "$cmd" 2>/dev/null; return 0; }
+  [[ -z "$ver" ]] && return 0
 
   local cache_file="${_zshtool_cache_dir}/${key}.${ver}.zsh"
   if [[ ! -f "$cache_file" ]]; then
@@ -71,6 +69,9 @@ _zshtool_cache_load() {
     local -a old=("${_zshtool_cache_dir}/${key}".*.zsh(N))
     [[ ${#old} -gt 0 ]] && rm -f "${old[@]}"
     eval "$cmd" > "$cache_file" 2>/dev/null
+    # Discard empty/broken output — don't cache a file that will
+    # error on every shell start.
+    [[ -s "$cache_file" ]] || { rm -f "$cache_file"; return 0; }
   fi
   source "$cache_file"
 }

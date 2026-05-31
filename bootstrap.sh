@@ -82,6 +82,8 @@ for dir in \
   "${XDG_CACHE_HOME}/zsh" \
   "${HOME}/.ssh/control" \
   "${HOME}/.local/bin" \
+  "${HOME}/work" \
+  "${HOME}/personal" \
 ; do
   run mkdir -p "$dir"
 done
@@ -126,7 +128,7 @@ link "${DOTFILES}/git/attributes" "${XDG_CONFIG_HOME}/git/attributes"
 
 # Profile templates: copy (not symlink) so user can edit locally without
 # dirtying the dotfiles repo. Skip if target already exists.
-for tpl in work personal allowed_signers; do
+for tpl in work personal opensource allowed_signers; do
   src="${DOTFILES}/git/${tpl}.config.example"
   [ "$tpl" = "allowed_signers" ] && src="${DOTFILES}/git/allowed_signers.example"
   dst="${XDG_CONFIG_HOME}/git/${tpl}.config"

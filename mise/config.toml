@@ -19,6 +19,7 @@ biome  = "latest"     # JS/TS linter/formatter
 lefthook = "latest"   # git hook runner
 tmux   = "latest"     # terminal multiplexer
 delta  = "latest"     # syntax-highlighting git pager
+usage  = "latest"     # required by mise's shell completions
 
 [settings]
 # Auto-install missing versions when they are referenced.
