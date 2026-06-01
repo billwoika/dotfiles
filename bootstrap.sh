@@ -84,6 +84,7 @@ for dir in \
   "${HOME}/.local/bin" \
   "${HOME}/work" \
   "${HOME}/personal" \
+  "${HOME}/opensource" \
 ; do
   run mkdir -p "$dir"
 done

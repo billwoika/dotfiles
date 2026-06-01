@@ -68,10 +68,13 @@ Podman is the framework's default for three reasons:
 2. **Rootless by default.** Containers run without a privileged daemon.
    No root-owned `dockerd` process, no iptables manipulation from a
    system service, fewer attack surfaces.
-3. **CLI-compatible with Docker.** `podman run`, `podman build`,
-   `podman compose` accept the same flags and arguments. Existing
-   muscle memory, scripts, and CI definitions transfer without
-   modification.
+3. **CLI-compatible with Docker.** `podman run` and `podman build`
+   accept the same flags as their `docker` equivalents (Docker-only
+   flags are kept as accepted no-ops so scripts don't break), so
+   muscle memory, scripts, and CI definitions transfer. One caveat:
+   `podman compose` is a thin wrapper that shells out to an external
+   provider — `docker-compose` or `podman-compose` must be installed
+   for it to do anything. It is not a built-in reimplementation.
 
 The Docker CLI remains the *lingua franca* of container tooling —
 tutorials, Stack Overflow answers, and CI examples all use `docker`
@@ -92,12 +95,14 @@ replacement: the commands are identical, and many engineers alias
 ### The Docker socket symlink
 
 Tools that hard-code `/var/run/docker.sock` break with Podman or
-Colima until you create the compatibility symlink:
+Colima until you create the compatibility symlink. On current Podman
+(5.x) the machine socket is a per-machine path that you must not
+hard-code — discover it with `podman machine inspect`:
 
 ```sh
-# For Podman (macOS — adjust path for Linux)
-sudo ln -sfn "$HOME/.local/share/containers/podman/machine/podman.sock" \
-  /var/run/docker.sock
+# For Podman (macOS) — resolve the real socket, then symlink it
+PODMAN_SOCK="$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+sudo ln -sfn "$PODMAN_SOCK" /var/run/docker.sock
 
 # For Colima
 sudo ln -sfn "$HOME/.colima/default/docker.sock" \
@@ -105,10 +110,11 @@ sudo ln -sfn "$HOME/.colima/default/docker.sock" \
 ```
 
 Podman also supports `DOCKER_HOST` as an environment variable, which
-avoids the symlink for tools that respect it:
+avoids the symlink for tools that respect it. Again, resolve the path
+rather than hard-coding it:
 
 ```sh
-export DOCKER_HOST="unix://$HOME/.local/share/containers/podman/machine/podman.sock"
+export DOCKER_HOST="unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
 ```
 
 ## Compose: the real workhorse
@@ -183,9 +189,10 @@ alias dcrestart='docker compose restart'
 ## Containerfiles for production builds
 
 Production container images should use multi-stage builds, pin base
-images by digest, and run as a non-root user. Podman uses
-`Containerfile` as the default filename; Docker uses `Dockerfile`.
-Both runtimes read either filename. The framework uses `Containerfile`
+images by digest, and run as a non-root user. Podman/Buildah look for
+`Containerfile` first and fall back to `Dockerfile` (Containerfile
+wins if both are present); Docker only reads `Dockerfile` by default
+and needs `-f Containerfile` otherwise. The framework uses `Containerfile`
 in new projects and `Dockerfile` where existing CI expects it — the
 content is identical.
 
@@ -231,8 +238,10 @@ The framework provides additional reference templates in the
 ## Devcontainers
 
 Devcontainers standardize the development environment as a container
-definition checked into the repo. VS Code and JetBrains both support
-the specification natively.
+definition checked into the repo. JetBrains IDEs (2025.3+) support the
+specification natively in-IDE; VS Code supports it through the
+first-party **Dev Containers** extension (made by Microsoft, but an
+add-on rather than built into the core editor).
 
 ### When to opt in
 
@@ -282,22 +291,32 @@ unnecessary. Options for macOS:
 
 - **Named volumes** for dependencies (`node_modules/`, `.bundle/`,
   `.venv/`) — stored inside the VM, not bind-mounted
-- **Delegated mounts** (`consistency: delegated` in Compose) — relaxes
-  consistency guarantees for better write performance
+- **Delegated mounts** (`consistency: delegated` in Compose) — the
+  Compose spec still accepts the `consistency` field, but its values
+  are platform-specific and, since Docker Desktop moved to VirtioFS,
+  it is effectively a no-op rather than the meaningful write-perf knob
+  it was under the old osxfs/gRPC-FUSE mounts. Harmless to keep; don't
+  rely on it for speed.
 - **OrbStack** — if switching runtimes is an option, it has the best
   bind-mount performance on Apple Silicon
 - **Podman machine resources** — `podman machine set --cpus 4 --memory
-  8192` adjusts the VM's allocation (defaults are often too
-  conservative for large builds)
+  8192` adjusts the VM's allocation, but these two flags are
+  **QEMU-only**. On a default Apple Silicon machine (the `applehv`
+  provider, which is also where Rosetta x86 translation runs), they do
+  not apply — recreate the machine with the desired size, or use a
+  provider/`containers.conf` setting instead.
 
 ## Cross-cutting concerns
 
 ### Secrets in containers
 
-Never bake secrets into images. Use `--secret` mounts in BuildKit for
-build-time secrets, and environment variables (from direnv or Compose
-environment files) for runtime secrets. Both Podman and Docker support
-BuildKit secret mounts:
+Never bake secrets into images. Use `--secret` mounts for build-time
+secrets, and environment variables (from direnv or Compose environment
+files) for runtime secrets. Both Podman and Docker support the
+`--secret` flag and the `RUN --mount=type=secret` Containerfile
+syntax — but only Docker implements it via BuildKit. Podman's build
+backend (Buildah) provides the same interface without BuildKit, so the
+command is portable even though the underlying machinery differs:
 
 ```sh
 podman build --secret id=npm_token,env=NPM_TOKEN -t myapp .

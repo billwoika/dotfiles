@@ -219,10 +219,12 @@ export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 With `AddKeysToAgent yes` in `~/.ssh/config`, keys are added to the
 agent automatically on first use for the duration of the session.
 
-On GNOME desktops, `gnome-keyring` can also serve as the SSH agent —
-it is enabled by default in most GNOME-based distributions and
-provides the same "passphrase remembered across reboots" behavior as
-macOS Keychain.
+On GNOME 46+ desktops (Fedora 40+, Ubuntu 24.04+), `gcr-ssh-agent`
+serves as the SSH agent — GNOME 46 moved this out of `gnome-keyring`
+into the `gcr-4` package. It is enabled by default, exposes its socket
+at `$XDG_RUNTIME_DIR/gcr/ssh`, and provides the same "passphrase
+remembered across the session" behavior. (On pre-46 systems the
+equivalent was `gnome-keyring` at `$XDG_RUNTIME_DIR/keyring/ssh`.)
 
 The `UseKeychain yes` directive in the SSH config is silently ignored
 on Linux (OpenSSH 7.2+). It is safe to leave in a shared config that

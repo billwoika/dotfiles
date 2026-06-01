@@ -63,8 +63,9 @@ it took effect before continuing:
 
 ```sh
 echo $SHELL
-# Must print /usr/bin/zsh (Linux) or /bin/zsh (macOS)
-# If it still shows bash, log out and back in first
+# Should print the path zsh was installed at: /usr/bin/zsh or
+# /bin/zsh on Linux (distro-dependent), /bin/zsh on macOS.
+# If it still shows bash, log out and back in first.
 ```
 
 If you are in a bash session and need to continue immediately,
@@ -98,10 +99,20 @@ mise's shell completions depend on the `usage` CLI. Without it,
 the completion script has broken quoting that produces errors on
 shell startup.
 
+`usage` is already pinned in the framework's `~/.config/mise/config.toml`,
+so Step 7 (`mise install`) would install it anyway. Install it now, on
+its own, so completions work the next time the shell reloads — before
+the full toolchain install:
+
 ```sh
 mise install usage
-mise use -g usage
 ```
+
+Do **not** run `mise use -g usage`. That command rewrites the global
+config file to add the pin — but the framework already ships that pin,
+and the file is a symlink back into your dotfiles repo, so the rewrite
+would dirty your working tree (or clobber the symlink). The declaration
+lives in version control; you only need to materialize the binary.
 
 ### Step 6: Install rv (Ruby manager)
 
@@ -164,12 +175,25 @@ Load keys into the agent:
 
 === "Linux (GNOME — Fedora, Ubuntu)"
 
-    GNOME Keyring provides an SSH agent automatically. Verify it is
-    running:
+    On GNOME 46+ (Fedora 40+, Ubuntu 24.04+), the SSH agent is no
+    longer part of `gnome-keyring`. GNOME 46 deprecated that component
+    and moved it to **`gcr-ssh-agent`** (the `gcr-4` package), whose
+    systemd user socket lives at `$XDG_RUNTIME_DIR/gcr/ssh`. On a
+    default Fedora Workstation this is already enabled — verify:
 
     ```sh
     echo $SSH_AUTH_SOCK
-    # Should print something like: /run/user/1000/keyring/ssh
+    # GNOME 46+ : /run/user/<uid>/gcr/ssh
+    # (older    : /run/user/<uid>/keyring/ssh — pre-GNOME-46)
+    ```
+
+    If `$SSH_AUTH_SOCK` is empty, the gcr agent socket is not active.
+    Enable it and re-login (or set the variable for the current shell):
+
+    ```sh
+    systemctl --user enable --now gcr-ssh-agent.socket
+    # current shell, until next login:
+    export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
     ```
 
     Then add your keys:
@@ -270,7 +294,9 @@ mise doctor
     ```sh
     echo "$HOME/.local/share/mise/shims" | \
       sudo tee /etc/paths.d/mise > /dev/null
-    # Takes effect after logout/login
+    # New login shells (any new Terminal window) pick this up
+    # immediately via path_helper in /etc/zprofile. GUI apps launched
+    # from Finder/Dock see it only after the next logout/login.
     ```
 
 === "Debian / Ubuntu"
@@ -286,9 +312,10 @@ mise doctor
 
     ### SSH agent persistence
 
-    See the systemd user service in Step 10 above. On GNOME desktops,
-    `gnome-keyring` can also serve as the SSH agent — it is enabled
-    by default in most GNOME-based distributions.
+    See the systemd user service in Step 10 above. On GNOME 46+
+    desktops (Ubuntu 24.04+), the SSH agent is provided by
+    `gcr-ssh-agent`, not `gnome-keyring` — its socket is
+    `$XDG_RUNTIME_DIR/gcr/ssh`, normally already active.
 
     ### Add mise shims to system PATH (for GUI IDEs)
 
@@ -296,7 +323,8 @@ mise doctor
     mkdir -p ~/.config/environment.d
     echo 'PATH=$HOME/.local/share/mise/shims:$PATH' > \
       ~/.config/environment.d/mise.conf
-    # Takes effect after logout/login (systemd-based distros)
+    # Reaches systemd user services immediately; GUI apps after
+    # logout/login. Terminals get it via conf.d/10-path.zsh already.
     ```
 
 === "Fedora / RHEL"
@@ -308,9 +336,10 @@ mise doctor
 
     ### SSH agent persistence
 
-    See the systemd user service in Step 10 above. On GNOME desktops,
-    `gnome-keyring` can also serve as the SSH agent — it is enabled
-    by default in Fedora Workstation.
+    See the systemd user service in Step 10 above. On Fedora
+    Workstation (GNOME 46+), the SSH agent is provided by
+    `gcr-ssh-agent`, not `gnome-keyring` — its socket is
+    `$XDG_RUNTIME_DIR/gcr/ssh`, enabled by default.
 
     ### Add mise shims to system PATH (for GUI IDEs)
 
@@ -318,7 +347,9 @@ mise doctor
     mkdir -p ~/.config/environment.d
     echo 'PATH=$HOME/.local/share/mise/shims:$PATH' > \
       ~/.config/environment.d/mise.conf
-    # Takes effect after logout/login (systemd-based distros)
+    # Read by the systemd user manager: reaches user services right
+    # away, GUI apps after the next logout/login. (Terminals already
+    # get the shims via conf.d/10-path.zsh.)
     ```
 
 ## Cloning a project
@@ -339,5 +370,15 @@ mise install          # install project-pinned tools
 rv clean-install      # Ruby dependencies (if Ruby project)
 uv sync               # Python dependencies (if Python project)
 bun install           # JS dependencies (if JS project)
-docker compose up -d  # local services (podman-docker on Fedora)
+docker compose up -d  # local services
+```
+
+On Fedora the `docker` command is supplied by `podman-docker` (an
+alias to Podman), but that package does **not** provide `compose`.
+For `docker compose` / `podman compose` to work you also need a
+compose provider — install `podman-compose` (it is already in the
+Fedora developer-prerequisites list):
+
+```sh
+podman compose up -d   # requires podman-compose to be installed
 ```
