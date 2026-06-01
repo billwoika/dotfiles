@@ -27,14 +27,21 @@ export VISUAL="${EDITOR}"
 export LANG="en_US.UTF-8"
 
 # SSH agent socket (Linux only)
-# On GNOME desktops, gnome-keyring provides the SSH agent and sets
-# SSH_AUTH_SOCK automatically. On non-GNOME setups using a custom
-# systemd ssh-agent.service, the socket lives at this path.
+# On GNOME 46+ desktops, gcr-ssh-agent (not gnome-keyring) provides the
+# SSH agent and exports SSH_AUTH_SOCK itself (at $XDG_RUNTIME_DIR/gcr/ssh).
+# We only fill it in when unset — e.g. non-GNOME setups using a custom
+# systemd ssh-agent.service, whose socket lives at the path below. The
+# -z guard means we never override a value the desktop already set.
 if [ -z "${SSH_AUTH_SOCK}" ]; then
-  _ssh_sock="${XDG_RUNTIME_DIR}/ssh-agent.socket"
-  if [ -S "$_ssh_sock" ]; then
-    export SSH_AUTH_SOCK="$_ssh_sock"
-  fi
+  for _ssh_sock in \
+    "${XDG_RUNTIME_DIR}/gcr/ssh" \
+    "${XDG_RUNTIME_DIR}/ssh-agent.socket" \
+  ; do
+    if [ -S "$_ssh_sock" ]; then
+      export SSH_AUTH_SOCK="$_ssh_sock"
+      break
+    fi
+  done
   unset _ssh_sock
 fi
 

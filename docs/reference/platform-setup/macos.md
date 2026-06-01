@@ -36,10 +36,13 @@ If any of these are off on a personal machine:
 # Enable firewall
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 
-# Enable FileVault (prompts for recovery key setup)
+# Enable FileVault (prompts for an admin user/password; prints a
+# personal recovery key — save it)
 sudo fdesetup enable
 
-# Enable automatic updates
+# Enable automatic background update *checking* (not auto-download or
+# auto-install — configure those in System Settings > General >
+# Software Update for full automation)
 sudo softwareupdate --schedule on
 ```
 
@@ -90,12 +93,15 @@ brew install \
   coreutils findutils gnu-sed gnu-tar \
   direnv \
   jq bat fd ripgrep fzf \
-  ShellCheck \
+  shellcheck \
   podman
 
 # Terminal emulator
 brew install --cask iterm2
-# Or: wezterm, kitty, alacritty — the framework is emulator-agnostic
+# Or: wezterm, kitty — the framework is emulator-agnostic.
+# (alacritty's cask is deprecated as of 2026 — fails the macOS
+# Gatekeeper check — and is scheduled to be disabled; avoid for new
+# installs.)
 
 # Optional GUI apps
 brew install --cask textmate markedit
@@ -117,7 +123,9 @@ the `g`-prefixed versions explicitly when needed.
   project's pinned version.
 - **Docker Desktop** — the framework recommends Podman. If you need
   Docker Desktop for a specific reason, install it directly from
-  Docker's site, not via `brew install --cask docker`.
+  Docker's site, or via `brew install --cask docker-desktop` (the
+  cask was renamed from `docker`; the bare `docker` token is now a
+  deprecated alias).
 
 ## Rosetta 2 (Apple Silicon only)
 
@@ -145,15 +153,19 @@ and respond to the machine.
 ### Keyboard
 
 ```sh
-# Key repeat rate (fastest)
+# Key repeat rate. -int 2 is the fastest the System Settings slider
+# exposes (~30ms); -int 1 (~15ms) is reachable only via this command
+# if you want it faster than the GUI allows.
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Disable press-and-hold for accent characters (enables key repeat everywhere)
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
-# Full keyboard access (Tab navigates all controls, not just text fields)
-defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+# Full keyboard access (Tab navigates all controls, not just text fields).
+# Current macOS accepts 0 (off) or 2 (on) for this key — 3 is a legacy
+# value; use 2.
+defaults write NSGlobalDomain AppleKeyboardUIMode -int 2
 ```
 
 For Caps Lock as Ctrl: System Settings > Keyboard > Keyboard Shortcuts
@@ -246,8 +258,9 @@ resolver selection and encrypted DNS configuration.
 macOS has Bonjour (mDNS) enabled by default. `.local` domains resolve
 via multicast, which means `anything.local` in `/etc/hosts` or
 development URLs using `.local` TLD can behave unpredictably. Use
-`.localhost` (RFC 6761, guaranteed loopback) or `.test` for local
-development domains.
+`.localhost` (RFC 6761 reserves it for loopback, and resolution to
+127.0.0.1/::1 is recommended — though not strictly guaranteed for all
+software) or `.test` for local development domains.
 
 ## Podman on macOS
 

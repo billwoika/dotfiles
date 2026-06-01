@@ -58,7 +58,9 @@ sudo fwupdmgr update
 Fedora's package manager is conservative by default. These settings
 make it faster and more informative without sacrificing correctness.
 
-Edit `/etc/dnf/dnf.conf`:
+Fedora 41+ ships **dnf5**, which validates the config strictly and
+rejects some keys that dnf4 silently accepted. The set below is the
+dnf5-correct one. Edit `/etc/dnf/dnf.conf`:
 
 ```ini
 [main]
@@ -66,17 +68,7 @@ gpgcheck=True
 installonly_limit=3
 clean_requirements_on_remove=True
 best=False
-skip_if_unavailable=True
-
-# Performance
 max_parallel_downloads=10
-# Note: fastestmirror and deltarpm are dnf4 options. On Fedora 41+
-# (dnf5), mirror selection is automatic and deltarpm is not supported.
-# These lines are harmless on dnf5 but have no effect.
-fastestmirror=True
-deltarpm=True
-
-# Informational
 defaultyes=True
 countme=False
 ```
@@ -85,15 +77,34 @@ Key choices:
 
 - **`max_parallel_downloads=10`** — saturates modern connections.
   Default of 3 is a relic of slower networks.
-- **`fastestmirror=True`** — measures mirror latency on first use and
-  prefers the fastest. Small upfront cost, significant ongoing gain.
-- **`deltarpm=True`** — downloads binary diffs instead of full packages
-  during updates. Saves bandwidth on incremental updates.
 - **`best=False`** — allows dnf to skip packages with broken
   dependencies rather than failing the entire transaction. Prevents
   the "one broken COPR package blocks all updates" problem.
 - **`countme=False`** — disables the anonymous weekly request that
   Fedora uses for usage statistics.
+
+!!! warning "dnf5: dropped knobs"
+
+    Two options that every older Fedora guide still lists are gone on
+    dnf5 (Fedora 41+, so anything on **Fedora 44**):
+
+    - **`deltarpm`** — the delta-RPM mechanism was removed from dnf5
+      entirely. `deltarpm=True` does nothing; on a strict config it is
+      flagged as unknown. Omit it.
+    - **`fastestmirror` in `[main]`** — dnf5 treats `fastestmirror` as a
+      *repo* option, and Fedora's metalink already returns a
+      latency-sorted mirror list, so explicit tuning is rarely needed.
+      If you do want it, set it through the supported interface rather
+      than hand-editing the key. `config-manager` lives in the
+      `dnf5-plugins` package, which a minimal install may lack:
+
+        ```sh
+        sudo dnf install dnf5-plugins        # provides config-manager
+        sudo dnf config-manager setopt fastestmirror=True
+        ```
+
+    `skip_if_unavailable` is likewise a per-repo option on dnf5, not a
+    `[main]` global — set it on the specific repo that needs it.
 
 ## Multimedia codecs
 
@@ -109,8 +120,11 @@ sudo dnf install \
   --exclude=gstreamer1-plugins-bad-free-devel
 
 # Hardware-accelerated video decode (Intel/AMD)
-sudo dnf install libva-utils intel-media-driver   # Intel
-sudo dnf install libva-utils mesa-va-drivers      # AMD
+# Intel: the Fedora package is libva-intel-media-driver (the bare
+# "intel-media-driver" name does not resolve). It provides the iHD
+# driver for Broadwell (5th gen) and newer.
+sudo dnf install libva-utils libva-intel-media-driver   # Intel (Gen5+)
+sudo dnf install libva-utils mesa-va-drivers            # AMD
 
 # OpenH264 from Cisco (fedora-cisco-openh264 repo, enabled by default)
 sudo dnf install mozilla-openh264
@@ -236,18 +250,26 @@ the specific port, test, remove it.
 
 ### SSH agent
 
-On Fedora Workstation with GNOME, `gnome-keyring` provides an SSH
-agent automatically — no additional setup is required. The agent
-starts with the desktop session, and `SSH_AUTH_SOCK` is set by
-GNOME's session manager.
+On Fedora Workstation (GNOME 46+, which is Fedora 40 onward), the SSH
+agent is provided by `gcr-ssh-agent`, not `gnome-keyring` — GNOME 46
+deprecated the keyring's SSH component and moved it to the `gcr-4`
+package. It still starts with the desktop session automatically, so no
+additional setup is required; only the socket path changed.
 
 Verify it is running:
 
 ```sh
 echo $SSH_AUTH_SOCK
-# Should print something like: /run/user/1000/keyring/ssh
+# GNOME 46+ : /run/user/1000/gcr/ssh
+# (older    : /run/user/1000/keyring/ssh)
 ssh-add -l
 # Should print "The agent has no identities." (not an error)
+```
+
+If `$SSH_AUTH_SOCK` is unset, enable the gcr socket and re-login:
+
+```sh
+systemctl --user enable --now gcr-ssh-agent.socket
 ```
 
 For non-GNOME Fedora setups (Sway, i3, Fedora Server), the

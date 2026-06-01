@@ -360,35 +360,46 @@ Why each group:
 
 ### Podman version (Ubuntu 22.04)
 
-Ubuntu 22.04's default Podman package is old (3.4.x). For rootless
-networking and compose support, install from the Kubic repo:
+Ubuntu 22.04's default Podman package is old (3.4.x). Historically the
+fix was the **Kubic** (`devel:kubic:libcontainers`) OBS repository —
+but **that project has been discontinued and its repos are gone**, so
+the old `kubic` instructions no longer work. On 22.04 today, either:
+
+- upgrade to Ubuntu 24.04+ (ships Podman **4.9.x** — current enough for
+  rootless networking and `podman compose` with a provider), or
+- use a maintained alternative (the `podman` PPA / static builds), or
+  build from source.
 
 ```sh
-# Only needed on Ubuntu 22.04; 24.04+ ships current Podman
-. /etc/os-release
-echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_${VERSION_ID}/ /" | \
-  sudo tee /etc/apt/sources.list.d/podman.list
-curl -fsSL "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_${VERSION_ID}/Release.key" | \
-  sudo gpg --dearmor -o /etc/apt/keyrings/podman.gpg
-sudo apt update
+# Ubuntu 24.04+ : Podman 4.9.x is in the default repos, no extra setup.
 sudo apt install podman
+podman --version
 ```
 
-Ubuntu 24.04 and later ship Podman 4.x+ from the default repositories
-— no additional configuration needed.
+Do not copy the old `download.opensuse.org/.../kubic/...` source lines
+— they 404.
 
 ## VS Code installation
 
 Do not use the snap version of VS Code. Install from Microsoft's apt
 repository:
 
+Microsoft now recommends the deb822 `.sources` format (easier to audit
+and remove than the legacy one-line `.list`), with the key under
+`/usr/share/keyrings`:
+
 ```sh
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | \
-  gpg --dearmor | sudo tee /etc/apt/keyrings/microsoft.gpg > /dev/null
+  gpg --dearmor | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
 
-echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] \
-  https://packages.microsoft.com/repos/code stable main" | \
-  sudo tee /etc/apt/sources.list.d/vscode.list
+sudo tee /etc/apt/sources.list.d/vscode.sources > /dev/null <<'EOF'
+Types: deb
+URIs: https://packages.microsoft.com/repos/code
+Suites: stable
+Components: main
+Architectures: amd64,arm64,armhf
+Signed-By: /usr/share/keyrings/microsoft.gpg
+EOF
 
 sudo apt update
 sudo apt install code
