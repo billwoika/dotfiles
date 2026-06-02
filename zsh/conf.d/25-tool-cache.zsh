@@ -16,13 +16,22 @@ typeset -gA _ZSHTOOL_CACHE_ENTRIES=(
   mise-comp      "command -v usage >/dev/null && mise completion zsh"
   uv-comp        "uv generate-shell-completion zsh"
   uvx-comp       "uvx --generate-shell-completion zsh"
-  bun-comp       "bun completions"
   gh-comp        "gh completion -s zsh"
   kubectl-comp   "kubectl completion zsh"
-  rv-comp        "rv completions zsh"
+  rv-comp        "rv shell completions zsh"
   docker-comp    "docker completion zsh"
   podman-comp    "podman completion zsh"
 )
+# ── Excluded by design (see "Tools the cache excludes" in the
+#    integration-strategy doc for the full criteria) ──────────────────
+# Inclusion contract: a tool belongs here ONLY if it emits its
+# init/completion to STDOUT, deterministically per --version, with no
+# side effects. Carve-outs name their criterion + operating alternative.
+#
+#   bun  — criterion: writes completion FILES to disk, no supported
+#          stdout mode (upstream oven-sh/bun#2978 open; #2977 crash).
+#          operate instead: bun installs its own completions at install
+#          and on `bun upgrade`. Revisit if #2978 lands a stdout mode.
 
 # Map of cache-entry-key → binary to check on PATH.
 typeset -gA _ZSHTOOL_CACHE_BINARY=(
@@ -30,7 +39,6 @@ typeset -gA _ZSHTOOL_CACHE_BINARY=(
   mise-comp     mise
   uv-comp       uv
   uvx-comp      uv
-  bun-comp      bun
   gh-comp       gh
   kubectl-comp  kubectl
   rv-comp       rv

@@ -15,7 +15,9 @@ up() {
   local n="${1:-1}"
   local target="$PWD"
   for ((i = 0; i < n; i++)); do target="${target%/*}"; done
-  [[ -n "$target" ]] && cd "$target" || cd /
+  # Explicit if/else: `A && cd B || cd /` would also fall back to / when
+  # cd B *fails* (e.g. unsearchable parent), not only when target is empty.
+  if [[ -n "$target" ]]; then cd "$target"; else cd /; fi
 }
 
 # ── path_add: safely add a directory to PATH at runtime ─────────────
@@ -79,10 +81,17 @@ port_kill() {
 # ── timeshell: benchmark zsh startup time ───────────────────────────
 timeshell() {
   local n="${1:-10}"
-  for ((i = 0; i < n; i++)); do /usr/bin/time zsh -lic exit; done 2>&1 |
-    awk '/real/ { sum += $2; count++ } END {
-      printf "avg: %.3fs over %d runs\n", sum/count, count
-    }'
+  # -p forces POSIX format ("real <seconds>") on BOTH GNU and BSD time.
+  # We strip everything up to the "real" token first (sub() is portable
+  # across BSD/GNU awk), because a login shell can emit terminal/shell-
+  # integration escape sequences onto the same line (e.g.
+  # "...Truereal 0.60"), which would otherwise shift the fields. After
+  # the sub, $1 is the elapsed seconds.
+  for ((i = 0; i < n; i++)); do /usr/bin/time -p zsh -lic exit; done 2>&1 |
+    awk '/real[ \t]+[0-9]/ {
+           sub(/^.*real[ \t]+/, ""); sum += $1; count++
+         }
+         END { if (count) printf "avg: %.3fs over %d runs\n", sum/count, count }'
 }
 
 # ── keychain_get: cross-platform secret lookup ──────────────────────

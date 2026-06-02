@@ -40,8 +40,10 @@ infrastructure uses. Debugging tools (`tcpdump`, `iptables -L`,
 `ip netns exec`) work directly.
 
 **Podman-specific note:** Podman runs rootless by default. Rootless
-containers use `slirp4netns` or `pasta` for networking rather than
-manipulating host iptables directly. This avoids the iptables
+containers use `pasta` (the default since Podman 5.0) or the older
+`slirp4netns` for networking rather than manipulating host iptables
+directly. (Switch back via `default_rootless_network_cmd` in
+`containers.conf`.) This avoids the iptables
 conflicts described later in this page but introduces its own
 tradeoffs (slightly higher latency, different port binding behavior).
 

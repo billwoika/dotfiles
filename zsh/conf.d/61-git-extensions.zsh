@@ -51,7 +51,9 @@ alias gpushf='git push --force-with-lease --force-if-includes'
 gclean() {
   git branch --merged | \
     grep -vE '^\*|^\s*(main|master|develop)\s*$' | \
-    xargs -n 1 git branch -d
+    xargs -r -n 1 git branch -d
+    # -r (no-run-if-empty): on GNU xargs, without it an empty branch
+    # list would invoke `git branch -d` with no args. No-op on BSD.
 }
 
 # Find commits by message across all branches

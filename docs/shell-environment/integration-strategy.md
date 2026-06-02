@@ -47,7 +47,7 @@ every `cd`. If it doesn't, it does not belong here.
   every `cd`
 - **`direnv hook`** — evaluates the `.envrc` of every directory you
   enter
-- **`rv shell`** — reads `.ruby-version` on `cd`
+- **`rv shell init zsh`** — the hook (eval'd as `eval "$(rv shell init zsh)"`) that reads `.ruby-version` on `cd`
 - **SSH ControlMaster directory creation** — trivially fast, runs once
   per shell
 
@@ -65,11 +65,14 @@ thereafter, regenerating only when the binary changes.
 
 !!! info "What this saves"
 
-    On a typical machine with mise + uv + bun + gh + kubectl +
-    starship + fzf + zoxide installed, naive `eval "$(tool init)"`
-    for each costs roughly 60-150ms per shell start — most of it
-    spent forking subprocesses to regenerate identical output. The
-    cache approach replaces that with N file sources at ~1ms each.
+    On a typical machine with mise + uv + gh + kubectl + starship +
+    fzf + zoxide installed, naive `eval "$(tool init)"` for each costs
+    roughly 60-150ms per shell start — most of it spent forking
+    subprocesses to regenerate identical output. The cache approach
+    replaces that with N file sources at ~1ms each. (bun is a deliberate
+    exception — see [Tools the cache excludes](#tools-the-cache-excludes-by-design)
+    below — it installs completions to disk at install time and never
+    runs at shell start, so it costs nothing here regardless.)
 
 ### How the cache works
 
@@ -109,15 +112,70 @@ typeset -gA _ZSHTOOL_CACHE_ENTRIES=(
   rv-comp        "rv shell completions zsh"
   docker-comp    "docker completion zsh"
 )
-# Note: bun is intentionally absent here. `bun completions` WRITES
-# completion files to disk rather than emitting zsh to stdout, so it
-# cannot be captured-and-sourced like the entries above. Let bun install
-# its own completions at install time instead.
+# Note: bun is intentionally absent. The entries above emit a completion
+# script to stdout as a stable contract; `bun completions` instead
+# defaults to WRITING files to disk, takes no shell argument, and has no
+# officially-supported stdout mode (still open upstream: oven-sh/bun#2978).
+# Its output can sometimes be redirected, but it is not a reliable
+# capture-and-source source, so it stays out of the deterministic cache.
+# Let bun install its own completions at install time instead.
 ```
 
 Adding a new tool is a two-line change: add an entry to
 `_ZSHTOOL_CACHE_ENTRIES` and a binary mapping to
-`_ZSHTOOL_CACHE_BINARY`.
+`_ZSHTOOL_CACHE_BINARY` — **provided the tool meets the inclusion
+contract below.**
+
+### Tools the cache excludes (by design)
+
+The cache is not "every tool." It is "every tool whose shell
+integration can be **captured from stdout and sourced**." That is the
+contract every registry entry depends on, and the loader is built
+around it: it runs the emit command, redirects stdout to a cache file,
+and sources that file. A tool that does not play by this contract does
+not belong in the registry — forcing it in degrades reliability
+(garbage cached and sourced on every shell) rather than performance.
+
+**Inclusion contract** — a tool qualifies for the registry only if all
+of these hold:
+
+1. It **emits its init/completion script to stdout** when invoked
+   (e.g. `tool completion zsh` prints zsh code). It must not write
+   files, prompt, or mutate state as a side effect of that invocation.
+2. The output is **deterministic for a given `--version`** — same
+   binary version, same output — so the version hash is a valid cache
+   key.
+3. The invocation is **non-interactive and side-effect-free**: safe to
+   run unattended at shell start, exits non-zero (or empty) cleanly if
+   it cannot produce output.
+
+**Exclusion criteria** — a tool is carved out if any of these is true.
+When you exclude one, record *which* criterion and the operating
+alternative right where it would have gone in the registry (as the bun
+entry does):
+
+| Criterion | Why it disqualifies | What to do instead |
+|-----------|---------------------|--------------------|
+| Writes completion **files to disk** instead of stdout | The loader captures stdout; file-writing produces an empty/garbage cache and a disk side effect every shell | Let the tool install its own completions at install/upgrade time; rely on those static files |
+| **No stdout mode / no shell argument** | Can't target zsh or capture cleanly | Same — install-time completions, or a one-shot redirect outside the cache |
+| Output is **non-deterministic** across runs at a fixed version | Breaks the version-hash cache key (cache never stabilizes) | Source it directly (uncached) via a plain `eval` in `70-tools.zsh`, accepting the per-shell cost |
+| Invocation **prompts, is slow, or has side effects** | Unsafe to run unattended at every shell start | Gate it behind an explicit opt-in command, not the startup path |
+
+**Current exclusions:**
+
+- **bun** — writes completion files to disk and has no
+  officially-supported stdout mode (upstream request `oven-sh/bun#2978`
+  is still open; `bun completions` has also crashed in some setups per
+  `#2977`). Operating alternative: bun installs its own completions at
+  install and on every `bun upgrade`, so they work without the cache.
+  Re-evaluate for inclusion if `#2978` lands a stable stdout mode.
+
+This list is expected to **grow** as the toolchain changes — the point
+of stating the criteria explicitly is that the next carve-out is a
+*classified, documented decision* (with a known operating workaround),
+not an undocumented gap. If exclusions ever outnumber inclusions, that
+is the signal to revisit the registry design itself (e.g. split
+"startup-emitted" from "install-time" tools as first-class categories).
 
 ### Cache management commands
 

@@ -19,7 +19,7 @@ lint-current() {
 biome-current() {
   git diff --name-only HEAD | \
     grep -E '\.(ts|tsx|js|jsx|json)$' | \
-    xargs -r -I{} bunx biome check --apply {}
+    xargs -r -I{} bunx biome check --write {}
 }
 
 # Discover package.json scripts

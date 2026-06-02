@@ -272,8 +272,10 @@ SystemMaxUse=500M
 
 ## GNOME desktop tuning
 
-Ubuntu ships GNOME (with modifications). The same tuning as Fedora
-applies:
+Ubuntu ships GNOME on Wayland (with modifications). The framework's
+assumption of GNOME, why, and what changes if you run KDE/Sway instead
+are covered in the [Fedora page's GNOME note](fedora.md#gnome-desktop-tuning);
+it applies identically here. The same tuning as Fedora applies:
 
 ```sh
 # Key repeat speed

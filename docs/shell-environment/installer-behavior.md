@@ -18,9 +18,9 @@ toolchain, its shell requirements, and the profile files it modifies:
 |------|-------|------------|----------|----------|
 | mise | sh | `curl \| sh` | Nothing (binary only) | Downloads binary to `~/.local/bin`. Shell-specific endpoint adds activation; we use the binary-only form and wire activation in `conf.d/70-tools.zsh`. |
 | rv | sh | `curl \| sh` | Nothing (binary only) | Downloads to `~/.local/bin`; activation via `eval "$(rv shell zsh)"` wired in `conf.d/70-tools.zsh`. |
-| Homebrew | /bin/bash | `/bin/bash -c ...` | Nothing (prints instructions) | Requires bash explicitly. Prints `eval "$(brew shellenv)"` for user to add. |
+| Homebrew | /bin/bash | `/bin/bash -c ...` | Nothing (prints instructions) | Requires bash explicitly. Prints `eval "$(brew shellenv)"`, but you do not need it: `conf.d/10-path.zsh` adds `/opt/homebrew/{bin,sbin}` (Apple Silicon) directly, and `/usr/local/bin` (Intel) is in `/etc/paths` already. |
 | rustup | sh | `curl \| sh` | `~/.profile`, `~/.bashrc`, `~/.zshenv` | Writes `CARGO_HOME/bin` to PATH in all detected profiles. Reads `CARGO_HOME`, `RUSTUP_HOME`. |
-| nvm | bash | `curl \| bash` | `~/.bash_profile`, `~/.zshrc`, `~/.profile` | Appends `NVM_DIR` and source lines. Modifies first profile found. |
+| nvm | bash | `curl \| bash` | `~/.bashrc`, `~/.bash_profile`, `~/.zshrc`, `~/.profile` | Appends `NVM_DIR` and source lines to the first profile found (selection overridable via `$PROFILE`). |
 | uv | sh | `curl \| sh` | Nothing (binary only) | mise manages uv in this stack; standalone installs via `astral.sh/uv/install.sh`. |
 | bun | bash | `curl \| bash` | `~/.bashrc`, `~/.zshrc` | mise manages bun in this stack; standalone adds `BUN_INSTALL` to PATH in detected profiles. |
 
@@ -73,21 +73,23 @@ does not modify any profile files — it prints post-install instructions
 and expects you to add `eval "$(brew shellenv)"` to your profile
 manually.
 
-On **Intel**, you do not need the eval line: Homebrew's `/usr/local/bin`
-is in the default `/etc/paths` (and `conf.d/10-path.zsh` also appends
-it), so brew is already on PATH via `path_helper`.
+You do not need the eval line on either architecture — the framework's
+`conf.d/10-path.zsh` puts Homebrew on PATH for you:
 
-On **Apple Silicon**, `/opt/homebrew/bin` is NOT in `/etc/paths` and is
-NOT added by this framework's PATH builder. To get brew on PATH, add a
-prepend for it in a machine-local `aliases.local.zsh` (or
-`env.local.zsh`):
+- **Intel:** Homebrew's `/usr/local/bin` is in the default `/etc/paths`
+  (and `10-path.zsh` also appends it), so brew is on PATH via
+  `path_helper` regardless.
+- **Apple Silicon:** `/opt/homebrew/bin` is NOT in `/etc/paths`, so
+  `path_helper` would miss it — but `10-path.zsh` prepends
+  `/opt/homebrew/bin` and `/opt/homebrew/sbin` directly (guarded by a
+  directory test, so it is a no-op on machines without them). It sits
+  below the version-managed tool dirs (mise shims win) and above the
+  bare system bins.
 
-```sh
-# Apple Silicon only — framework does not add this for you
-[[ -d /opt/homebrew/bin ]] && path=("/opt/homebrew/bin" "${path[@]}")
-```
-
-Verify with `which brew` after installation.
+The framework adds the prefix directly rather than running
+`eval "$(brew shellenv)"`, to keep PATH construction deterministic and
+avoid a subprocess on every shell start. Verify with `which brew` after
+installation.
 
 On Linux, use `apt` (Debian/Ubuntu) or `dnf` (Fedora/RHEL) for system
 tools. The distribution package manager is the natural choice — better

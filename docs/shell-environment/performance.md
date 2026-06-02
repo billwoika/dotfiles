@@ -38,7 +38,8 @@ zprof
 For external timing:
 
 ```sh
-# Run 10 shells and average:
+# Run 10 shells and read the 10 timings (this lists them; it does not
+# compute a mean — use hyperfine below for an actual average):
 for i in $(seq 10); do /usr/bin/time zsh -lic exit; done 2>&1
 
 # Or use hyperfine if available:

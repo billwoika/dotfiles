@@ -247,13 +247,47 @@ workaround, but a cleaner fix would be to add an Apple-Silicon prepend to
 `10-path.zsh` itself. Not urgent on Fedora; flagged for a future artifact
 change.
 
-### Flagged — 24 medium/low-confidence findings (NOT applied — your call)
+### Flagged — 24 medium/low-confidence findings (round 5: 23 applied, 1 held)
 
-These survived adversarial refutation but are medium/low confidence or
-judgment-dependent. Several look worth applying (e.g. `egrep`
-obsolescence, Podman's `pasta` default, Starship not honoring
-`$XDG_CONFIG_HOME`, the stale `example.com` IP) — left for you.
-Full data in `meta/phaseB-flagged.json`.
+Originally flagged for review; the user then approved applying them.
+Before applying, three currency claims were re-verified independently:
+
+- **Starship config path** — CONFIRMED (official docs: default is
+  hardcoded `~/.config/starship.toml`, not `$XDG_CONFIG_HOME`-derived;
+  override via `STARSHIP_CONFIG`). Applied.
+- **`example.com` IP** — the agent's "ICANN migrated to Cloudflare in
+  2025" rationale could NOT be independently confirmed. But hardcoding
+  *any* IP for `example.com` is fragile regardless, so the *fix*
+  (resolve via `dig +short` inline) was applied without asserting the
+  unverified migration claim.
+- **macOS `readlink -f`** — **RESOLVED (applied 2026-06).** Initially
+  held back: the agent claimed (from its own Darwin 25.2 machine) that
+  current macOS `readlink` supports `-f`, but independent web search
+  *contradicted* this. The conflict was settled by running the actual
+  command on the user's real macOS box: `/usr/bin/readlink -f` on a
+  symlink chain resolved correctly (`/tmp/_rl_test` → `/private/etc/hosts`),
+  confirming the agent was right and the web sources were reading a
+  **stale man page** (it still documents the old BSD `-f format` syntax
+  while the implementation now matches GNU `-f`). Ground-truth
+  observation beat published docs. The doc was updated to say `readlink
+  -f` works on current macOS, while keeping `realpath` as the
+  maximally-portable choice (older macOS genuinely lacked `-f`).
+
+The other 22 were applied as-is (one with a clarifying refinement: the
+`SSL_CERT_FILE` example block was kept rather than deleted — it is
+genuinely correct for the Python *stdlib*/OpenSSL, just not for
+`requests` — with a comment making the distinction explicit). All
+gates green after. Full data: `meta/phaseB-flagged.json`.
+
+**Applied highlights:** `egrep` obsolescence (grep 3.8+ warns);
+Podman `pasta` default since 5.0; Starship XDG path; XFS limited shrink
+(Linux 5.12+); ACPI `_OSI("Linux")` is a no-op; nested-virt is not
+Haswell-gated; `docker info` does not report virt status; Fedora 41+
+uses `tuned`/`tuned-ppd`; Microsoft "Windows Production PCA 2011" name;
+SATA ceiling ~600 MB/s (signaling) vs ~550 real; TPM PCR 11 detail;
+`rv shell init zsh` hook; the zprof loop "average" comment; the
+WireGuard `DNS=` double-config; mitmproxy now prefers wireguard/local
+mode; Tunnelblick utun framing.
 
 **`operations/container-networking.md`**
 - [outdated/medium] Listing slirp4netns first reads as the default/primary rootless backend. Since Podman 5.0 (early 2024), pasta (passt) is the default rootless networking tool an → _Lead with pasta as the current default and note slirp4netns as the older fallback, e.g. 'Rootless containers use pasta (_
@@ -319,6 +353,78 @@ Full data in `meta/phaseB-flagged.json`.
 
 Phase B data files: `meta/phaseB-confirmed.json` (63),
 `meta/phaseB-flagged.json` (24), `meta/phaseB-refuted.json` (12).
+
+## Phase C — the executable conf.d code, audited (round 6)
+
+The docs were vetted, but the **code that actually runs on every shell
+start** had only ever been syntax-checked (`zsh -n`). Phase C closed
+that: a **bounded code-audit workflow** (one agent per file, hard cap)
+over all 21 executable units — the 5-file zsh startup chain + 16 conf.d
+fragments (`25-tool-cache.zsh` was already hand-fixed earlier). Lens was
+a real **code review**, not a fact-check: wrong tool flags, deprecated
+zsh, bugs/footguns, silent no-ops, load-order hazards. **34 agents** (21
+audit + 13 refute), within bounds.
+
+**10 confirmed defects, 3 dismissed, 13/21 files airtight** — including
+the entire startup chain (`zshenv`/`.zshenv`/`.zprofile`/`.zshrc`/
+`.zlogout`) and the PATH builder, which all came back clean.
+
+The 3 dismissed are notable: all were predictions that a construct
+breaks on macOS (`xargs -r` "illegal option", a destructive `grep`
+pipe, an awk boundary fall-through) that the refute agent **executed on
+real Darwin awk/xargs** and found do NOT reproduce. The adversarial
+layer prevented 3 bad edits to working code.
+
+**All 10 applied** (these are confirmed defects in running code, which
+is exactly the "airtight" bar). The awk-heavy fixes were
+**functionally tested**, not just `zsh -n`'d:
+
+*Wrong tool flags (the highest-value class — same family as the earlier
+`rv completions` bug):*
+
+- **`70-tools.zsh:22`** — `rv shell zsh` → `rv shell init zsh`. This is
+  the **live activation hook**; the bare form does not emit eval-able
+  code, so `.ruby-version`-on-`cd` switching was silently not wired up.
+- **`60-aliases.zsh:64`** — `rvi="rv install"` → `rv ruby install`
+  (install moved under the `ruby` namespace; bare form errors).
+- **`64-js-aliases.zsh:22`** — biome `--apply` → `--write` (removed in
+  Biome v2).
+
+*Logic bugs (functionally verified against real awk):*
+
+- **`20-completion.zsh:27`** — the 24h compinit cache **never engaged**:
+  `EXTENDED_GLOB` isn't set until `40-options.zsh` (loads later), so the
+  `(#q)` age check was literal text → every shell took the slow
+  full-rebuild path. Fixed with `setopt LOCAL_OPTIONS EXTENDED_GLOB` +
+  a missing-dump guard. Verified: fresh dump now takes `compinit -C`.
+- **`67-devloop.zsh`** (`tree-trunk`) — stale-state awk: the first line
+  of a new group was suppressed when the prior group hit the cap (data
+  loss), and the summary used the wrong prefix + count. Rewritten and
+  tested: collapsed groups now summarize with their own prefix and the
+  following group's lines survive.
+- **`66-data-functions.zsh:39`** — CSV-split chunk boundary off-by-one
+  (`(NR-1)%chunk==1` → `(NR-2)%chunk==0`). Verified row counts.
+- **`80-functions.zsh:82`** — `timeshell` parsed the wrong `/usr/bin/time`
+  field. Fixed to `-p` (POSIX format, portable GNU+BSD) AND made the awk
+  strip shell-integration escape sequences that the terminal injects
+  onto the `real` line (which would otherwise shift fields). Verified it
+  now reports an average on real noisy output.
+
+*Footguns:*
+
+- **`80-functions.zsh:18`** (`up`) — `[[ -n $t ]] && cd $t || cd /`
+  precedence: fell back to `/` on cd *failure*, not just empty. Made an
+  explicit `if/else`.
+- **`61-git-extensions.zsh:54`** (`gclean`) — added `xargs -r` so an
+  empty branch list doesn't invoke `git branch -d` with no args on GNU.
+
+All gates green after: `zsh -n` (22 files), POSIX suite 30/30,
+`ssh -G` parse, `mkdocs --strict`, and a real `zsh -lic` login-shell
+smoke test. Data: `meta/phaseC-confirmed.json` (10),
+`meta/phaseC-dismissed.json` (3).
+
+**With Phase C done, every line of code that executes on shell startup
+has been through an upstream-verified, adversarially-refuted audit.**
 
 ## Summary
 

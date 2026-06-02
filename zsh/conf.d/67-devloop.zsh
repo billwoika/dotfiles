@@ -18,23 +18,31 @@ tm() {
 # ── tree-trunk: tree output collapsed at N files per directory level ──
 # Usage: tree-trunk [dir] [depth]  (defaults: . 3)
 tree-trunk() {
-  tree -L ${2:-3} ${1:-.} | awk '
-    BEGIN { last_prefix = ""; count = 1 }
+  tree -L ${2:-3} ${1:-.} | awk -v cap=4 '
+    # Collapse runs of same-prefix lines to the first `cap`, then a
+    # "... N more ..." summary. Decisions use the CURRENT group, and the
+    # summary is flushed for the group that just ENDED (its own prefix).
+    function flush(p, c) {
+      if (c > cap) print p "... " (c - cap) " more ..."
+    }
+    BEGIN { last_prefix = ""; count = 0; have_group = 0 }
     {
-      # Extract indentation prefix (the tree-drawing characters)
       prefix = $0
       sub(/[^│├└─]+$/, "", prefix)
 
-      if (count < 5) { print }
-
-      if (prefix == last_prefix) {
-        count++
-      } else {
-        if (count > 5) { print prefix " " count " more files..." }
-        count = 1
+      if (have_group && prefix != last_prefix) {
+        flush(last_prefix, count)   # summarize the group that just ended
+        count = 0
       }
+
+      count++
+      if (count <= cap) print       # print first `cap` of THIS group
+
       last_prefix = prefix
-    }'
+      have_group = 1
+    }
+    END { flush(last_prefix, count) }  # summarize the final group
+  '
 }
 
 # ── Quick HTTP server for the current directory ─────────────────────

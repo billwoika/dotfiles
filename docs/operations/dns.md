@@ -294,7 +294,11 @@ split DNS:
 [Interface]
 PrivateKey = <key>
 Address = 10.0.0.2/32
-DNS = 10.0.0.1
+# No DNS= line here on purpose: wg-quick's DNS= would configure the
+# resolver itself (and treats the non-IP entry as a search domain). The
+# PostUp pair below is what we want — it sets the resolver AND the '~'
+# routing-domain (split DNS), which DNS= cannot express. Use one or the
+# other, not both.
 PostUp = resolvectl dns %i 10.0.0.1; resolvectl domain %i '~corp.example.com'
 PostDown = resolvectl revert %i
 ```

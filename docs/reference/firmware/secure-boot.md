@@ -232,8 +232,8 @@ Dual-booting Linux alongside Windows with Secure Boot enabled
 works correctly on most systems because both operating systems use
 the same trust chain:
 
-- Windows is signed by Microsoft's Windows Production CA (in the
-  firmware's db).
+- Windows is signed by the Microsoft Windows Production PCA 2011 (its
+  2023 successor is the "Windows UEFI CA 2023"), in the firmware's db.
 - Linux's shim is signed by the Microsoft Corporation UEFI CA 2011
   (also in the firmware's db).
 - Both pass firmware verification.

@@ -61,7 +61,7 @@ alias be="bundle exec"
 alias bi="bundle install"
 alias bo="bundle open"
 alias rvr="rv run"
-alias rvi="rv install"
+alias rvi="rv ruby install"
 
 # Python (uv)
 alias uvr="uv run"

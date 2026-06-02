@@ -320,9 +320,12 @@ IRIX and ported to Linux.
 
 **Weaknesses:**
 
-- **Cannot shrink.** An XFS filesystem can only grow, never shrink.
-  If a logical volume is too large, the only path is backup, delete,
-  recreate smaller, restore.
+- **Limited shrink only.** Historically XFS could only grow. Since
+  Linux 5.12 (2021), `xfs_growfs` can shrink experimentally — but only
+  by reclaiming unused space from the last allocation group, so it
+  rarely shrinks by a useful amount in practice. The reliable path for
+  a real size reduction is still backup, delete, recreate smaller,
+  restore.
 - No built-in snapshots (requires LVM).
 - No built-in compression.
 - No checksumming (though metadata checksumming was added in

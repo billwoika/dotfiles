@@ -256,9 +256,12 @@ STOP_CHARGE_THRESH_BAT0=80
 
 ### Power profiles
 
-Modern Linux distributions integrate with `power-profiles-daemon`
-(GNOME) or `tuned` (Fedora server/workstation) to provide
-system-wide power profiles:
+Modern Linux distributions expose system-wide power profiles through
+the `powerprofilesctl` interface. That interface is backed either by
+`power-profiles-daemon` or by `tuned` — and since Fedora 41 (2024),
+Fedora Workstation uses `tuned` by default via the `tuned-ppd`
+compatibility layer rather than `power-profiles-daemon`. Both speak the
+same CLI:
 
 ```bash
 # List available profiles

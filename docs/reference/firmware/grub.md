@@ -85,10 +85,11 @@ GRUB_CMDLINE_LINUX="rd.luks.uuid=<uuid> resume=/dev/mapper/swap"
 # Additional parameters appended only to the default (non-recovery) entry
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 
-# Terminal output (console for text, gfxterm for graphical)
-GRUB_TERMINAL_OUTPUT="console"
-
-# Console settings for serial access
+# Console + serial. NOTE: GRUB_TERMINAL overrides BOTH
+# GRUB_TERMINAL_INPUT and GRUB_TERMINAL_OUTPUT, so do not also set
+# GRUB_TERMINAL_OUTPUT — it would be ignored. Use either GRUB_TERMINAL
+# alone (input+output together, as below), or only the split
+# INPUT/OUTPUT keys — not a mix.
 GRUB_TERMINAL="serial console"
 GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
 
