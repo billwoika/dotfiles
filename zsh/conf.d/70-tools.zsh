@@ -19,7 +19,7 @@ fi
 # ── rv (Ruby) ───────────────────────────────────────────────────────
 # rv has its own shell integration that reads .ruby-version on cd.
 if command -v rv &>/dev/null; then
-  eval "$(rv shell zsh)"
+  eval "$(rv shell init zsh)"
 fi
 
 # ── direnv ──────────────────────────────────────────────────────────

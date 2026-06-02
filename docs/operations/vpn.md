@@ -148,10 +148,13 @@ lifecycle:
   the interface it expects.
 
 This is not an OpenVPN protocol problem — it's an implementation
-problem in macOS clients that use the legacy kext model rather than
-the modern Network Extension framework. The AWS Client VPN macOS app
-and Tunnelblick both exhibit this behavior. OpenVPN Connect (the
-official OpenVPN3-based client) handles it better but not perfectly.
+problem in how some macOS clients manage the lifecycle of the `utun`
+interfaces they create (leaving stale ones behind on disconnect). The
+AWS Client VPN macOS app and Tunnelblick both exhibit this behavior.
+(Modern Tunnelblick uses the built-in macOS `utun` interface, not a
+kernel extension, for standard tun VPNs — so this is an interface
+cleanup issue, not a kext-vs-Network-Extension one.) OpenVPN Connect
+(the official OpenVPN3-based client) handles it better but not perfectly.
 
 **The bad on Linux:** fewer problems. The `tun` device model is
 well-understood by the kernel, `ip link delete` cleans up reliably,

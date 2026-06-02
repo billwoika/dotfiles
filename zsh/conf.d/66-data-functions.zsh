@@ -36,7 +36,7 @@ csvsplit() {
       print header > outfile
       next
     }
-    (NR - 1) % chunk == 1 && NR > 2 {
+    (NR - 2) % chunk == 0 && NR > 2 {
       close(outfile)
       part++
       outfile = sprintf("%s%04d.csv", pre, part)

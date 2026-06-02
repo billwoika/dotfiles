@@ -20,12 +20,18 @@ mkdir -p "${XDG_CACHE_HOME}/zsh"
 
 autoload -Uz compinit
 
-# Use extendedglob for the age check (#q glob qualifier).
-# N     = null-glob (no error if no match)
-# .     = regular files only
-# mh+24 = modified more than 24 hours ago
-if [[ -n "${_zcompdump}"(#qN.mh+24) ]]; then
-  # Cache is stale or absent: full rebuild (security-checked)
+# Age check via the (#q) glob qualifier:
+#   N     = null-glob (no error if no match)
+#   .     = regular files only
+#   mh+24 = modified more than 24 hours ago
+# The (#q) qualifier REQUIRES extended_glob to be in effect, and it is
+# NOT yet set this early in startup (40-options.zsh sets it globally,
+# but that loads after this fragment). LOCAL_OPTIONS makes the setopt
+# auto-revert at the end of this enclosing scope. The operand must be
+# UNQUOTED for filename generation to run inside [[ ]].
+setopt LOCAL_OPTIONS EXTENDED_GLOB
+if [[ -n ${_zcompdump}(#qN.mh+24) || ! -e ${_zcompdump} ]]; then
+  # Cache is stale, absent, or missing: full rebuild (security-checked)
   compinit -d "${_zcompdump}"
 else
   # Cache is fresh: skip security check for faster startup (-C flag)

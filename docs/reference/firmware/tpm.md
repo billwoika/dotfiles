@@ -167,7 +167,7 @@ sudo cryptsetup luksDump /dev/nvme0n1p3
 | 7 | Secure Boot policy | **Recommended** — changes only if Secure Boot keys change |
 | 8 | GRUB commands + kernel command line (GRUB measures here) | Useful on GRUB systems. systemd-boot's kernel cmdline is PCR 12, not 8 |
 | 9 | GRUB: all files read, incl. kernel image | Breaks on kernel update — avoid unless automated. systemd-boot/UKI measures the kernel into PCR 11, not 9 |
-| 11 | Unified Kernel Image hash (systemd-boot/UKI) | For UKI-based boot chains |
+| 11 | systemd-stub: each PE section of the UKI, plus systemd boot-phase strings | For UKI-based boot chains |
 | 14 | MOK certificates | Changes when MOK keys are enrolled/removed |
 
 **PCR 7 alone is the pragmatic choice** for most workstations. It

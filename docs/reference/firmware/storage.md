@@ -24,11 +24,12 @@ the motherboard, communicate through the SATA controller (part of
 the PCH — see [Hardware Topology](hardware-topology.md)), and are
 managed by the AHCI protocol.
 
-SATA III (the current and final version) has a maximum throughput
-of 6 Gb/s (~550 MB/s). This is the ceiling for any SATA device,
-regardless of how fast the underlying media is. A SATA SSD
-advertised at 560 MB/s sequential read is at the physical limit of
-the interface.
+SATA III (the current and final version) signals at 6 Gb/s; after
+8b/10b line encoding the usable payload ceiling is 4.8 Gb/s, about
+600 MB/s. Real SATA SSDs reach ~550–560 MB/s, which is the practical
+ceiling for any SATA device regardless of how fast the underlying
+media is. A SATA SSD advertised at 560 MB/s sequential read is at the
+effective limit of the interface.
 
 ### NVMe (Non-Volatile Memory Express)
 

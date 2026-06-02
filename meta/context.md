@@ -389,6 +389,24 @@ are obvious about what they do.
 `~/.profile` shim is what makes the subprocess story work; switching
 the primary shell to a non-POSIX shell breaks it.
 
+**Multi-desktop Linux support (KDE / Sway / i3 equivalents).** The
+framework's Linux desktop guidance assumes **GNOME on Wayland** and is
+now explicit about it (see `fedora.md` "GNOME desktop tuning" note,
+added 2026-06). Reasoning: GNOME-on-Wayland is the default on Fedora
+Workstation and Ubuntu (what most readers get without choosing), its
+settings are scriptable via `gsettings`/`dconf` (so the tuning is
+reproducible, not a click-path), and GNOME 46+ ships the `gcr-ssh-agent`
+stack the framework depends on. NB this is NOT a "GNOME vs Wayland" or
+"Wayland vs X11" choice — GNOME is the desktop, Wayland the display
+protocol, and the framework targets the Wayland default. We deliberately
+do NOT document KDE/Sway equivalents for the `gsettings` tuning —
+supporting every Linux desktop is beyond a personal framework's remit —
+but the note names the settings to look for and flags that the
+SSH-agent guidance is the one desktop-independent piece. If Bill ever
+moves off GNOME, this is the decision to revisit. (The implicit
+assumption existed for the whole project; surfacing/defending it was
+prompted by Bill's "are we consciously choosing this?" question.)
+
 ### 3.11 Framework versioning
 
 **Decision: Versioned via the docs site, not the dotfiles. Word doc

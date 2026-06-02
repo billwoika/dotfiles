@@ -23,6 +23,18 @@ _path_append "/bin"
 _path_append "/usr/sbin"
 _path_append "/sbin"
 
+# ── Homebrew (macOS) ────────────────────────────────────────────────
+# Apple Silicon installs brew at /opt/homebrew, which is NOT in the
+# default /etc/paths (so path_helper does not add it) — without this,
+# brew tools are missing from PATH in this framework's shells. Intel's
+# /usr/local is already covered by the system baseline above. We add
+# the prefix directly rather than `eval "$(brew shellenv)"` to keep PATH
+# construction deterministic and avoid a subprocess on every shell.
+# Prepended here (below the version-managed tools added later) so mise
+# shims still win, but above the bare system bins.
+_path_prepend "/opt/homebrew/sbin"
+_path_prepend "/opt/homebrew/bin"
+
 # ── User-local binaries ─────────────────────────────────────────────
 _path_prepend "${HOME}/.local/bin"
 
@@ -48,7 +60,7 @@ _path_prepend "${XDG_DATA_HOME}/mise/shims"
 
 # ── rv: Ruby version & gem manager (not managed by mise in this stack) ──
 # rv has its own shell integration (installed in conf.d/70-tools.zsh).
-# Its bin directory is added by `rv shell zsh` activation, not here.
+# Its bin directory is added by `rv shell init zsh` activation, not here.
 
 # ── Cleanup: unset private helpers to avoid namespace pollution ─────
 unfunction _path_prepend _path_append 2>/dev/null || true

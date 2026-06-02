@@ -143,7 +143,8 @@ Not every tool uses the system trust store:
 |------|-------------|-------------------|
 | **curl** | System store (macOS), `/etc/ssl/certs` (Linux) | Usually works after system install |
 | **Node.js** | Does not use system store by default | Set `NODE_EXTRA_CA_CERTS=~/.mitmproxy/mitmproxy-ca-cert.pem` |
-| **Python (requests)** | Uses `certifi` bundle, not system store | Set `REQUESTS_CA_BUNDLE=~/.mitmproxy/mitmproxy-ca-cert.pem` or `SSL_CERT_FILE` |
+| **Python (requests)** | Uses `certifi` bundle, not system store | Set `REQUESTS_CA_BUNDLE=~/.mitmproxy/mitmproxy-ca-cert.pem` (requests honors `REQUESTS_CA_BUNDLE`/`CURL_CA_BUNDLE`, not `SSL_CERT_FILE`) |
+| **Python stdlib (`ssl`/`urllib`)** | Uses OpenSSL default paths | Set `SSL_CERT_FILE=~/.mitmproxy/mitmproxy-ca-cert.pem` (this covers `urllib`/`http.client`/OpenSSL CLI, but *not* requests) |
 | **Java** | Uses its own keystore | `keytool -import -trustcacerts -keystore $JAVA_HOME/lib/security/cacerts -file ca.pem` |
 | **Ruby** | System store on macOS, OpenSSL bundle on Linux | Usually works after system install |
 | **Go** | System store | Usually works after system install |
@@ -156,9 +157,9 @@ debugging is active):
 
 ```sh
 # .envrc for a proxy-debugging session
-export NODE_EXTRA_CA_CERTS="$HOME/.mitmproxy/mitmproxy-ca-cert.pem"
-export REQUESTS_CA_BUNDLE="$HOME/.mitmproxy/mitmproxy-ca-cert.pem"
-export SSL_CERT_FILE="$HOME/.mitmproxy/mitmproxy-ca-cert.pem"
+export NODE_EXTRA_CA_CERTS="$HOME/.mitmproxy/mitmproxy-ca-cert.pem"  # Node
+export REQUESTS_CA_BUNDLE="$HOME/.mitmproxy/mitmproxy-ca-cert.pem"   # Python requests
+export SSL_CERT_FILE="$HOME/.mitmproxy/mitmproxy-ca-cert.pem"        # Python stdlib ssl/urllib + OpenSSL (NOT requests)
 ```
 
 ### Removing trust when done
@@ -380,6 +381,15 @@ podman run -v ~/.mitmproxy/mitmproxy-ca-cert.pem:/usr/local/share/ca-certificate
 Instead of configuring each client to use the proxy, you can redirect
 traffic at the network layer — all outbound HTTP/HTTPS traffic is
 routed to the proxy without the client knowing.
+
+!!! note "Upstream now prefers WireGuard / local mode"
+
+    mitmproxy's docs now recommend `--mode wireguard` or `--mode local`
+    (local capture, with optional per-process filtering) over transparent
+    mode: they are simpler to set up and also handle UDP-based protocols,
+    which transparent mode does not. The pf/iptables transparent setup
+    below still works and is kept as a fallback for environments where the
+    newer modes are not an option.
 
 ### macOS (pf)
 

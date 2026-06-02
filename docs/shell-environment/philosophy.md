@@ -34,9 +34,10 @@ fragments contain the actual configuration.
 
 ## What this does not include
 
-**Prompt theming** is intentionally out of scope. Starship
-(`starship.toml` in `XDG_CONFIG_HOME/starship.toml`) or a hand-written
-`PROMPT` function are both reasonable choices and integrate cleanly
+**Prompt theming** is intentionally out of scope. Starship (config at
+`~/.config/starship.toml` by default — Starship does not honor
+`$XDG_CONFIG_HOME`; set `STARSHIP_CONFIG` to relocate it) or a
+hand-written `PROMPT` function are both reasonable choices and integrate cleanly
 with the config described here.
 
 **Fuzzy finders** (fzf, zoxide) have their eval-based init lines in

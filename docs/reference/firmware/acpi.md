@@ -204,20 +204,27 @@ produces incorrect behavior under Linux — the kernel provides boot
 parameters to override `_OSI` behavior:
 
 ```bash
-# Tell firmware that no Windows version is running
-acpi_osi=!  acpi_osi="Linux"
-
-# Tell firmware a specific Windows version
+# Clear the default _OSI list, then advertise a specific Windows version
 acpi_osi=!  acpi_osi="Windows 2019"
 
-# Multiple overrides
-acpi_osi=!  acpi_osi="Linux"  acpi_osi="Windows 2015"
+# Clear, then advertise an older Windows (common backlight/sleep fix)
+acpi_osi=!  acpi_osi="Windows 2015"
 ```
 
 These are added to the kernel command line via the bootloader
 configuration (see [Boot Management](boot-management.md)). The
 `acpi_osi=!` clears the default list; subsequent `acpi_osi=`
 entries add specific strings.
+
+!!! note "`acpi_osi="Linux"` is effectively a no-op"
+
+    Advertising `_OSI("Linux")` does **not** make firmware take a
+    Linux-friendly path. The kernel removed default support for
+    `_OSI("Linux")` back in 2009 (it caused more breakage than it fixed
+    and triggers a `FW_BUG` warning), and essentially no modern firmware
+    honors it. The effective overrides are the **Windows** strings above
+    — they change which Windows code path the firmware exposes, which is
+    what actually fixes backlight/sleep issues.
 
 Common scenarios where `_OSI` overrides fix Linux issues:
 

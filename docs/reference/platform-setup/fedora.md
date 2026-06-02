@@ -314,6 +314,32 @@ SystemMaxUse=500M
 Fedora Workstation ships GNOME. These are not cosmetic preferences —
 they are settings that affect developer productivity.
 
+!!! note "We assume GNOME on Wayland — and why"
+
+    The framework's Linux desktop guidance assumes **GNOME running on
+    Wayland**, which is the default on both Fedora Workstation and Ubuntu
+    (so it is what most readers get without choosing anything), exposes
+    its settings through `gsettings`/`dconf` (scriptable, so the tuning
+    below is reproducible rather than a click-path), and on GNOME 46+
+    provides the modern `gcr-ssh-agent` Wayland-era secret/SSH stack the
+    framework relies on elsewhere. To be clear about the terms: **GNOME
+    is the desktop environment and Wayland is the display protocol** —
+    they are not alternatives to each other. The framework is not "X11
+    vs Wayland" — it targets the Wayland default and only notes X11
+    where a tool genuinely differs (e.g. SSH `askpass`).
+
+    **Where this is wrong for you:** if you run **KDE Plasma, Sway, i3,
+    or another desktop**, the `gsettings org.gnome.*` commands below do
+    not apply — they are GNOME-specific and silently no-op (or error)
+    elsewhere. The *intent* of each (key-repeat rate, Caps-as-Ctrl,
+    font hinting, focus-follows-mouse, night light) is portable, but the
+    mechanism is not. KDE uses `kwriteconfig6`/System Settings; Sway/i3
+    use their own config files and `input`/`xkb` directives. We do not
+    document those equivalents here — supporting every Linux desktop is
+    beyond a personal framework's remit — but the settings to look for
+    are named above, and the SSH-agent guidance (`gcr-ssh-agent`) is the
+    one piece that matters regardless of desktop.
+
 ### Keyboard and input
 
 ```sh

@@ -32,8 +32,9 @@ Boot Mode, or Advanced → CSM Configuration. Varies by vendor.
 - Boot Mode: **UEFI**
 - CSM / Legacy Support: **Disabled**
 
-**Why:** Legacy BIOS boot limits disk size to 2TB, uses MBR instead
-of GPT, and prevents Secure Boot. Every modern Linux distribution
+**Why:** Legacy BIOS boot forces an MBR partition table on the boot
+disk, and MBR limits disk size to ~2TB on 512-byte-sector drives
+(GPT, which UEFI uses, does not), and prevents Secure Boot. Every modern Linux distribution
 expects UEFI. If CSM is enabled, the installer may boot in legacy
 mode and create an MBR partition table — producing a system that
 works but cannot use Secure Boot, cannot boot from disks larger

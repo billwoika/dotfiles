@@ -86,7 +86,9 @@ produces unexpected output tells you which layer to investigate:
     dig +short internal.corp.example.com  # should go through VPN DNS
 
     # 5. Can you actually reach the resolved IP?
-    nc -zv 93.184.216.34 443 -w 3
+    #    (resolve the host rather than hardcoding an address — example.com's
+    #    IP is not stable, and pinning one masks DNS-vs-routing failures)
+    nc -zv "$(dig +short example.com | tail -1)" 443 -w 3
 
     # 6. Is something proxying?
     echo $HTTP_PROXY $HTTPS_PROXY $ALL_PROXY
@@ -112,7 +114,9 @@ produces unexpected output tells you which layer to investigate:
     dig +short internal.corp.example.com
 
     # 5. Can you actually reach the resolved IP?
-    nc -zv 93.184.216.34 443 -w 3
+    #    (resolve the host rather than hardcoding an address — example.com's
+    #    IP is not stable, and pinning one masks DNS-vs-routing failures)
+    nc -zv "$(dig +short example.com | tail -1)" 443 -w 3
 
     # 6. Is something proxying?
     echo $HTTP_PROXY $HTTPS_PROXY $ALL_PROXY

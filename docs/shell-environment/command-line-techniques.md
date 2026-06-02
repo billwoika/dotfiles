@@ -35,7 +35,7 @@ unless explicitly redirected:
 # stdout to grep, stderr to terminal
 command_that_warns 2>&1 | grep "error"
 
-# stderr only to grep (zsh-specific syntax)
+# stderr only to grep (portable POSIX redirection — order matters)
 command_that_warns 2>&1 >/dev/null | grep "error"
 ```
 
@@ -280,8 +280,10 @@ grep -B2 -A5 "Exception" server.log    # 2 lines before, 5 after
 ### Basic vs. extended regex
 
 By default, `grep` uses basic regular expressions where `+`, `?`,
-`{`, `|`, and `(` are literal characters. Use `-E` (extended regex)
-or `egrep` to enable them:
+`{`, `|`, and `(` are literal characters. Use `grep -E` (extended
+regex) to enable them (and `grep -F` for fixed strings). The legacy
+`egrep`/`fgrep` wrappers are deprecated — GNU grep 3.8+ prints an
+obsolescence warning for them — so prefer the `-E`/`-F` flags:
 
 ```zsh
 # Basic regex: must escape special characters
@@ -694,11 +696,15 @@ stat -f %z file.txt
 ### readlink
 
 ```zsh
-# GNU readlink (Linux): resolve symlink fully
+# Resolve a symlink fully (canonicalize). `readlink -f` works on both
+# GNU (Linux) and current macOS — verified on macOS 26.x: /usr/bin/readlink
+# now accepts -f and canonicalizes like GNU, despite a stale man page that
+# still documents the old BSD `-f format` syntax.
 readlink -f /usr/local/bin/python3
 
-# BSD readlink (macOS): does not support -f
-# Use realpath instead (available in recent macOS)
+# For maximum portability (older macOS releases genuinely lacked
+# readlink -f, and for POSIX-leaning scripts), `realpath` is the safer
+# choice and is available on Linux and recent macOS:
 realpath /usr/local/bin/python3
 ```
 

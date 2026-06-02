@@ -187,9 +187,13 @@ when:
 Nested virtualization is a CPU feature that must be enabled in both
 firmware and the host hypervisor:
 
-**Intel:** Supported on most CPUs since Haswell (2013). The `vmx`
-flag in `/proc/cpuinfo` indicates base support; the KVM module
-parameter `nested` controls whether it is exposed to guests.
+**Intel:** Nested VMX works on essentially any VMX-capable Intel CPU
+(it predates Haswell — KVM has supported it since ~2010 on
+Nehalem/Sandy Bridge/Ivy Bridge). It is gated by the `kvm-intel`
+module's `nested` parameter, not by CPU generation. Haswell (2013)
+added VMCS shadowing, which makes nested virtualization *faster* but is
+not required for it. The `vmx` flag in `/proc/cpuinfo` indicates base
+support.
 
 **AMD:** Supported on most CPUs since Zen (2017). AMD's nested
 virtualization is generally considered more mature and performant
@@ -249,7 +253,9 @@ virtualization settings.
    `kvm` module installed or the firmware setting is disabled.
 4. Does the development workflow require nested virtualization? If
    so, verify with `cat /sys/module/kvm_*/parameters/nested`.
-5. If running Docker or Podman: does the container runtime report
-   hardware virtualization as available? `docker info` and
-   `podman info` both report the backing runtime and
-   virtualization status.
+5. If running Docker or Podman: `docker info` / `podman info` report
+   the backing runtime (runc/crun), storage driver, and cgroup
+   details — but NOT CPU hardware-virtualization status (on native
+   Linux there is no hypervisor in the path). To check virtualization
+   availability, use `lscpu`, `/proc/cpuinfo` (vmx/svm flags), or
+   `lsmod | grep kvm`.
