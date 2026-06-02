@@ -8,10 +8,14 @@ operating systems with near-native performance by using CPU
 hardware features instead of emulating them in software.
 
 For a Linux development workstation, virtualization support is not
-optional. Docker, Podman, QEMU/KVM, VirtualBox, and most container
-runtimes require hardware virtualization. Without it, containers
-run in degraded mode (or refuse to start), VMs fall back to slow
-software emulation, and development workflows that depend on
+optional — but be precise about what needs it. **QEMU/KVM and
+VirtualBox** (hypervisors) require CPU hardware virtualization
+(VT-x/AMD-V). **Native Linux containers (Docker, Podman) do NOT** —
+they use kernel namespaces and cgroups and run fine without vmx/svm.
+(On macOS/Windows, Docker runs inside a Linux VM, so there the
+hypervisor requirement applies.) Without hardware virtualization on
+Linux, VMs fall back to slow software emulation, and development
+workflows that depend on
 isolated environments break.
 
 On most desktop motherboards, virtualization is enabled by default.
@@ -147,10 +151,13 @@ dmesg | grep -i iommu
 # Check IOMMU groups (each group is an isolation boundary)
 find /sys/kernel/iommu_groups/ -type l -exec basename {} \; | sort -n | head -20
 
-# If IOMMU is not active despite being enabled in firmware,
-# add the kernel parameter:
-# Intel: intel_iommu=on
-# AMD:   iommu=pt  (passthrough mode — recommended for desktops)
+# If IOMMU is not active despite being enabled in firmware, add the
+# vendor on-switch:
+#   Intel: intel_iommu=on
+#   AMD:   amd_iommu=on   (often on by default; harmless to set)
+# iommu=pt is a VENDOR-NEUTRAL option that sets passthrough mode (less
+# overhead for devices not being passed through); add it alongside the
+# on-switch on either vendor, e.g. "intel_iommu=on iommu=pt".
 #
 # Add to GRUB_CMDLINE_LINUX in /etc/default/grub
 # Then: sudo grub2-mkconfig -o /boot/grub2/grub.cfg  (Fedora)

@@ -101,8 +101,11 @@ driver.
 **Intel Rapid Storage Technology (RST)** is Intel's RAID/storage
 acceleration layer. When the firmware is set to "RST" or "Intel
 RST Premium" mode, the SATA controller uses Intel's proprietary
-interface instead of standard AHCI. Windows has a native RST
-driver. Linux does not.
+interface instead of standard AHCI. Windows has a native RST driver.
+Linux supports Intel RST/IMSM RAID volumes via the kernel `md` driver
+and `mdadm` (using IMSM external metadata), but the cleaner path for a
+Linux box is to switch the controller to AHCI in firmware and use
+software RAID or Btrfs/ZFS instead.
 
 This is the single most common reason a Linux installer cannot see
 an installed SATA or M.2 SATA drive: the firmware is set to RST

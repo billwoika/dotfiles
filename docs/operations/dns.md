@@ -355,8 +355,10 @@ dig +trace example.com
 # Query a specific server (bypass system resolver)
 dig @10.0.0.1 internal.corp.example.com
 
-# Query the systemd-resolved cache specifically
-resolvectl query --cache-only=yes example.com
+# Answer only from the local cache, never the network
+# (resolvectl has no --cache-only; --network=no forces a cache-only
+# answer. --cache=BOOL only toggles whether the cache is consulted.)
+resolvectl query --network=no example.com
 
 # See NXDOMAIN vs timeout (timeout = routing/firewall; NXDOMAIN = DNS config)
 dig internal.corp.example.com
@@ -438,7 +440,7 @@ Two protocols encrypt DNS queries in transit:
 
 - **DNS-over-HTTPS (DoH)** — DNS queries wrapped in HTTPS to port
   443. Indistinguishable from normal web traffic to network observers.
-  Supported by all major browsers, macOS (14+), and systemd-resolved.
+  Supported by all major browsers, macOS (11+ / Big Sur), and systemd-resolved.
 - **DNS-over-TLS (DoT)** — DNS queries wrapped in TLS on a dedicated
   port (853). Visible as "encrypted DNS traffic" to network observers
   (the port identifies its purpose) but the query content is private.
@@ -454,16 +456,18 @@ identify DNS traffic without decrypting it.
 
 **Configuration:**
 
-=== "macOS (14+)"
+=== "macOS (11+)"
 
-    System Settings > Network > Wi-Fi (or Ethernet) > Details > DNS.
-    macOS supports encrypted DNS via configuration profiles. Cloudflare
-    and other providers publish `.mobileconfig` profiles that configure
-    DoH system-wide.
+    The System Settings > Network > Wi-Fi (or Ethernet) > Details > DNS
+    pane only sets **plaintext** resolver IP addresses — macOS exposes
+    no DoH/DoT toggle anywhere in the Network UI. System-level encrypted
+    DNS requires installing a `.mobileconfig` profile: Cloudflare and
+    other providers publish profiles that configure DoH/DoT system-wide
+    (visible afterward under System Settings > General > Device
+    Management / Profiles).
 
-    Alternatively, `networksetup` does not support DoH directly —
-    a configuration profile or MDM is required for system-level
-    encrypted DNS on macOS.
+    `networksetup` does not support DoH either — a configuration profile
+    or MDM is the only path to system-level encrypted DNS on macOS.
 
 === "Linux (systemd-resolved)"
 

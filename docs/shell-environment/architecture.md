@@ -77,8 +77,10 @@ When you start an interactive login shell:
 9. **`$ZDOTDIR/.zlogin`** (rarely used).
 
 For interactive non-login shells (the common case after the first
-session), step 4 and the system files at 4 and 5 are skipped, but
-everything else runs.
+session), the login-only files are skipped — that is both the zprofile
+pair (`/etc/zprofile`, `$ZDOTDIR/.zprofile`) and the zlogin pair
+(`/etc/zlogin`, `$ZDOTDIR/.zlogin`). Everything else (zshenv chain and
+zshrc chain) runs.
 
 ## XDG state directories
 
@@ -90,7 +92,7 @@ that should be cache or state.
 |------|---------|
 | `~/.config/<tool>/` | Configuration |
 | `~/.local/share/<tool>/` | Data the user generates (databases, projects) |
-| `~/.local/state/<tool>/` | Runtime state (logs, history, sockets) |
+| `~/.local/state/<tool>/` | Persistent state (logs, history) |
 | `~/.cache/<tool>/` | Cache that can be deleted at any time |
 
 Examples in the framework:

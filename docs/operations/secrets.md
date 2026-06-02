@@ -144,7 +144,7 @@ jobs:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - uses: 1password/install-cli-action@v1
+      - uses: 1password/install-cli-action@v3
       - run: |
           export DATABASE_URL=$(op read "op://CI/Production DB/connection_string")
           ./bin/deploy
@@ -166,7 +166,8 @@ use_vault
 export DATABASE_URL=$(vault_read secret/data/myapp database_url)
 ```
 
-For teams using **sops** (mozilla/sops) with age or AWS KMS for
+For teams using **sops** (getsops/sops, a CNCF Sandbox project — moved
+from the mozilla org to getsops in 2023) with age or AWS KMS for
 key management, secrets live in encrypted YAML files committed to
 the repo:
 

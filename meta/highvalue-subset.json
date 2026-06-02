@@ -1,0 +1,3579 @@
+[
+  {
+    "file": "docs/tools/containers.md",
+    "claim": "A Compose healthcheck for Postgres can use test: [\"CMD-SHELL\", \"pg_isready -U app\"] with interval, timeout, and retries keys",
+    "tool": "docker-compose",
+    "category": "command",
+    "locator": "test: [\"CMD-SHELL\", \"pg_isready -U app\"]"
+  },
+  {
+    "file": "docs/tools/containers.md",
+    "claim": "A Compose healthcheck for Redis can use test: [\"CMD\", \"redis-cli\", \"ping\"]",
+    "tool": "docker-compose",
+    "category": "command",
+    "locator": "test: [\"CMD\", \"redis-cli\", \"ping\"]"
+  },
+  {
+    "file": "docs/tools/containers.md",
+    "claim": "podman build --secret id=npm_token,env=NPM_TOKEN -t myapp . passes a build-time secret from an environment variable",
+    "tool": "podman",
+    "category": "command",
+    "locator": "podman build --secret id=npm_token,env=NPM_TOKEN -t myapp ."
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The command `sudo apt update && sudo apt upgrade -y` updates the package index and upgrades installed packages non-interactively.",
+    "tool": "apt",
+    "category": "command",
+    "locator": "Post-install checklist (first boot) \u2014 # 1. System update"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`software-properties-common` is the package providing `add-apt-repository` on Debian/Ubuntu, installable via `sudo apt install -y curl wget git software-properties-common`.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Post-install checklist \u2014 # 2. Install basic tools immediately"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`fwupdmgr get-devices` lists devices with firmware that fwupd can manage.",
+    "tool": "fwupd",
+    "category": "command",
+    "locator": "Post-install checklist \u2014 # 3. Firmware updates (Ubuntu)"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`fwupdmgr refresh --force` refreshes firmware metadata from LVFS, forcing a refresh even if metadata is current.",
+    "tool": "fwupd",
+    "category": "flag",
+    "locator": "Post-install checklist \u2014 sudo fwupdmgr refresh --force"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`fwupdmgr get-updates` lists available firmware updates and `fwupdmgr update` applies them.",
+    "tool": "fwupd",
+    "category": "command",
+    "locator": "Post-install checklist \u2014 sudo fwupdmgr get-updates / update"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Creating `/etc/apt/apt.conf.d/99parallel` with `Acquire::Queue-Mode \"host\";` and `Acquire::http::Pipeline-Depth \"10\";` enables parallel/pipelined apt downloads.",
+    "tool": "apt",
+    "category": "path",
+    "locator": "apt configuration \u2014 Parallel downloads"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu enables `unattended-upgrades` for security updates by default.",
+    "tool": "ubuntu",
+    "category": "default",
+    "locator": "Automatic security updates"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo dpkg-reconfigure -plow unattended-upgrades` reconfigures the unattended-upgrades package at low priority.",
+    "tool": "dpkg",
+    "category": "command",
+    "locator": "Automatic security updates \u2014 sudo dpkg-reconfigure -plow"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "On vanilla Debian, unattended-upgrades is not enabled by default.",
+    "tool": "debian",
+    "category": "default",
+    "locator": "Automatic security updates \u2014 On vanilla Debian"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The Debian backports apt source line is `deb http://deb.debian.org/debian <codename>-backports main` where codename comes from `lsb_release -cs`.",
+    "tool": "debian",
+    "category": "command",
+    "locator": "Backports (Debian only)"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`lsb_release -cs` prints the distribution codename (short form).",
+    "tool": "lsb_release",
+    "category": "flag",
+    "locator": "Backports \u2014 $(lsb_release -cs)"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Installing a package from Debian backports uses `sudo apt install -t <codename>-backports <package>`.",
+    "tool": "apt",
+    "category": "flag",
+    "locator": "Backports \u2014 sudo apt install -t"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo snap remove firefox` removes the snap-packaged Firefox.",
+    "tool": "snap",
+    "category": "command",
+    "locator": "Replacing snap Firefox (Ubuntu) \u2014 sudo snap remove firefox"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo add-apt-repository ppa:mozillateam/ppa` adds the Mozilla Team PPA for Firefox.",
+    "tool": "mozilla-ppa",
+    "category": "command",
+    "locator": "Replacing snap Firefox \u2014 Install Mozilla's official PPA"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "An apt preferences pin `Package: *` / `Pin: release o=LP-PPA-mozillateam` / `Pin-Priority: 1001` in `/etc/apt/preferences.d/mozilla-firefox` prioritizes the mozillateam PPA Firefox over the snap.",
+    "tool": "apt",
+    "category": "path",
+    "locator": "Replacing snap Firefox \u2014 Pin PPA version over snap"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo apt-mark hold firefox snap` holds the firefox and snap packages to prevent snap transitional packages from being reinstalled during upgrades.",
+    "tool": "apt",
+    "category": "command",
+    "locator": "Preventing snap reinstallation \u2014 sudo apt-mark hold firefox snap"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "On Ubuntu, `sudo apt install ubuntu-restricted-extras` installs multimedia codecs (restricted extras).",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Multimedia codecs \u2014 Ubuntu"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "On Debian, `sudo apt install libavcodec-extra` installs extra multimedia codecs.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Multimedia codecs \u2014 Debian"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The package `intel-media-va-driver-non-free` provides Intel hardware-accelerated video (VA-API) drivers.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "For hardware-accelerated video \u2014 Intel"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The package `mesa-va-drivers` provides AMD hardware-accelerated video (VA-API) drivers.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "For hardware-accelerated video \u2014 AMD"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The package `nvidia-vaapi-driver` provides NVIDIA VA-API video acceleration when using the proprietary driver.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "For hardware-accelerated video \u2014 NVIDIA"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo systemctl enable --now fstrim.timer` enables and starts the periodic SSD TRIM systemd timer.",
+    "tool": "systemd",
+    "category": "command",
+    "locator": "Enable fstrim for SSDs"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu defaults to the ext4 filesystem (not Btrfs).",
+    "tool": "ubuntu",
+    "category": "default",
+    "locator": "ext4 considerations"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The Debian installer offers Btrfs as a filesystem option; the Ubuntu installer does not offer Btrfs by default.",
+    "tool": "debian",
+    "category": "default",
+    "locator": "ext4 considerations \u2014 Debian installer offers it, Ubuntu does not"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu ships `ufw` (Uncomplicated Firewall), a frontend to iptables/nftables, installed but not enabled by default on desktop Ubuntu.",
+    "tool": "ufw",
+    "category": "default",
+    "locator": "Firewall \u2014 Ubuntu ships with ufw"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo ufw enable` enables the firewall; `sudo ufw default deny incoming` and `sudo ufw default allow outgoing` set default policies.",
+    "tool": "ufw",
+    "category": "command",
+    "locator": "Firewall \u2014 sudo ufw enable / default"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo ufw status verbose` shows the firewall status with default policies and verbosity.",
+    "tool": "ufw",
+    "category": "command",
+    "locator": "Firewall \u2014 Verify"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo ufw allow 3000/tcp` opens TCP port 3000 and `sudo ufw delete allow 3000/tcp` removes that rule.",
+    "tool": "ufw",
+    "category": "command",
+    "locator": "Firewall \u2014 Allow a dev server from LAN / Remove when done"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo ufw allow ssh` opens the SSH port (by service name).",
+    "tool": "ufw",
+    "category": "command",
+    "locator": "Firewall \u2014 Allow SSH"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo ufw status numbered` lists firewall rules with index numbers.",
+    "tool": "ufw",
+    "category": "command",
+    "locator": "Firewall \u2014 Check rules"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "On vanilla Debian, ufw is available but not pre-installed; install it with `sudo apt install ufw`.",
+    "tool": "ufw",
+    "category": "default",
+    "locator": "Firewall \u2014 On vanilla Debian, ufw is available but not pre-installed"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu uses AppArmor (not SELinux) as its mandatory access control framework.",
+    "tool": "apparmor",
+    "category": "default",
+    "locator": "AppArmor \u2014 Ubuntu uses AppArmor"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo aa-status` reports the AppArmor status (loaded/enforced/complain profiles).",
+    "tool": "apparmor",
+    "category": "command",
+    "locator": "AppArmor \u2014 Check status"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo aa-complain /usr/bin/some-program` sets an AppArmor profile to complain mode (logging without enforcement) and `sudo aa-enforce /usr/bin/some-program` re-enables enforcement.",
+    "tool": "apparmor",
+    "category": "command",
+    "locator": "AppArmor \u2014 Set a profile to complain mode / Re-enable enforcement"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`systemctl --user enable --now ssh-agent` enables and starts the ssh-agent user service.",
+    "tool": "systemd",
+    "category": "command",
+    "locator": "SSH agent as a user service"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`systemctl --user enable --now podman.socket` enables and starts the Podman user socket.",
+    "tool": "podman",
+    "category": "command",
+    "locator": "Podman socket \u2014 systemctl --user enable --now podman.socket"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The Podman rootless socket path used for `DOCKER_HOST` is `unix://${XDG_RUNTIME_DIR}/podman/podman.sock`.",
+    "tool": "podman",
+    "category": "path",
+    "locator": "Podman socket \u2014 export DOCKER_HOST"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo journalctl --vacuum-size=500M` shrinks the systemd journal to 500M.",
+    "tool": "systemd",
+    "category": "command",
+    "locator": "Journal size management \u2014 sudo journalctl --vacuum-size=500M"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Setting `SystemMaxUse=500M` under `[Journal]` in `/etc/systemd/journald.conf` caps the persistent journal at 500M.",
+    "tool": "systemd",
+    "category": "path",
+    "locator": "Journal size management \u2014 Edit /etc/systemd/journald.conf"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`gsettings set org.gnome.desktop.peripherals.keyboard delay 200` and `repeat-interval 25` set key repeat delay and interval in GNOME.",
+    "tool": "gnome",
+    "category": "command",
+    "locator": "GNOME desktop tuning \u2014 Key repeat speed"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`gsettings set org.gnome.desktop.input-sources xkb-options \"['caps:ctrl_modifier']\"` maps Caps Lock to act as Ctrl in GNOME.",
+    "tool": "gnome",
+    "category": "command",
+    "locator": "GNOME desktop tuning \u2014 Caps Lock as Ctrl"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`gsettings set org.gnome.desktop.interface enable-hot-corners false` disables the GNOME hot corner.",
+    "tool": "gnome",
+    "category": "command",
+    "locator": "GNOME desktop tuning \u2014 Disable hot corner"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'` and `font-hinting 'slight'` set GNOME font rendering options.",
+    "tool": "gnome",
+    "category": "command",
+    "locator": "GNOME desktop tuning \u2014 Font rendering"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu's GNOME adds a minimize button by default.",
+    "tool": "ubuntu",
+    "category": "default",
+    "locator": "Ubuntu-specific: minimize button"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`gsettings set org.gnome.desktop.wm.preferences button-layout 'close:'` removes the minimize/maximize buttons, leaving only close on the left.",
+    "tool": "gnome",
+    "category": "command",
+    "locator": "Ubuntu-specific: minimize button"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`sudo apt install tlp tlp-rdw` installs TLP and its radio device wizard for power management.",
+    "tool": "tlp",
+    "category": "package-name",
+    "locator": "Power management (laptops) \u2014 TLP for advanced power management"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu uses power-profiles-daemon by default, and TLP replaces it (mask via `sudo systemctl mask power-profiles-daemon`).",
+    "tool": "ubuntu",
+    "category": "default",
+    "locator": "Power management \u2014 Ubuntu uses power-profiles-daemon by default"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "For ThinkPads, `sudo apt install tp-smapi-dkms acpi-call-dkms` installs the relevant DKMS modules.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Power management \u2014 For ThinkPads"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "On Debian/Ubuntu, fd is packaged as `fd-find` and the binary is named `fdfind`.",
+    "tool": "fd",
+    "category": "package-name",
+    "locator": "fd and bat binary names on Debian/Ubuntu"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "On Debian/Ubuntu, the bat package ships its binary as `batcat` due to a naming conflict.",
+    "tool": "bat",
+    "category": "package-name",
+    "locator": "fd and bat binary names on Debian/Ubuntu"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The package `libsecret-tools` provides the `secret-tool` command.",
+    "tool": "libsecret",
+    "category": "package-name",
+    "locator": "Why each group \u2014 libsecret-tools provides secret-tool"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "`build-essential`, `cmake`, `pkg-config`, and `lib*-dev` packages are required to compile native extensions for Ruby, Python, and Node.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Why each group \u2014 build-essential, cmake, pkg-config, lib*-dev"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu 22.04's default Podman package version is 3.4.x.",
+    "tool": "podman",
+    "category": "version",
+    "locator": "Podman version (Ubuntu 22.04) \u2014 default Podman package is old (3.4.x)"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The Kubic/libcontainers unstable repo URL for Podman on Ubuntu is `https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_${VERSION_ID}/`.",
+    "tool": "podman",
+    "category": "url",
+    "locator": "Podman version (Ubuntu 22.04) \u2014 Kubic repo sources.list"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The Kubic repo signing key is fetched from `https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_${VERSION_ID}/Release.key` and dearmored to `/etc/apt/keyrings/podman.gpg`.",
+    "tool": "podman",
+    "category": "url",
+    "locator": "Podman version (Ubuntu 22.04) \u2014 Release.key / keyrings/podman.gpg"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "Ubuntu 24.04 and later ship Podman 4.x+ from the default repositories with no additional configuration.",
+    "tool": "podman",
+    "category": "version",
+    "locator": "Podman version \u2014 Ubuntu 24.04 and later ship Podman 4.x+"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The Microsoft VS Code apt signing key is at `https://packages.microsoft.com/keys/microsoft.asc`, dearmored to `/etc/apt/keyrings/microsoft.gpg`.",
+    "tool": "vscode",
+    "category": "url",
+    "locator": "VS Code installation \u2014 packages.microsoft.com/keys/microsoft.asc"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The VS Code apt repository source line is `deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main`, written to `/etc/apt/sources.list.d/vscode.list`.",
+    "tool": "vscode",
+    "category": "url",
+    "locator": "VS Code installation \u2014 sources.list.d/vscode.list"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The apt package name for VS Code from Microsoft's repository is `code`, installed via `sudo apt install code`.",
+    "tool": "vscode",
+    "category": "package-name",
+    "locator": "VS Code installation \u2014 sudo apt install code"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "The container toolchain packages podman, buildah, and skopeo are all available as native apt packages on Debian/Ubuntu.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Developer prerequisites \u2014 podman buildah skopeo"
+  },
+  {
+    "file": "docs/reference/platform-setup/debian-ubuntu.md",
+    "claim": "ripgrep, fzf, jq, and shellcheck are available as native apt packages named `ripgrep`, `fzf`, `jq`, and `shellcheck` on Debian/Ubuntu.",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Developer prerequisites \u2014 fd-find ripgrep fzf jq bat / shellcheck"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "mise can be installed by running: curl https://mise.run | sh",
+    "tool": "mise",
+    "category": "url",
+    "locator": "Final instructions, step 1: 'Install mise: curl https://mise.run | sh'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "rv can be installed from the URL https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh piped to sh, using curl with flags --proto '=https' --tlsv1.2 -LsSf",
+    "tool": "rv",
+    "category": "url",
+    "locator": "Final instructions, step 2: 'Install rv: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh | sh'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "rv is published under the GitHub organization/repo spinel-coop/rv",
+    "tool": "rv",
+    "category": "package-name",
+    "locator": "rv install URL: github.com/spinel-coop/rv"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "curl supports the flag --proto '=https' to restrict the protocol to HTTPS",
+    "tool": "curl",
+    "category": "flag",
+    "locator": "rv install command: 'curl --proto '=https' --tlsv1.2 -LsSf'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "curl supports the flag --tlsv1.2 to require a minimum TLS version of 1.2",
+    "tool": "curl",
+    "category": "flag",
+    "locator": "rv install command: 'curl --proto '=https' --tlsv1.2 -LsSf'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "curl supports the combined short flags -LsSf (follow redirects -L, silent -s, show errors -S, fail -f)",
+    "tool": "curl",
+    "category": "flag",
+    "locator": "rv install command: 'curl --proto '=https' --tlsv1.2 -LsSf'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "Runtimes declared in ~/.config/mise/config.toml are installed by running 'mise install'",
+    "tool": "mise",
+    "category": "command",
+    "locator": "Final instructions, step 4: 'Install runtimes declared in ~/.config/mise/config.toml: mise install'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "mise reads its configuration from ~/.config/mise/config.toml",
+    "tool": "mise",
+    "category": "path",
+    "locator": "Final instructions, step 4 references '~/.config/mise/config.toml'; also link target XDG_CONFIG_HOME/mise/config.toml"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "An ed25519 SSH key can be generated with: ssh-keygen -t ed25519 -C '<comment>' -f ~/.ssh/id_ed25519_work",
+    "tool": "ssh",
+    "category": "command",
+    "locator": "Final instructions, step 5: 'ssh-keygen -t ed25519 -C ... -f ~/.ssh/id_ed25519_work'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "ssh-keygen accepts -t ed25519 to select the Ed25519 key type",
+    "tool": "ssh",
+    "category": "flag",
+    "locator": "Final instructions, step 5: 'ssh-keygen -t ed25519'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "ssh-keygen accepts -C to set the key comment and -f to set the output key file",
+    "tool": "ssh",
+    "category": "flag",
+    "locator": "Final instructions, step 5: 'ssh-keygen -t ed25519 -C ... -f ...'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "TextMate can be installed via Homebrew with: brew install --cask textmate",
+    "tool": "homebrew",
+    "category": "package-name",
+    "locator": "TextMate section: '(Install via: brew install --cask textmate)'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "MarkEdit can be installed via Homebrew with: brew install --cask markedit",
+    "tool": "homebrew",
+    "category": "package-name",
+    "locator": "MarkEdit section: '(Install via: brew install --cask markedit)'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "TextMate and MarkEdit can be installed together via: brew install --cask textmate markedit",
+    "tool": "homebrew",
+    "category": "command",
+    "locator": "Optional macOS step 8: 'brew install --cask textmate markedit'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "The TextMate 'mate' CLI binary is located at /Applications/TextMate.app/Contents/Resources/mate when TextMate is installed",
+    "tool": "textmate",
+    "category": "path",
+    "locator": "TextMate detection block: link '/Applications/TextMate.app/Contents/Resources/mate'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "macOS open accepts -a <app> to open files with a named application, and the open binary is at /usr/bin/open",
+    "tool": "macos-open",
+    "category": "command",
+    "locator": "MarkEdit wrapper: 'exec /usr/bin/open -a MarkEdit.app \"$@\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "duti can be installed via Homebrew with: brew install duti",
+    "tool": "homebrew",
+    "category": "package-name",
+    "locator": "Optional macOS step 9: 'brew install duti'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "mise shims live at $HOME/.local/share/mise/shims",
+    "tool": "mise",
+    "category": "path",
+    "locator": "Optional macOS step 10: 'echo \"$HOME/.local/share/mise/shims\"'; Linux step 10 'PATH=$HOME/.local/share/mise/shims'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "On Linux, zsh can be set as the default login shell with: chsh -s $(which zsh)",
+    "tool": "chsh",
+    "category": "command",
+    "locator": "Optional Linux step 8: 'chsh -s $(which zsh)'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "chsh accepts -s to set the login shell",
+    "tool": "chsh",
+    "category": "flag",
+    "locator": "Optional Linux step 8: 'chsh -s $(which zsh)'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "On Debian/Ubuntu, libsecret command-line tools are installed with: sudo apt install libsecret-tools",
+    "tool": "apt",
+    "category": "package-name",
+    "locator": "Optional Linux step 9: 'Debian/Ubuntu: sudo apt install libsecret-tools'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "On Fedora/RHEL, libsecret is installed with: sudo dnf install libsecret",
+    "tool": "dnf",
+    "category": "package-name",
+    "locator": "Optional Linux step 9: 'Fedora/RHEL: sudo dnf install libsecret'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "The POSIX profile test suite is run with: sh <dotfiles>/sh/tests/profile_test.sh",
+    "tool": "dotfiles-internal",
+    "category": "command",
+    "locator": "Final instructions, step 7: 'sh ${DOTFILES}/sh/tests/profile_test.sh'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap.sh accepts --dry-run (or -n) to print actions without making changes",
+    "tool": "dotfiles-internal",
+    "category": "flag",
+    "locator": "Usage and case statement: '--dry-run|-n) DRY_RUN=1'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap.sh accepts -h or --help to print usage and exit 0",
+    "tool": "dotfiles-internal",
+    "category": "flag",
+    "locator": "case statement: '-h|--help) ... exit 0'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap creates symlinks using: ln -sfn <src> <dst>",
+    "tool": "ln",
+    "category": "command",
+    "locator": "link() function: 'run ln -sfn \"$src\" \"$dst\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "ln accepts the combined flags -sfn (symbolic -s, force -f, no-dereference -n)",
+    "tool": "ln",
+    "category": "flag",
+    "locator": "link() function: 'ln -sfn'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap symlinks the repo's zsh/zshenv to ~/.zshenv (the root zshenv)",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "Zsh section: 'link \"${DOTFILES}/zsh/zshenv\" \"${HOME}/.zshenv\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap symlinks zsh config files (.zshenv, .zprofile, .zshrc, .zlogout) into $XDG_CONFIG_HOME/zsh/",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "Zsh section: links into '${XDG_CONFIG_HOME}/zsh/'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap symlinks the POSIX profile to ~/.profile",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "POSIX profile section: 'link \"${DOTFILES}/profile\" \"${HOME}/.profile\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "The framework's deterministic PATH builder lives in conf.d/10-path.zsh and is the single source of truth for PATH",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "Audit remediation text: 'rely on conf.d/10-path.zsh instead. The framework's deterministic PATH builder is the single source of truth'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap creates the directories ~/work, ~/personal, and ~/opensource",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "Create XDG directories loop: '\"${HOME}/work\" \"${HOME}/personal\" \"${HOME}/opensource\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap creates vim state directories under $XDG_STATE_HOME/vim/ named undo, swap, and backup",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "vim section: 'mkdir -p \"${XDG_STATE_HOME}/vim/undo\" ... /swap ... /backup'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/bootstrap.sh",
+    "claim": "bootstrap symlinks the vim config to ~/.vim/vimrc",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "vim section: 'link \"${DOTFILES}/vim/vimrc\" \"${HOME}/.vim/vimrc\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "XDG_CONFIG_HOME defaults to $HOME/.config when unset",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "profile line: 'export XDG_CONFIG_HOME=\"${XDG_CONFIG_HOME:-$HOME/.config}\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "XDG_DATA_HOME defaults to $HOME/.local/share when unset",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "profile line: 'export XDG_DATA_HOME=\"${XDG_DATA_HOME:-$HOME/.local/share}\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "XDG_STATE_HOME defaults to $HOME/.local/state when unset",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "profile line: 'export XDG_STATE_HOME=\"${XDG_STATE_HOME:-$HOME/.local/state}\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "XDG_CACHE_HOME defaults to $HOME/.cache when unset",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "profile line: 'export XDG_CACHE_HOME=\"${XDG_CACHE_HOME:-$HOME/.cache}\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "CARGO_HOME is set to $XDG_DATA_HOME/cargo",
+    "tool": "cargo",
+    "category": "path",
+    "locator": "profile line: 'export CARGO_HOME=\"${XDG_DATA_HOME}/cargo\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "RUSTUP_HOME is set to $XDG_DATA_HOME/rustup",
+    "tool": "rustup",
+    "category": "path",
+    "locator": "profile line: 'export RUSTUP_HOME=\"${XDG_DATA_HOME}/rustup\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "GOPATH is set to $XDG_DATA_HOME/go",
+    "tool": "go",
+    "category": "path",
+    "locator": "profile line: 'export GOPATH=\"${XDG_DATA_HOME}/go\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "CARGO_HOME is the environment variable cargo uses to locate its home directory (default ~/.cargo)",
+    "tool": "cargo",
+    "category": "default",
+    "locator": "profile 'Tool locations' block uses CARGO_HOME as an override"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "RUSTUP_HOME is the environment variable rustup uses to locate its home directory (default ~/.rustup)",
+    "tool": "rustup",
+    "category": "default",
+    "locator": "profile 'Tool locations' block uses RUSTUP_HOME as an override"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "EDITOR is set to vim and VISUAL is set to the same value as EDITOR",
+    "tool": "posix-env",
+    "category": "default",
+    "locator": "profile lines: 'export EDITOR=\"vim\"' / 'export VISUAL=\"${EDITOR}\"'"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "A systemd ssh-agent.service places its agent socket at $XDG_RUNTIME_DIR/ssh-agent.socket",
+    "tool": "systemd",
+    "category": "path",
+    "locator": "profile: '_ssh_sock=\"${XDG_RUNTIME_DIR}/ssh-agent.socket\"' with comment about custom systemd ssh-agent.service"
+  },
+  {
+    "file": "/Users/BillWoika/personal/repos/dotfiles/profile",
+    "claim": "The profile PATH priority order, highest first, is: $XDG_DATA_HOME/mise/shims, $CARGO_HOME/bin, $GOPATH/bin, $HOME/.local/bin",
+    "tool": "dotfiles-internal",
+    "category": "path",
+    "locator": "profile PATH loop iterates low-to-high: .local/bin, GOPATH/bin, CARGO_HOME/bin, mise/shims (last iterated ends up first)"
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "`fdesetup status` reports FileVault state and prints \"FileVault is On\" when full-disk encryption is enabled",
+    "tool": "macos-fdesetup",
+    "category": "command",
+    "locator": "Verify MDM coverage / # FileVault (full-disk encryption)"
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "`spctl --status` reports Gatekeeper state and prints \"assessments enabled\" when Gatekeeper is on",
+    "tool": "macos-spctl",
+    "category": "command",
+    "locator": "Verify MDM coverage / # Gatekeeper"
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "Homebrew is installed by running `/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"`",
+    "tool": "homebrew",
+    "category": "url",
+    "locator": "## Homebrew / curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "`defaults write com.apple.finder FXPreferredViewStyle -string \"Nlsv\"` sets Finder default to list view",
+    "tool": "macos-defaults",
+    "category": "default",
+    "locator": "# Default to list view / FXPreferredViewStyle -string \"Nlsv\""
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "`defaults write com.apple.dock autohide-time-modifier -float 0.4` sets the Dock auto-hide animation duration",
+    "tool": "macos-defaults",
+    "category": "command",
+    "locator": "### Dock / autohide-time-modifier -float 0.4"
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "`defaults write com.apple.screencapture type -string \"png\"` sets the default screenshot format to PNG",
+    "tool": "macos-defaults",
+    "category": "default",
+    "locator": "### Screenshots / # Default format PNG"
+  },
+  {
+    "file": "docs/reference/platform-setup/macos.md",
+    "claim": "`defaults write com.apple.screencapture disable-shadow -bool true` disables the shadow on window captures",
+    "tool": "macos-defaults",
+    "category": "command",
+    "locator": "### Screenshots / # Disable shadow on window captures"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Running `hostnamectl` with no arguments displays the current hostname status.",
+    "locator": "# Verify\nhostnamectl",
+    "tool": "systemd (hostnamectl)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo dnf upgrade --refresh` performs a system update, refreshing repository metadata first.",
+    "locator": "System update (reboot after \u2014 kernel and firmware)",
+    "tool": "dnf5",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The RPM Fusion free release package install URL is https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm",
+    "locator": "Enable RPM Fusion (free + nonfree)",
+    "tool": "RPM Fusion",
+    "category": "url"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The RPM Fusion nonfree release package install URL is https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm",
+    "locator": "Enable RPM Fusion (free + nonfree)",
+    "tool": "RPM Fusion",
+    "category": "url"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`rpm -E %fedora` expands to the current Fedora release number (used to build RPM Fusion URLs).",
+    "locator": "rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm",
+    "tool": "rpm",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo fwupdmgr get-devices` lists devices that fwupd can manage.",
+    "locator": "Firmware updates via fwupd",
+    "tool": "fwupd",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo fwupdmgr refresh --force` refreshes the firmware metadata, forcing a refresh.",
+    "locator": "sudo fwupdmgr refresh --force",
+    "tool": "fwupd",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo fwupdmgr get-updates` lists available firmware updates.",
+    "locator": "sudo fwupdmgr get-updates",
+    "tool": "fwupd",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo fwupdmgr update` applies available firmware updates.",
+    "locator": "sudo fwupdmgr update",
+    "tool": "fwupd",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Fedora 41 and later ships dnf5.",
+    "locator": "Fedora 41+ ships **dnf5**",
+    "tool": "dnf5",
+    "category": "version"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The dnf configuration file is located at /etc/dnf/dnf.conf",
+    "locator": "Edit `/etc/dnf/dnf.conf`",
+    "tool": "dnf5",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gpgcheck`, `installonly_limit`, `clean_requirements_on_remove`, `best`, `max_parallel_downloads`, `defaultyes`, and `countme` are valid `[main]` options in dnf5's dnf.conf.",
+    "locator": "[main] block: gpgcheck=True ... countme=False",
+    "tool": "dnf5",
+    "category": "flag"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The default value of `max_parallel_downloads` in dnf is 3.",
+    "locator": "Default of 3 is a relic of slower networks",
+    "tool": "dnf5",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "dnf5 treats `fastestmirror` as a repo option, not a `[main]` global option.",
+    "locator": "dnf5 treats `fastestmirror` as a *repo* option",
+    "tool": "dnf5",
+    "category": "flag"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The `config-manager` command lives in the `dnf5-plugins` package.",
+    "locator": "`config-manager` lives in the `dnf5-plugins` package",
+    "tool": "dnf5",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo dnf install dnf5-plugins` provides config-manager.",
+    "locator": "sudo dnf install dnf5-plugins        # provides config-manager",
+    "tool": "dnf5",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo dnf config-manager setopt fastestmirror=True` is the supported way to set fastestmirror on dnf5.",
+    "locator": "sudo dnf config-manager setopt fastestmirror=True",
+    "tool": "dnf5",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`skip_if_unavailable` is a per-repo option on dnf5, not a `[main]` global.",
+    "locator": "`skip_if_unavailable` is likewise a per-repo option on dnf5",
+    "tool": "dnf5",
+    "category": "flag"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The current Fedora release referenced for dnf5 dropped-knob behavior is Fedora 44.",
+    "locator": "dnf5 (Fedora 41+, so anything on **Fedora 44**)",
+    "tool": "Fedora",
+    "category": "version"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Installing GStreamer codecs uses the package globs gstreamer1-plugins-{bad-*,good-*,base}, gstreamer1-plugin-openh264, and gstreamer1-libav, excluding gstreamer1-plugins-bad-free-devel.",
+    "locator": "GStreamer codecs (covers most media playback needs)",
+    "tool": "RPM Fusion / GStreamer packaging",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "For Intel hardware-accelerated video decode, install packages libva-utils and intel-media-driver.",
+    "locator": "sudo dnf install libva-utils intel-media-driver   # Intel",
+    "tool": "Fedora packaging",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "For AMD hardware-accelerated video decode, install packages libva-utils and mesa-va-drivers.",
+    "locator": "sudo dnf install libva-utils mesa-va-drivers      # AMD",
+    "tool": "Fedora packaging",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The fedora-cisco-openh264 repo is enabled by default, and OpenH264 from Cisco is installed via the `mozilla-openh264` package.",
+    "locator": "OpenH264 from Cisco (fedora-cisco-openh264 repo, enabled by default)",
+    "tool": "Fedora packaging",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo systemctl enable --now fstrim.timer` enables and starts the fstrim systemd timer.",
+    "locator": "Enable fstrim for SSDs",
+    "tool": "systemd / util-linux",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The fstrim.timer runs weekly.",
+    "locator": "This runs weekly.",
+    "tool": "systemd / util-linux",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The continuous-TRIM mount option is `discard`.",
+    "locator": "continuous TRIM (`discard` mount option)",
+    "tool": "Linux kernel / mount",
+    "category": "flag"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Fedora defaults to Btrfs on Workstation installs.",
+    "locator": "Fedora defaults to Btrfs on Workstation installs.",
+    "tool": "Fedora (Btrfs)",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo btrfs subvolume list /` lists the current subvolume layout.",
+    "locator": "Check current subvolume layout",
+    "tool": "btrfs-progs",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The default container storage path that must be created before podman writes to it is /var/lib/containers.",
+    "locator": "Container storage \u2014 must be created before podman writes to it",
+    "tool": "podman",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Fedora ships with SELinux in enforcing mode by default.",
+    "locator": "Fedora ships with SELinux enforcing.",
+    "tool": "SELinux",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`getenforce` prints the current SELinux mode and should say \"Enforcing\".",
+    "locator": "getenforce                        # should say \"Enforcing\"",
+    "tool": "SELinux (libselinux-utils)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo ausearch -m avc -ts recent` shows recent SELinux AVC denials.",
+    "locator": "See recent denials",
+    "tool": "audit (ausearch)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo semanage permissive -a httpd_t` puts the httpd_t domain into permissive mode.",
+    "locator": "Temporary permissive mode for a specific domain (debugging only)",
+    "tool": "policycoreutils (semanage)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo ausearch -m avc -ts recent | audit2allow -M my_local_fix` generates a local policy module named my_local_fix from denials, producing my_local_fix.pp.",
+    "locator": "Generate a local policy module from denials",
+    "tool": "policycoreutils (audit2allow)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo semodule -i my_local_fix.pp` installs the compiled policy module.",
+    "locator": "sudo semodule -i my_local_fix.pp",
+    "tool": "policycoreutils (semodule)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo restorecon -Rv /path/to/moved/files` restores file contexts recursively and verbosely.",
+    "locator": "Restore file contexts after moving files",
+    "tool": "policycoreutils (restorecon)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The `:z` bind-mount suffix applies a shared SELinux label so multiple containers can access the mount.",
+    "locator": ":z \u2014 shared label (multiple containers can access)",
+    "tool": "podman",
+    "category": "flag"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The `:Z` bind-mount suffix applies a private SELinux label so only that container can access the mount.",
+    "locator": ":Z \u2014 private label (only this container can access)",
+    "tool": "podman",
+    "category": "flag"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The default firewalld zone on Fedora Workstation is `FedoraWorkstation`, which allows SSH inbound and blocks everything else.",
+    "locator": "The default zone (`FedoraWorkstation`) allows SSH inbound and blocks everything else",
+    "tool": "firewalld",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo firewall-cmd --state` shows whether firewalld is running.",
+    "locator": "View current state",
+    "tool": "firewalld",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo firewall-cmd --list-all` lists the full configuration of the active zone.",
+    "locator": "sudo firewall-cmd --list-all",
+    "tool": "firewalld",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo firewall-cmd --reload` applies permanent rules.",
+    "locator": "sudo firewall-cmd --reload                         # apply permanent rules",
+    "tool": "firewalld",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo firewall-cmd --add-service=mdns --permanent` permanently allows the mdns service.",
+    "locator": "Allow mDNS/Avahi (useful for device testing)",
+    "tool": "firewalld",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo firewall-cmd --remove-port=3000/tcp --permanent` removes a previously added permanent port.",
+    "locator": "Remove when done",
+    "tool": "firewalld",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The GNOME keyring SSH_AUTH_SOCK value looks like /run/user/1000/keyring/ssh",
+    "locator": "Should print something like: /run/user/1000/keyring/ssh",
+    "tool": "gnome-keyring",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`systemctl --user enable --now podman.socket` enables and starts Podman's Docker-compatible socket as a systemd user service.",
+    "locator": "Podman socket (for Docker-compatible tooling)",
+    "tool": "podman",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`podman info` reports Podman's configuration/status.",
+    "locator": "# Verify\npodman info",
+    "tool": "podman",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Systemd's journal grows unbounded by default.",
+    "locator": "Systemd's journal grows unbounded by default.",
+    "tool": "systemd (journald)",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo journalctl --vacuum-size=500M` shrinks the journal to a maximum of 500M.",
+    "locator": "sudo journalctl --vacuum-size=500M",
+    "tool": "systemd (journalctl)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The journald configuration file is /etc/systemd/journald.conf and SystemMaxUse=500M under [Journal] sets a permanent journal size limit.",
+    "locator": "edit `/etc/systemd/journald.conf`",
+    "tool": "systemd (journald)",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Fedora Workstation ships GNOME.",
+    "locator": "Fedora Workstation ships GNOME.",
+    "tool": "Fedora",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.peripherals.keyboard delay 200` sets the key repeat delay.",
+    "locator": "Key repeat speed (default is sluggish for terminal work)",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.peripherals.keyboard repeat-interval 25` sets the key repeat interval.",
+    "locator": "gsettings set org.gnome.desktop.peripherals.keyboard repeat-interval 25",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.input-sources xkb-options \"['caps:ctrl_modifier']\"` maps Caps Lock as an additional Ctrl key.",
+    "locator": "Caps Lock as additional Ctrl",
+    "tool": "GNOME (gsettings) / xkeyboard-config",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.interface enable-hot-corners false` disables the hot corner.",
+    "locator": "Disable hot corner (accidental Activities trigger)",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.wm.preferences focus-mode 'sloppy'` enables focus-follows-mouse.",
+    "locator": "Focus-follows-mouse (useful for tiling workflows)",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.mutter attach-modal-dialogs true` attaches modal dialogs.",
+    "locator": "Attach modal dialogs (prevents lost dialogs on multi-monitor)",
+    "tool": "GNOME (mutter/gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.mutter workspaces-only-on-primary false` enables workspaces on all displays.",
+    "locator": "Workspaces on all displays",
+    "tool": "GNOME (mutter/gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'` enables subpixel antialiasing.",
+    "locator": "Enable subpixel antialiasing (crisper text on LCD displays)",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.desktop.interface font-hinting 'slight'` sets slight font hinting.",
+    "locator": "gsettings set org.gnome.desktop.interface font-hinting 'slight'",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true` enables Night Light.",
+    "locator": "Reduce blue light on schedule",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gsettings set org.gnome.settings-daemon.plugins.color night-light-temperature 3500` sets the Night Light color temperature to 3500.",
+    "locator": "gsettings set org.gnome.settings-daemon.plugins.color night-light-temperature 3500",
+    "tool": "GNOME (gsettings)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "tuned + tuned-ppd is the Fedora default since Fedora 41.",
+    "locator": "**tuned + tuned-ppd** is the Fedora default since Fedora 41.",
+    "tool": "tuned / Fedora",
+    "category": "version"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`powerprofilesctl list` lists available power profiles.",
+    "locator": "Check current profile (uses the same CLI as the old PPD)",
+    "tool": "power-profiles-daemon / tuned-ppd (powerprofilesctl)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`powerprofilesctl set power-saver`, `powerprofilesctl set balanced`, and `powerprofilesctl set performance` switch among the three profiles power-saver, balanced, and performance.",
+    "locator": "Switch profiles \u2014 GNOME's Settings panel also does this",
+    "tool": "power-profiles-daemon / tuned-ppd (powerprofilesctl)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "power-profiles-daemon (PPD) was the Fedora default through Fedora 40 and provided three profiles over D-Bus.",
+    "locator": "**power-profiles-daemon (PPD)** was the Fedora default through Fedora 40",
+    "tool": "power-profiles-daemon / Fedora",
+    "category": "version"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo dnf remove tuned tuned-ppd` removes the default power management stack.",
+    "locator": "Remove the default power management stack",
+    "tool": "dnf5 / tuned",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "TLP is installed via the packages tlp and tlp-rdw.",
+    "locator": "Install TLP\nsudo dnf install tlp tlp-rdw",
+    "tool": "TLP",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo systemctl mask systemd-rfkill.service systemd-rfkill.socket` masks the rfkill services so TLP can manage radio devices directly.",
+    "locator": "Mask rfkill services (TLP manages radio devices directly)",
+    "tool": "TLP / systemd",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo systemctl enable --now tlp` enables and starts TLP.",
+    "locator": "Enable and start TLP",
+    "tool": "TLP / systemd",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`sudo tlp-stat -s` shows TLP status.",
+    "locator": "sudo tlp-stat -s",
+    "tool": "TLP",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "On ThinkPads, the packages kernel-devel and akmod-acpi_call enable battery charge thresholds.",
+    "locator": "the additional `kernel-devel` and `akmod-acpi_call` packages enable battery charge thresholds",
+    "tool": "TLP / akmods",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "On ThinkPads, writing 80 to /sys/class/power_supply/BAT0/charge_control_end_threshold limits charge to 80%.",
+    "locator": "echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold",
+    "tool": "Linux kernel (sysfs power_supply)",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The developer prerequisite package list installed via dnf includes: zsh git curl wget util-linux-user gcc gcc-c++ make cmake openssl-devel zlib-devel readline-devel libffi-devel libyaml-devel sqlite-devel postgresql-devel fd-find ripgrep fzf jq bat gh direnv libsecret-tools podman podman-compose podman-docker buildah skopeo ShellCheck.",
+    "locator": "These packages must be installed before running `bootstrap.sh`.",
+    "tool": "Fedora packaging (dnf)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The util-linux-user package provides `chsh` on Fedora; without it, changing the default shell fails with \"command not found.\"",
+    "locator": "**util-linux-user** \u2014 provides `chsh` on Fedora",
+    "tool": "Fedora packaging (util-linux-user)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "On Fedora the fd-find package provides the fd tool.",
+    "locator": "fd-find, ripgrep, fzf, jq, bat, gh",
+    "tool": "Fedora packaging (fd-find)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`gh` is the GitHub CLI.",
+    "locator": "`gh` is the GitHub CLI",
+    "tool": "GitHub CLI (gh)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The libsecret-tools package provides the `secret-tool` CLI; the libsecret package (without -tools) installs only the shared library, not the CLI.",
+    "locator": "**libsecret-tools** \u2014 provides `secret-tool`",
+    "tool": "Fedora packaging (libsecret-tools)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "On Fedora the ShellCheck package name is capitalized as `ShellCheck`.",
+    "locator": "ShellCheck\n```\n... **ShellCheck** \u2014 static analysis for shell scripts",
+    "tool": "Fedora packaging (ShellCheck)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Fedora ships with bash as the default login shell.",
+    "locator": "Fedora ships with bash as the default login shell.",
+    "tool": "Fedora",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "`chsh -s $(which zsh)` changes the login shell to zsh.",
+    "locator": "Change the login shell to zsh\nchsh -s $(which zsh)",
+    "tool": "util-linux-user (chsh)",
+    "category": "command"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "After setting zsh as the login shell, `echo $SHELL` should print /usr/bin/zsh.",
+    "locator": "echo $SHELL\n# Should print: /usr/bin/zsh",
+    "tool": "zsh / Fedora",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The zsh entry in /etc/passwd ends with /usr/bin/zsh.",
+    "locator": "grep $(whoami) /etc/passwd\n# Should end with: /usr/bin/zsh",
+    "tool": "zsh / Fedora",
+    "category": "path"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "Fedora ships with Flatpak and Flathub pre-configured.",
+    "locator": "Fedora ships with Flatpak and Flathub pre-configured.",
+    "tool": "Fedora / Flatpak",
+    "category": "default"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The VS Code Microsoft GPG key is imported from https://packages.microsoft.com/keys/microsoft.asc",
+    "locator": "sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc",
+    "tool": "Microsoft (VS Code repo)",
+    "category": "url"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "The VS Code yum repo baseurl is https://packages.microsoft.com/yumrepos/vscode and the repo file is /etc/yum.repos.d/vscode.repo",
+    "locator": "baseurl=https://packages.microsoft.com/yumrepos/vscode",
+    "tool": "Microsoft (VS Code repo)",
+    "category": "url"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "VS Code is installed from Microsoft's repo via the package named `code` (`sudo dnf install code`).",
+    "locator": "sudo dnf install code",
+    "tool": "Microsoft (VS Code repo)",
+    "category": "package-name"
+  },
+  {
+    "file": "docs/reference/platform-setup/fedora.md",
+    "claim": "JetBrains Toolbox is downloaded from https://www.jetbrains.com/toolbox-app/",
+    "locator": "Download from https://www.jetbrains.com/toolbox-app/ and extract to ~/.local/bin",
+    "tool": "JetBrains",
+    "category": "url"
+  },
+  {
+    "file": "docs/reference/onboarding.md",
+    "claim": "On Debian/Ubuntu, core dependencies zsh, git, and curl are installed with `sudo apt install zsh git curl`",
+    "tool": "apt",
+    "category": "command",
+    "locator": "Prerequisites > Debian / Ubuntu: `sudo apt install zsh git curl`"
+  },
+  {
+    "file": "docs/reference/onboarding.md",
+    "claim": "On Fedora/RHEL, the package `util-linux-user` is required (it provides chsh for setting the default shell)",
+    "tool": "dnf5",
+    "category": "package-name",
+    "locator": "Prerequisites > Fedora / RHEL: 'including `zsh`, `git`, and `util-linux-user`'"
+  },
+  {
+    "file": "docs/reference/onboarding.md",
+    "claim": "An ed25519 SSH key is generated with `ssh-keygen -t ed25519 -C \"<comment>\" -f <path>`",
+    "tool": "ssh-keygen",
+    "category": "command",
+    "locator": "Step 8: `ssh-keygen -t ed25519 -C ... -f ~/.ssh/id_ed25519_work`"
+  },
+  {
+    "file": "docs/reference/onboarding.md",
+    "claim": "Connectivity to GitHub over SSH is verified with `ssh -T git@github.com-work` / `ssh -T git@github.com-personal` (host aliases)",
+    "tool": "ssh",
+    "category": "command",
+    "locator": "Step 11: `ssh -T git@github.com-work`"
+  },
+  {
+    "file": "docs/reference/onboarding.md",
+    "claim": "On GNOME-based distributions, gnome-keyring is enabled by default and can serve as the SSH agent",
+    "tool": "gnome-keyring",
+    "category": "default",
+    "locator": "Optional > Debian/Ubuntu: 'gnome-keyring ... enabled by default in most GNOME-based distributions'"
+  },
+  {
+    "file": "docs/reference/onboarding.md",
+    "claim": "On Fedora Workstation, gnome-keyring is enabled by default and can serve as the SSH agent",
+    "tool": "gnome-keyring",
+    "category": "default",
+    "locator": "Optional > Fedora / RHEL: 'enabled by default in Fedora Workstation'"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "The system-level zsh startup files are /etc/zshenv, /etc/zprofile, /etc/zshrc, and /etc/zlogin",
+    "tool": "zsh",
+    "category": "path",
+    "locator": "Boot sequence \u2014 /etc/zshenv, /etc/zprofile, /etc/zshrc, /etc/zlogin"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "typeset -U creates a unique-elements array (used for deterministic PATH dedup)",
+    "tool": "zsh",
+    "category": "command",
+    "locator": "10-path.zsh  Deterministic PATH with typeset -U"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "(( $+commands[mise] )) is the zsh idiom to test whether the mise command exists",
+    "tool": "zsh",
+    "category": "command",
+    "locator": "(( $+commands[mise] )) || return 0 for a mise-dependent fragment"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "vim writes undo files to ~/.local/state/vim/undo/",
+    "tool": "vim",
+    "category": "path",
+    "locator": "vim writes undo files to ~/.local/state/vim/undo/"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "zsh history is stored at ~/.local/state/zsh/history",
+    "tool": "zsh",
+    "category": "path",
+    "locator": "zsh history goes to ~/.local/state/zsh/history"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "XDG_STATE_HOME and XDG_DATA_HOME are the XDG variables tools are redirected to use",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "redirects every tool that supports $XDG_STATE_HOME and $XDG_DATA_HOME"
+  },
+  {
+    "file": "docs/shell-environment/architecture.md",
+    "claim": "find ~ -maxdepth 1 -type d lists top-level directories in HOME",
+    "tool": "find",
+    "category": "command",
+    "locator": "A find ~ -maxdepth 1 -type d on a framework-configured machine"
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "XDG_CONFIG_HOME defaults to $HOME/.config",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "export XDG_CONFIG_HOME=\"${XDG_CONFIG_HOME:-$HOME/.config}\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "XDG_DATA_HOME defaults to $HOME/.local/share",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "export XDG_DATA_HOME=\"${XDG_DATA_HOME:-$HOME/.local/share}\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "XDG_STATE_HOME defaults to $HOME/.local/state",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "export XDG_STATE_HOME=\"${XDG_STATE_HOME:-$HOME/.local/state}\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "XDG_CACHE_HOME defaults to $HOME/.cache",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "export XDG_CACHE_HOME=\"${XDG_CACHE_HOME:-$HOME/.cache}\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "CARGO_HOME is set to ${XDG_DATA_HOME}/cargo",
+    "tool": "rustup",
+    "category": "default",
+    "locator": "export CARGO_HOME=\"${XDG_DATA_HOME}/cargo\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "RUSTUP_HOME is set to ${XDG_DATA_HOME}/rustup",
+    "tool": "rustup",
+    "category": "default",
+    "locator": "export RUSTUP_HOME=\"${XDG_DATA_HOME}/rustup\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "GOPATH is set to ${XDG_DATA_HOME}/go",
+    "tool": "go",
+    "category": "default",
+    "locator": "export GOPATH=\"${XDG_DATA_HOME}/go\""
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "mise shims live at ${XDG_DATA_HOME}/mise/shims",
+    "tool": "mise",
+    "category": "path",
+    "locator": "\"${XDG_DATA_HOME}/mise/shims\" in the PATH loop"
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "The Go binary path is ${GOPATH}/bin",
+    "tool": "go",
+    "category": "path",
+    "locator": "\"${GOPATH}/bin\" in PATH loop"
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "The Cargo binary path is ${CARGO_HOME}/bin",
+    "tool": "rustup",
+    "category": "path",
+    "locator": "\"${CARGO_HOME}/bin\" in PATH loop"
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "The POSIX profile test suite is run with: sh sh/tests/profile_test.sh",
+    "tool": "posix-sh",
+    "category": "command",
+    "locator": "# Run the suite\\nsh sh/tests/profile_test.sh"
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "The multi-shell sweep is run with: sh sh/tests/profile_test.sh --multi (covers dash, bash --posix, busybox)",
+    "tool": "posix-sh",
+    "category": "flag",
+    "locator": "Multi-shell sweep (dash, bash --posix, busybox)\\nsh sh/tests/profile_test.sh --multi"
+  },
+  {
+    "file": "docs/shell-environment/posix-profile.md",
+    "claim": "EDITOR is set to vim and VISUAL to ${EDITOR}",
+    "tool": "posix-sh",
+    "category": "default",
+    "locator": "export EDITOR=\"vim\"  export VISUAL=\"${EDITOR}\""
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "XDG_CONFIG_HOME default is ~/.config",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "XDG variable definitions table \u2014 XDG_CONFIG_HOME | ~/.config"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "XDG_DATA_HOME default is ~/.local/share",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "XDG_DATA_HOME | ~/.local/share"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "XDG_STATE_HOME default is ~/.local/state",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "XDG_STATE_HOME | ~/.local/state"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "XDG_CACHE_HOME default is ~/.cache",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "XDG_CACHE_HOME | ~/.cache"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "XDG_RUNTIME_DIR is set by PAM/systemd, holds runtime files (sockets, fifos, named pipes), is mode 0700, and is cleared on logout",
+    "tool": "xdg-basedir",
+    "category": "default",
+    "locator": "XDG_RUNTIME_DIR | Set by PAM/systemd | ... 0700, cleared on logout"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "proto's home override env var is PROTO_HOME",
+    "tool": "proto",
+    "category": "default",
+    "locator": "previously necessary for proto (PROTO_HOME)"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "volta's home override env var is VOLTA_HOME",
+    "tool": "volta",
+    "category": "default",
+    "locator": "volta (VOLTA_HOME)"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "On systems with root access, ZDOTDIR can be set in /etc/zsh/zshenv instead of ~/.zshenv",
+    "tool": "zsh",
+    "category": "path",
+    "locator": "you can set ZDOTDIR in /etc/zsh/zshenv instead"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "mise global config lives at ~/.config/mise/config.toml",
+    "tool": "mise",
+    "category": "path",
+    "locator": "~/.config/mise/ ... config.toml  # User-scope tool/env/task defaults"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "mise state (installs, shims, plugins) lives at ~/.local/share/mise/ with shims/ and installs/ subdirectories",
+    "tool": "mise",
+    "category": "path",
+    "locator": "~/.local/share/mise/ ... shims/ ... installs/"
+  },
+  {
+    "file": "docs/shell-environment/xdg-and-posix.md",
+    "claim": "zsh zcompdump cache lives at ~/.cache/zsh/zcompdump",
+    "tool": "zsh",
+    "category": "path",
+    "locator": "~/.cache/zsh/ ... zcompdump"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "mise's setting python.uv_venv_auto replaces direnv's layout_uv function",
+    "tool": "mise",
+    "category": "default",
+    "locator": "The layout_uv function is replaced by mise's python.uv_venv_auto setting"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "mise activate replaces proto's use_proto for tool activation",
+    "tool": "mise",
+    "category": "command",
+    "locator": "use_proto is replaced by mise activate"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "mise requires explicit trust for each mise.toml via 'mise trust' (or automatic trust for files you edited yourself)",
+    "tool": "mise",
+    "category": "command",
+    "locator": "mise requires explicit trust for each mise.toml it loads via mise trust"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "mise trust is the equivalent of direnv's 'direnv allow'",
+    "tool": "mise",
+    "category": "command",
+    "locator": "This is the equivalent of direnv's direnv allow"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "openssl rand -hex 32 generates a hex secret key",
+    "tool": "openssl",
+    "category": "command",
+    "locator": "APP_SECRET_KEY=<generate with: openssl rand -hex 32>"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "1Password CLI binary is 'op'; 'op inject' loads secrets, 'op account list' lists accounts, 'op signin' authenticates",
+    "tool": "1password-cli",
+    "category": "command",
+    "locator": "op inject -i .envrc.op ... op account list ... Run: op signin"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "sops decrypts age-encrypted files via 'sops -d <file>'",
+    "tool": "sops",
+    "category": "command",
+    "locator": "eval \"$(sops -d \"$file\")\""
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "aws-vault runs commands with credentials via 'aws-vault exec'",
+    "tool": "aws-vault",
+    "category": "command",
+    "locator": "aws-vault exec"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "pass retrieves a secret via 'pass show'",
+    "tool": "pass",
+    "category": "command",
+    "locator": "or pass show"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "git rev-parse --abbrev-ref HEAD returns the current branch name",
+    "tool": "git",
+    "category": "command",
+    "locator": "branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "direnv global config goes in ~/.config/direnv/direnvrc",
+    "tool": "direnv",
+    "category": "path",
+    "locator": "its configuration goes in ~/.config/direnv/direnvrc"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "direnv build artifacts go in .direnv/ directory",
+    "tool": "direnv",
+    "category": "path",
+    "locator": "# direnv build artifacts\\n.direnv/"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "Python virtual environments default directory is .venv/",
+    "tool": "python",
+    "category": "path",
+    "locator": "# Python virtual environments\\n.venv/"
+  },
+  {
+    "file": "docs/shell-environment/environment.md",
+    "claim": "log_status and log_error are direnv stdlib helper functions usable in direnvrc",
+    "tool": "direnv",
+    "category": "command",
+    "locator": "log_status \"Loading secrets from 1Password vault\" ... log_error \"1Password CLI not available"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "mise's base installer URL is https://mise.run and installs to ~/.local/bin/mise without modifying profiles",
+    "tool": "mise",
+    "category": "url",
+    "locator": "mise's base installer (curl https://mise.run | sh) downloads a binary to ~/.local/bin/mise"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "mise shell-specific endpoint https://mise.run/zsh adds an activation line to the detected shell config",
+    "tool": "mise",
+    "category": "url",
+    "locator": "The shell-specific endpoints (curl https://mise.run/zsh | sh) add an activation line"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "rv activation uses eval \"$(rv shell zsh)\"",
+    "tool": "rv",
+    "category": "command",
+    "locator": "activation via eval \"$(rv shell zsh)\""
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "rv installer URL is https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh",
+    "tool": "rv",
+    "category": "url",
+    "locator": "https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh | sh"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "rv version is checked with rv --version",
+    "tool": "rv",
+    "category": "command",
+    "locator": "# Verify\\nrv --version"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "Homebrew prints eval \"$(brew shellenv)\" for the user to add",
+    "tool": "homebrew",
+    "category": "command",
+    "locator": "Prints eval \"$(brew shellenv)\" for user to add"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "Homebrew install command is /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"",
+    "tool": "homebrew",
+    "category": "url",
+    "locator": "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "Homebrew bin is /opt/homebrew/bin on Apple Silicon and /usr/local/bin on Intel",
+    "tool": "homebrew",
+    "category": "path",
+    "locator": "Homebrew's bin directory (/opt/homebrew/bin on Apple Silicon, /usr/local/bin on Intel)"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "brew shellenv activation idiom is eval \"$(/opt/homebrew/bin/brew shellenv)\"",
+    "tool": "homebrew",
+    "category": "command",
+    "locator": "eval \"$(/opt/homebrew/bin/brew shellenv)\""
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "rustup's --no-modify-path flag prevents it from appending PATH entries to shell profiles",
+    "tool": "rustup",
+    "category": "flag",
+    "locator": "Use --no-modify-path to prevent it from appending redundant PATH entries"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "rustup installer URL is https://sh.rustup.rs",
+    "tool": "rustup",
+    "category": "url",
+    "locator": "curl --proto \"=https\" --tlsv1.2 -sSf https://sh.rustup.rs"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "rustup non-interactive install passes flags via sh -s -- --no-modify-path -y",
+    "tool": "rustup",
+    "category": "flag",
+    "locator": "sh -s -- --no-modify-path -y"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "nvm can be installed with --no-use to prevent profile modification",
+    "tool": "nvm",
+    "category": "flag",
+    "locator": "install it with --no-use to prevent it from modifying your profile"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "uv standalone installer URL is astral.sh/uv/install.sh (curl | sh, binary only)",
+    "tool": "uv",
+    "category": "url",
+    "locator": "uv | sh | curl | sh | Nothing (binary only) | ... standalone installs via astral.sh/uv/install.sh"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "On Linux use apt (Debian/Ubuntu) or dnf (Fedora/RHEL) for system tools",
+    "tool": "linux-pkg",
+    "category": "command",
+    "locator": "On Linux, use apt (Debian/Ubuntu) or dnf (Fedora/RHEL) for system tools"
+  },
+  {
+    "file": "docs/shell-environment/installer-behavior.md",
+    "claim": "bootstrap.sh supports a --dry-run flag and its audit emits lines tagged [rogue]",
+    "tool": "bootstrap.sh",
+    "category": "flag",
+    "locator": "sh bootstrap.sh --dry-run 2>&1 | grep '\\[rogue\\]'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rv provides the command `rv clean-install` as a drop-in replacement for `bundle install --frozen`.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "'rv clean-install as a drop-in replacement for bundle install --frozen'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`rv clean-install` is also available as the alias `rv ci`.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "Project setup: 'rv clean-install          # also available as: rv ci'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rv provides the command `rv tool install` for installing isolated CLI tools.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "'rv tool install for isolated CLI tools'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rv provides `rvx` for ephemeral execution.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "'rvx for ephemeral execution'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "The rv installer is fetched from https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh",
+    "tool": "rv",
+    "category": "url",
+    "locator": "Installation code block: 'https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "The rv install command is `curl --proto '=https' --tlsv1.2 -LsSf <url> | sh`.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "Installation: 'curl --proto '=https' --tlsv1.2 -LsSf ... | sh'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rv shell activation for zsh is `eval \"$(rv shell zsh)\"`.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "Installation comment: 'eval \"$(rv shell zsh)\"'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "The current rv version is 0.5.x or higher (`rv --version` expected to show rv 0.5.x or higher).",
+    "tool": "rv",
+    "category": "version",
+    "locator": "Installation: 'rv --version              # expect: rv 0.5.x or higher'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`rv ruby list` lists available and installed Ruby versions.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "Installation: 'rv ruby list              # list available/installed Ruby versions'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`rv ruby pin <version>` writes a `.ruby-version` file.",
+    "tool": "rv",
+    "category": "command",
+    "locator": "Project setup: 'rv ruby pin 3.3.4         # writes .ruby-version'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`rv ruby install` installs the pinned Ruby version (precompiled).",
+    "tool": "rv",
+    "category": "command",
+    "locator": "Project setup: 'rv ruby install           # installs the pinned version'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rv supports an alternative gem layout where gems live under `~/.local/share/rv/gems` keyed by Ruby version and Gemfile hash.",
+    "tool": "rv",
+    "category": "path",
+    "locator": "Gemfile and bundle configuration: 'gems live under ~/.local/share/rv/gems keyed by Ruby version and Gemfile hash'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rv installs to `~/.local/share/rv`.",
+    "tool": "rv",
+    "category": "path",
+    "locator": "Team coexistence table: 'rv (you) | ... | ~/.local/share/rv'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "rbenv installs to `~/.rbenv/versions` and uses shims in `~/.rbenv/shims`.",
+    "tool": "rbenv",
+    "category": "path",
+    "locator": "Team coexistence table: 'rbenv (team) | .ruby-version | ~/.rbenv/versions | Shims in ~/.rbenv/shims'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "The mise config setting `python.uv_venv_auto = \"create|source\"` causes `cd` into a project to create and activate `.venv` automatically.",
+    "tool": "mise",
+    "category": "default",
+    "locator": "How mise and uv cooperate: 'With python.uv_venv_auto = \"create|source\" in your mise config, cd into a project creates and activates .venv automatically'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`mise sync python --uv` shares a single Python installation between mise and uv.",
+    "tool": "mise",
+    "category": "command",
+    "locator": "How mise and uv cooperate: 'run mise sync python --uv to share a single Python installation between the two tools'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uv init <name>` initializes a new uv project.",
+    "tool": "uv",
+    "category": "command",
+    "locator": "Project initialization: 'uv init my-service'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uv python pin <version>` writes a `.python-version` file.",
+    "tool": "uv",
+    "category": "command",
+    "locator": "Project initialization: 'uv python pin 3.12.7          # writes .python-version'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uv add <packages>` adds runtime dependencies.",
+    "tool": "uv",
+    "category": "command",
+    "locator": "Project initialization: 'uv add fastapi uvicorn'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uv add --dev <packages>` adds development dependencies.",
+    "tool": "uv",
+    "category": "flag",
+    "locator": "Project initialization: 'uv add --dev pytest ruff mypy'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uv sync` creates a `.venv/` directory in the project root.",
+    "tool": "uv",
+    "category": "command",
+    "locator": "Project initialization: 'uv sync                        # creates .venv/ in project root'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uv run <command>` runs a command with the correct interpreter and dependencies active without leaking virtualenv state into parent shells.",
+    "tool": "uv",
+    "category": "command",
+    "locator": "uv run vs. manual activation: 'uv run ensures the correct interpreter and dependencies are active'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "Astral publishes a `setup-uv` GitHub Actions action.",
+    "tool": "uv",
+    "category": "package-name",
+    "locator": "When requirements.txt still makes sense: 'Astral publishes a setup-uv action'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`uvx --with-requirements` is a valid uv invocation for running tools with a requirements file.",
+    "tool": "uv",
+    "category": "flag",
+    "locator": "When requirements.txt still makes sense: 'uses uvx --with-requirements for local builds'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`@tailwindcss/oxide` is the Rust-compiled core of Tailwind CSS v4.",
+    "tool": "tailwindcss",
+    "category": "package-name",
+    "locator": "Why the runtime isn't ready: '@tailwindcss/oxide (the Rust-compiled core of Tailwind CSS v4)'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "bun's lockfile is named `bun.lock`.",
+    "tool": "bun",
+    "category": "default",
+    "locator": "The correct architecture: 'bun = package manager (bun install, bun add, bun.lock)'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`bun.lock` is a human-readable text lockfile; earlier versions of bun used a binary lockfile format (bun.lockb) which is no longer the default.",
+    "tool": "bun",
+    "category": "default",
+    "locator": "bun.lock section: 'bun.lock is a human-readable text lockfile (earlier versions of bun used a binary format \u2014 that is no longer the case)'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`bun install --frozen-lockfile` exits non-zero if the lockfile would change (CI-safe install).",
+    "tool": "bun",
+    "category": "flag",
+    "locator": "Project setup: 'bun install --frozen-lockfile' and 'CI-safe install: exits non-zero if lockfile would change'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`bun init` initializes a new bun project.",
+    "tool": "bun",
+    "category": "command",
+    "locator": "Project setup: 'bun init'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "`bun add <pkg>` adds a dependency and `bun add -d <pkg>` adds a dev dependency.",
+    "tool": "bun",
+    "category": "flag",
+    "locator": "Project setup: 'bun add hono' and 'bun add -d typescript @types/bun biome vite'"
+  },
+  {
+    "file": "docs/tools/package-managers.md",
+    "claim": "The Docker base image `node:22-slim` exists and is referenced as a Node 22 slim image.",
+    "tool": "node",
+    "category": "version",
+    "locator": "In Dockerfiles: 'FROM node:22-slim'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "A project's runtime versions are declared in a `mise.toml` file under a `[tools]` table.",
+    "tool": "mise",
+    "category": "path",
+    "locator": "mise.toml at project root code block: '[tools]'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "mise supports per-task environment overrides via `mise run --env staging deploy`.",
+    "tool": "mise",
+    "category": "flag",
+    "locator": "advantages list: 'Per-task environment overrides (mise run --env staging deploy)'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "mise tasks can be defined as `*.sh` files placed in a `mise/tasks/` directory.",
+    "tool": "mise",
+    "category": "path",
+    "locator": "advantages list: 'Tasks can be *.sh files in mise/tasks/ for complex logic'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "`mise run <task>` executes a defined task.",
+    "tool": "mise",
+    "category": "command",
+    "locator": "invoke section: 'mise run test         # exec the test task'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "`mise run --watch <task>` re-runs a task on file changes.",
+    "tool": "mise",
+    "category": "flag",
+    "locator": "invoke section: 'mise run --watch test # re-run on file changes'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "`mise tasks ls` lists all available tasks.",
+    "tool": "mise",
+    "category": "command",
+    "locator": "invoke section: 'mise tasks ls         # list all available tasks'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "Make was first released in 1976.",
+    "tool": "make",
+    "category": "version",
+    "locator": "Make as the wrapper layer: 'Make has been around since 1976'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "Make supports parallel execution via the `-j` flag (`make -j`).",
+    "tool": "make",
+    "category": "flag",
+    "locator": "When the wrapper isn't enough: 'parallel execution with make -j'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "just can be installed via mise with `mise use -g just@latest`.",
+    "tool": "mise",
+    "category": "command",
+    "locator": "just section: 'Available via mise (mise use -g just@latest) or Homebrew'"
+  },
+  {
+    "file": "docs/tools/mise-and-make.md",
+    "claim": "just has a built-in help/list target, and `just --list` lists recipes.",
+    "tool": "just",
+    "category": "command",
+    "locator": "just section: 'the help target is built in' and justfile 'default: @just --list'"
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise accepts the value \"latest\" for a tool version to track the newest release",
+    "tool": "mise",
+    "category": "default",
+    "locator": "uv     = \"latest\""
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise can install a tool named `usage`, which is required by mise's shell completions",
+    "tool": "mise",
+    "category": "package-name",
+    "locator": "usage  = \"latest\"   # required by mise's shell completions"
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise can install a tool named `delta` (syntax-highlighting git pager)",
+    "tool": "mise",
+    "category": "package-name",
+    "locator": "delta  = \"latest\""
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "The mise setting `auto_install = true` auto-installs missing tool versions when they are referenced",
+    "tool": "mise",
+    "category": "default",
+    "locator": "auto_install = true"
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise supports a `python.compile` setting (boolean) that controls whether Python is compiled from source vs. using precompiled binaries",
+    "tool": "mise",
+    "category": "default",
+    "locator": "python.compile = false"
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise reads `.python-version` for Python and `.nvmrc` for Node as idiomatic version files",
+    "tool": "mise",
+    "category": "path",
+    "locator": ".python-version, .nvmrc"
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise supports a `github_attestations` setting (boolean) that verifies GitHub attestations on precompiled binaries",
+    "tool": "mise",
+    "category": "default",
+    "locator": "github_attestations = true"
+  },
+  {
+    "file": "mise/config.toml",
+    "claim": "mise user-scope config.toml lives at ~/.config/mise/config.toml",
+    "tool": "mise",
+    "category": "path",
+    "locator": "# ~/.config/mise/config.toml"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git reads user config from ~/.config/git/config (XDG location)",
+    "tool": "git",
+    "category": "path",
+    "locator": "# ~/.config/git/config"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `core.pager` can be set to `delta`",
+    "tool": "git",
+    "category": "default",
+    "locator": "pager = delta"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `core.excludesfile` points to a global ignore file (here ~/.config/git/ignore)",
+    "tool": "git",
+    "category": "path",
+    "locator": "excludesfile = ~/.config/git/ignore"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `core.attributesfile` points to a global attributes file (here ~/.config/git/attributes)",
+    "tool": "git",
+    "category": "path",
+    "locator": "attributesfile = ~/.config/git/attributes"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `core.autocrlf = input` converts CRLF to LF on commit but not on checkout",
+    "tool": "git",
+    "category": "default",
+    "locator": "autocrlf = input"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `core.untrackedCache` (boolean) to cache untracked file state",
+    "tool": "git",
+    "category": "default",
+    "locator": "untrackedCache = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `core.bigFileThreshold`, accepting a size suffix like `512m`",
+    "tool": "git",
+    "category": "default",
+    "locator": "bigFileThreshold = 512m"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `init.defaultBranch` to set the default branch name for new repos",
+    "tool": "git",
+    "category": "default",
+    "locator": "defaultBranch = master"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `pull.rebase = true` to rebase instead of merge on pull",
+    "tool": "git",
+    "category": "default",
+    "locator": "rebase = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `push.default = simple`",
+    "tool": "git",
+    "category": "default",
+    "locator": "default = simple"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `push.autoSetupRemote = true` to auto-configure upstream on first push of a new branch",
+    "tool": "git",
+    "category": "default",
+    "locator": "autoSetupRemote = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `push.followTags = true` to push annotated tags reachable from pushed refs",
+    "tool": "git",
+    "category": "default",
+    "locator": "followTags = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `fetch.prune = true` to prune deleted remote branches on fetch",
+    "tool": "git",
+    "category": "default",
+    "locator": "prune = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `fetch.pruneTags = true` to prune deleted remote tags on fetch",
+    "tool": "git",
+    "category": "default",
+    "locator": "pruneTags = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `merge.conflictStyle = zdiff3` is available in git 2.35+",
+    "tool": "git",
+    "category": "version",
+    "locator": "conflictStyle = zdiff3 (git 2.35+)"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `merge.conflictStyle` accepts `diff3` as a value for older git versions",
+    "tool": "git",
+    "category": "default",
+    "locator": "conflictStyle = diff3"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `rebase.updateRefs = true` to update intermediate branch refs during a rebase",
+    "tool": "git",
+    "category": "default",
+    "locator": "updateRefs = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `rebase.autoSquash = true`",
+    "tool": "git",
+    "category": "default",
+    "locator": "autoSquash = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `rebase.autoStash = true`",
+    "tool": "git",
+    "category": "default",
+    "locator": "autoStash = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `rerere.enabled = true` and `rerere.autoupdate = true`",
+    "tool": "git",
+    "category": "default",
+    "locator": "[rerere] enabled = true autoupdate = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `diff.algorithm = histogram`",
+    "tool": "git",
+    "category": "default",
+    "locator": "algorithm = histogram"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `diff.colorMoved = zebra`",
+    "tool": "git",
+    "category": "default",
+    "locator": "colorMoved = zebra"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `diff.colorMovedWS = allow-indentation-change`",
+    "tool": "git",
+    "category": "default",
+    "locator": "colorMovedWS = allow-indentation-change"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `diff.submodule = log`",
+    "tool": "git",
+    "category": "default",
+    "locator": "submodule = log"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `log.date = iso`",
+    "tool": "git",
+    "category": "default",
+    "locator": "date = iso"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `status.submoduleSummary = true`",
+    "tool": "git",
+    "category": "default",
+    "locator": "submoduleSummary = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `status.showStash = true`",
+    "tool": "git",
+    "category": "default",
+    "locator": "showStash = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `commit.gpgsign = true` to sign commits",
+    "tool": "git",
+    "category": "default",
+    "locator": "[commit] gpgsign = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `commit.verbose = true` to include the diff in the commit message editor",
+    "tool": "git",
+    "category": "default",
+    "locator": "verbose = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `tag.gpgsign = true` to sign tags",
+    "tool": "git",
+    "category": "default",
+    "locator": "[tag] gpgsign = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `column.ui = auto` to display certain output in columns",
+    "tool": "git",
+    "category": "default",
+    "locator": "[column] ui = auto"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `branch.sort = -committerdate` to sort branch listings",
+    "tool": "git",
+    "category": "default",
+    "locator": "sort = -committerdate"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git `help.autocorrect` accepts the value `prompt` (prompt before running an autocorrected command)",
+    "tool": "git",
+    "category": "default",
+    "locator": "autocorrect = prompt"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `advice.detachedHead` (boolean) to suppress the detached HEAD advice",
+    "tool": "git",
+    "category": "default",
+    "locator": "detachedHead = false"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `advice.skippedCherryPicks` (boolean)",
+    "tool": "git",
+    "category": "default",
+    "locator": "skippedCherryPicks = false"
+  },
+  {
+    "file": "git/config",
+    "claim": "Git supports `interactive.diffFilter`, set here to `delta --color-only --features=interactive`",
+    "tool": "git",
+    "category": "command",
+    "locator": "diffFilter = delta --color-only --features=interactive"
+  },
+  {
+    "file": "git/config",
+    "claim": "`git push --force-with-lease --force-if-includes` is valid syntax",
+    "tool": "git",
+    "category": "flag",
+    "locator": "pushf = push --force-with-lease --force-if-includes"
+  },
+  {
+    "file": "git/config",
+    "claim": "`git reset --soft HEAD^` is valid syntax",
+    "tool": "git",
+    "category": "command",
+    "locator": "uncommit = reset --soft HEAD^"
+  },
+  {
+    "file": "git/config",
+    "claim": "`git commit --amend --no-edit` is valid syntax",
+    "tool": "git",
+    "category": "flag",
+    "locator": "amend = commit --amend --no-edit"
+  },
+  {
+    "file": "git/config",
+    "claim": "`git branch --merged` lists branches merged into the current branch",
+    "tool": "git",
+    "category": "command",
+    "locator": "merged = ... git branch --merged"
+  },
+  {
+    "file": "git/config",
+    "claim": "`git config --list --show-origin` shows config with the originating file for each value",
+    "tool": "git",
+    "category": "flag",
+    "locator": "whoami = config --list --show-origin"
+  },
+  {
+    "file": "git/config",
+    "claim": "`git config --show-origin user.email` is valid syntax",
+    "tool": "git",
+    "category": "flag",
+    "locator": "profile = config --show-origin user.email"
+  },
+  {
+    "file": "git/config",
+    "claim": "delta supports a `navigate` config option (boolean)",
+    "tool": "delta",
+    "category": "default",
+    "locator": "[delta] navigate = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "delta supports a `line-numbers` config option (boolean)",
+    "tool": "delta",
+    "category": "default",
+    "locator": "line-numbers = true"
+  },
+  {
+    "file": "git/config",
+    "claim": "delta supports a `side-by-side` config option (boolean)",
+    "tool": "delta",
+    "category": "default",
+    "locator": "side-by-side = false"
+  },
+  {
+    "file": "git/config",
+    "claim": "delta supports a `syntax-theme` config option (here set to GitHub)",
+    "tool": "delta",
+    "category": "default",
+    "locator": "syntax-theme = GitHub"
+  },
+  {
+    "file": "git/config",
+    "claim": "delta accepts `--color-only` and `--features=<name>` command-line flags",
+    "tool": "delta",
+    "category": "flag",
+    "locator": "delta --color-only --features=interactive"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH client config lives at ~/.ssh/config",
+    "tool": "ssh",
+    "category": "path",
+    "locator": "# ~/.ssh/config"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `ServerAliveInterval 60` sends a keepalive every 60 seconds",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "ServerAliveInterval 60"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `ServerAliveCountMax 3` disconnects after 3 missed keepalive responses",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "ServerAliveCountMax 3"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `TCPKeepAlive yes` enables TCP-level keepalives",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "TCPKeepAlive yes"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `ForwardAgent no` disables agent forwarding",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "ForwardAgent no"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `ControlPersist 10m` keeps the master connection open in the background for 10 minutes after the last session closes",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "ControlPersist 10m"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `HashKnownHosts yes` hashes hostnames in the known_hosts file",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "HashKnownHosts yes"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `StrictHostKeyChecking accept-new` auto-accepts keys for new hosts but refuses changed keys for known hosts",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "StrictHostKeyChecking accept-new"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `UpdateHostKeys yes` lets the client accept additional host keys advertised by the server",
+    "tool": "ssh",
+    "category": "default",
+    "locator": "UpdateHostKeys yes"
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "SSH `IdentityAgent` can point to the 1Password SSH agent socket at \"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\" on macOS",
+    "tool": "ssh",
+    "category": "path",
+    "locator": "IdentityAgent \"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\""
+  },
+  {
+    "file": "ssh/config.example",
+    "claim": "The 1Password SSH agent socket path on Linux is ~/.1password/agent.sock",
+    "tool": "1password",
+    "category": "path",
+    "locator": "Linux: IdentityAgent ~/.1password/agent.sock"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "direnv reads a global standard-library file at ~/.config/direnv/direnvrc",
+    "tool": "direnv",
+    "category": "path",
+    "locator": "# ~/.config/direnv/direnvrc"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "direnv provides a `log_status` helper function usable in direnvrc/.envrc",
+    "tool": "direnv",
+    "category": "command",
+    "locator": "log_status \"Loading secrets from 1Password vault"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "direnv provides a `log_error` helper function usable in direnvrc/.envrc",
+    "tool": "direnv",
+    "category": "command",
+    "locator": "log_error \"1Password CLI not available"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "The 1Password CLI binary is named `op`",
+    "tool": "1password",
+    "category": "package-name",
+    "locator": "command -v op"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "`op account list` lists configured 1Password accounts (used here to test authentication)",
+    "tool": "1password",
+    "category": "command",
+    "locator": "op account list"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "`op inject -i <file>` injects 1Password secret references from an input template file",
+    "tool": "1password",
+    "category": "flag",
+    "locator": "op inject -i .envrc.op"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "`op read <reference>` reads a single secret given an `op://vault/item/field` reference",
+    "tool": "1password",
+    "category": "command",
+    "locator": "op read \"$ref\""
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "The HashiCorp Vault CLI binary is named `vault`",
+    "tool": "vault",
+    "category": "package-name",
+    "locator": "command -v vault"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "`vault kv get -field=<field> <path>` retrieves a single field from a KV secret",
+    "tool": "vault",
+    "category": "flag",
+    "locator": "vault kv get -field=\"$field\" \"$path\""
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "The sops CLI binary is named `sops`",
+    "tool": "sops",
+    "category": "package-name",
+    "locator": "command -v sops"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "`sops -d <file>` decrypts a sops-encrypted file to stdout",
+    "tool": "sops",
+    "category": "flag",
+    "locator": "sops -d \"$file\""
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "`git rev-parse --abbrev-ref HEAD` prints the current branch name",
+    "tool": "git",
+    "category": "flag",
+    "locator": "git rev-parse --abbrev-ref HEAD"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "macOS `security find-generic-password -a <account> -s <service> -w` prints a stored generic password from the Keychain",
+    "tool": "security",
+    "category": "flag",
+    "locator": "security find-generic-password -a \"$USER\" -s \"$service\" -w"
+  },
+  {
+    "file": "direnv/direnvrc",
+    "claim": "Linux `secret-tool lookup service <service> account <account>` retrieves a secret from the Secret Service / keyring",
+    "tool": "secret-tool",
+    "category": "command",
+    "locator": "secret-tool lookup service \"$service\" account \"$USER\""
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux user config is located at ~/.config/tmux/tmux.conf (XDG location)",
+    "tool": "tmux",
+    "category": "path",
+    "locator": "# ~/.config/tmux/tmux.conf"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "The default tmux prefix key is C-b",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "KEEP the default C-b"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `default-terminal` can be set to \"tmux-256color\"",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "set -g default-terminal \"tmux-256color\""
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `escape-time` default is 500ms and is set here to 10",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "Faster escape key (default 500ms ... set -sg escape-time 10"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `base-index 1` makes window numbering start at 1",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "set -g base-index 1"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `pane-base-index 1` makes pane numbering start at 1",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "setw -g pane-base-index 1"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux supports `history-limit` (set here to 100000)",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "set -g history-limit 100000"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `mode-keys emacs` sets emacs key bindings in copy mode",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "setw -g mode-keys emacs"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `status-keys emacs` sets emacs key bindings at the status-line command prompt",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "set -g status-keys emacs"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `status-position` accepts `top` (in addition to bottom)",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "set -g status-position top"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `bind r source-file <path>` rebinds a key to reload the config file",
+    "tool": "tmux",
+    "category": "command",
+    "locator": "bind r source-file ~/.config/tmux/tmux.conf"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `split-window -v` splits vertically (stacked) and `-h` splits horizontally (side by side)",
+    "tool": "tmux",
+    "category": "flag",
+    "locator": "split-window -v ... split-window -h"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `bind -r` makes a key binding repeatable (re-triggerable without re-pressing prefix within the repeat timeout)",
+    "tool": "tmux",
+    "category": "flag",
+    "locator": "bind -r h select-pane -L"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `select-pane -L/-D/-U/-R` selects the pane in the given direction",
+    "tool": "tmux",
+    "category": "flag",
+    "locator": "select-pane -L ... -D ... -U ... -R"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `resize-pane -L/-D/-U/-R <n>` resizes the pane by n cells in the given direction",
+    "tool": "tmux",
+    "category": "flag",
+    "locator": "resize-pane -L 5"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `last-window` switches to the previously selected window",
+    "tool": "tmux",
+    "category": "command",
+    "locator": "bind Tab last-window"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux `kill-pane` kills the current pane",
+    "tool": "tmux",
+    "category": "command",
+    "locator": "bind x kill-pane"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux plugin manager (tpm) is installed by cloning https://github.com/tmux-plugins/tpm into ~/.config/tmux/plugins/tpm",
+    "tool": "tpm",
+    "category": "url",
+    "locator": "git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm"
+  },
+  {
+    "file": "tmux/tmux.conf",
+    "claim": "tmux-resurrect and tmux-continuum are tpm plugins (tmux-plugins/tmux-resurrect, tmux-plugins/tmux-continuum), and tmux-continuum supports @continuum-restore and @continuum-save-interval options",
+    "tool": "tpm",
+    "category": "package-name",
+    "locator": "@plugin \"tmux-plugins/tmux-resurrect\" ... @continuum-restore"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`tee -a` appends to a file",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "tee section: 'tee deploy.log | tee -a history.log'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "Heredoc syntax is `<< DELIMITER` ... `DELIMITER`",
+    "tool": "zsh",
+    "category": "command",
+    "locator": "Heredocs: 'The syntax is << DELIMITER ... DELIMITER'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "In the default nginx access log format, the 9th field ($9) is the HTTP status code",
+    "tool": "nginx",
+    "category": "default",
+    "locator": "text processing pipeline: 'awk {print $9} ... HTTP status code in the default nginx log format'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`uniq -c` counts consecutive identical lines (requires prior sort)",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "pipeline stage: 'uniq -c \u2014 count consecutive identical lines'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`sort -rn` sorts numerically in reverse order",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "pipeline stage: 'sort -rn \u2014 sort numerically in reverse'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`cut -d',' -f1,3` extracts fields 1 and 3 using comma as delimiter",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "cut vs awk: 'cut -d\\',\\' -f1,3 data.csv'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -r --include=\"*.py\" PATTERN DIR` searches recursively only in Python files",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "grep Essential flags: 'grep -r --include=\"*.py\"'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -rl` shows only filenames, not matching lines",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "grep: 'Show only filenames (not matching lines) grep -rl'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -v` inverts the match (prints lines that do not match)",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "grep: 'Invert match grep -v'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -c` counts matches",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "grep: 'Count matches grep -c'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -B2 -A5` shows 2 lines of context before and 5 lines after each match",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "grep: 'grep -B2 -A5 ... 2 lines before, 5 after'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -E` enables extended regex (alternative: egrep)",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "Basic vs extended regex: 'Use -E (extended regex) or egrep'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`grep -F` treats the pattern as a fixed (literal) string",
+    "tool": "grep",
+    "category": "flag",
+    "locator": "Fixed strings: 'use -F (fixed string)'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`rg \"def enroll\" --type py` is equivalent to `grep -rn --include=\"*.py\"`",
+    "tool": "ripgrep",
+    "category": "flag",
+    "locator": "ripgrep: 'Equivalent to grep -rn --include=\"*.py\" / rg ... --type py'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`rg -o` shows only the matched text, not surrounding text",
+    "tool": "ripgrep",
+    "category": "flag",
+    "locator": "ripgrep: 'rg -o ... Show only matches'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "ripgrep is not installed by default on macOS or Linux; install via `brew install ripgrep`, `apt install ripgrep`, or `dnf install ripgrep`",
+    "tool": "ripgrep",
+    "category": "package-name",
+    "locator": "ripgrep: 'Install via brew install ripgrep ... apt install ripgrep / dnf install ripgrep'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU sed supports case-insensitive replacement via the `I` flag, e.g. `sed 's/old/new/gI'`",
+    "tool": "sed",
+    "category": "flag",
+    "locator": "sed: 'Case-insensitive replacement (GNU sed) sed s/old/new/gI'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU sed (Linux) in-place editing uses `-i` with no argument; BSD sed (macOS) requires `-i ''` with an empty extension argument",
+    "tool": "sed",
+    "category": "flag",
+    "locator": "In-place editing: 'GNU sed: -i with no argument ... BSD sed: -i requires an extension argument'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`sed -i.bak` works as a portable in-place edit on both GNU and BSD sed, creating a .bak backup file",
+    "tool": "sed",
+    "category": "flag",
+    "locator": "Portable approach: 'use sed -i.bak on both platforms'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`sed '5s/old/new/'` operates only on line 5; `sed '10,20s/old/new/g'` operates on lines 10 through 20",
+    "tool": "sed",
+    "category": "command",
+    "locator": "Address ranges: 'Only line 5 ... Lines 10 through 20'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`sed '/^#/d'` deletes lines matching a pattern; `sed -n '/pattern/p'` prints only matching lines",
+    "tool": "sed",
+    "category": "command",
+    "locator": "Address ranges: 'Delete lines matching a pattern ... Print only matching lines'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "awk `-F','` sets the field separator to comma; `-F'[,;:]'` treats any of those characters as a delimiter",
+    "tool": "awk",
+    "category": "flag",
+    "locator": "awk Basics: 'Custom delimiter awk -F\\',\\' ... Multiple delimiters awk -F\\'[,;:]\\''"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "awk built-in variable NR is the current line number across all files; NF is the number of fields in the current line",
+    "tool": "awk",
+    "category": "default",
+    "locator": "Built-in variables table: NR, NF rows"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "awk built-in variables: FS=input field separator, OFS=output field separator, RS=input record separator, ORS=output record separator, FILENAME=current input filename",
+    "tool": "awk",
+    "category": "default",
+    "locator": "Built-in variables table: FS, OFS, RS, ORS, FILENAME rows"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`find . -name \"*.log\" -print0 | xargs -0` uses null-delimited input to safely handle filenames with spaces",
+    "tool": "findutils",
+    "category": "flag",
+    "locator": "Handling filenames with spaces: 'find -print0 produces null-delimited output / xargs -0 reads null-delimited input'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`xargs -I{}` replaces `{}` in the command with each input item, allowing the argument to be placed anywhere in the command",
+    "tool": "findutils",
+    "category": "flag",
+    "locator": "The -I{} pattern: '-I{} replaces {} in the command with each input item'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`xargs -P` runs multiple processes in parallel (e.g. -P4 runs 4 at a time)",
+    "tool": "findutils",
+    "category": "flag",
+    "locator": "Parallel execution: 'xargs -P runs multiple processes in parallel'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU date (Linux) uses `-d` for date parsing (e.g. `date -d \"2026-05-24\" +%s`); BSD date (macOS) uses `-j -f` (e.g. `date -j -f \"%Y-%m-%d\" \"2026-05-24\" +%s`)",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "date: 'GNU date: -d for date parsing ... BSD date: -j -f for date parsing'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU date relative dates use `-d \"+3 days\"`; BSD date relative dates use `-v+3d`",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "date: 'GNU date: relative dates date -d \"+3 days\" ... BSD date: date -v+3d'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU stat (Linux) gets file size with `stat -c %s`; BSD stat (macOS) uses `stat -f %z`",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "stat: 'GNU stat: stat -c %s ... BSD stat: stat -f %z'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU readlink (Linux) supports `-f` to resolve a symlink fully; BSD readlink (macOS) does not support `-f`, so use `realpath` instead",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "readlink: 'GNU readlink: readlink -f ... BSD readlink: does not support -f ... Use realpath instead'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "GNU sort (Linux) supports `-h` for human-readable numeric sort; BSD sort (macOS) does not support `-h`",
+    "tool": "coreutils",
+    "category": "flag",
+    "locator": "sort: 'GNU sort: du -sh * | sort -h ... BSD sort: -h is not supported'"
+  },
+  {
+    "file": "docs/shell-environment/command-line-techniques.md",
+    "claim": "`brew install coreutils` installs GNU coreutils on macOS, exposing GNU tools with a 'g' prefix (gdate, gsed, gstat, greadlink)",
+    "tool": "homebrew",
+    "category": "command",
+    "locator": "The portable solution: 'brew install coreutils ... GNU tools are available with g prefix: gdate, gsed, gstat, greadlink'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "`kubectl completion zsh` emits a static completion function",
+    "tool": "kubectl",
+    "category": "command",
+    "locator": "intro: 'kubectl completion zsh emits a static completion function'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "`fzf --zsh` emits a mix of widgets, keybindings, and completions",
+    "tool": "fzf",
+    "category": "command",
+    "locator": "intro: 'fzf --zsh emits a mix of widgets, keybindings, and completions'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "The version-hashed cache file path is `${XDG_CACHE_HOME}/zsh/tool-injections/<tool>.<hash>.zsh`",
+    "tool": "dotfiles",
+    "category": "path",
+    "locator": "How the cache works: 'cache file at ${XDG_CACHE_HOME}/zsh/tool-injections/<tool>.<hash>.zsh'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "Registry command to emit zoxide init for zsh with cd alias: `zoxide init zsh --cmd cd`",
+    "tool": "zoxide",
+    "category": "command",
+    "locator": "tool registry: 'zoxide \"zoxide init zsh --cmd cd\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "Registry command for mise completions: `mise completion zsh`",
+    "tool": "mise",
+    "category": "command",
+    "locator": "tool registry: 'mise-comp \"mise completion zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "uv shell completion command for zsh is `uv generate-shell-completion zsh`",
+    "tool": "uv",
+    "category": "command",
+    "locator": "tool registry: 'uv-comp \"uv generate-shell-completion zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "uvx shell completion command for zsh is `uvx --generate-shell-completion zsh`",
+    "tool": "uv",
+    "category": "command",
+    "locator": "tool registry: 'uvx-comp \"uvx --generate-shell-completion zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "bun completions command is `bun completions`",
+    "tool": "bun",
+    "category": "command",
+    "locator": "tool registry: 'bun-comp \"bun completions\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "gh zsh completion command is `gh completion -s zsh`",
+    "tool": "gh",
+    "category": "command",
+    "locator": "tool registry: 'gh-comp \"gh completion -s zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "kubectl zsh completion command is `kubectl completion zsh`",
+    "tool": "kubectl",
+    "category": "command",
+    "locator": "tool registry: 'kubectl-comp \"kubectl completion zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "rv zsh completions command is `rv completions zsh`",
+    "tool": "rv",
+    "category": "command",
+    "locator": "tool registry: 'rv-comp \"rv completions zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "docker zsh completion command is `docker completion zsh`",
+    "tool": "docker",
+    "category": "command",
+    "locator": "tool registry: 'docker-comp \"docker completion zsh\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "rustup installer flag `--no-modify-path` skips all profile writes",
+    "tool": "rustup",
+    "category": "flag",
+    "locator": "Installer flags table: rustup --no-modify-path"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "nvm installer flag `--no-use` installs without modifying profiles",
+    "tool": "nvm",
+    "category": "flag",
+    "locator": "Installer flags table: nvm --no-use"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "`hyperfine --warmup 3 \"zsh -lic exit\"` benchmarks interactive startup",
+    "tool": "hyperfine",
+    "category": "command",
+    "locator": "Performance validation: 'hyperfine --warmup 3 \"zsh -lic exit\"'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "zsh built-in profiler is enabled by `zmodload zsh/zprof` at top of .zshrc and `zprof` at bottom",
+    "tool": "zsh",
+    "category": "command",
+    "locator": "Performance validation: 'zmodload zsh/zprof ... zprof'"
+  },
+  {
+    "file": "docs/shell-environment/performance.md",
+    "claim": "zsh ships a built-in profiler named zprof, enabled with `zmodload zsh/zprof`",
+    "tool": "zsh",
+    "category": "command",
+    "locator": "Profiling with zprof: 'zsh ships a built-in profiler (zprof) ... zmodload zsh/zprof'"
+  },
+  {
+    "file": "docs/shell-environment/performance.md",
+    "claim": "`zsh -lic exit` starts a login (-l), interactive (-i), command (-c) shell that runs exit, usable for timing startup",
+    "tool": "zsh",
+    "category": "flag",
+    "locator": "External timing: '/usr/bin/time zsh -lic exit' and 'hyperfine --warmup 3 \"zsh -lic exit\"'"
+  },
+  {
+    "file": "docs/shell-environment/performance.md",
+    "claim": "`zoxide init zsh --cmd cd` is the real zoxide init command used in the lazy-init example",
+    "tool": "zoxide",
+    "category": "command",
+    "locator": "Lazy eval: 'eval \"$(zoxide init zsh --cmd cd)\"'"
+  },
+  {
+    "file": "docs/shell-environment/performance.md",
+    "claim": "compinit cache-hit startup can use a 24h cache plus the `-C` flag to skip security checks",
+    "tool": "zsh",
+    "category": "flag",
+    "locator": "benchmarks table: 'compinit (cache hit) ... 24h cache + -C flag'"
+  },
+  {
+    "file": "docs/shell-environment/performance.md",
+    "claim": "The zsh completion dump file is named .zcompdump",
+    "tool": "zsh",
+    "category": "path",
+    "locator": "benchmarks table: 'compinit (cache miss) ... Delete stale .zcompdump'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2 is installed on macOS via `brew install --cask iterm2`",
+    "tool": "homebrew",
+    "category": "command",
+    "locator": "macOS: iTerm2 Installation: 'brew install --cask iterm2'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2 setting 'Load preferences from a custom folder or URL' is under Settings > General > Preferences",
+    "tool": "iterm2",
+    "category": "default",
+    "locator": "Settings and version control: 'iTerm2 > Settings > General > Preferences > Load preferences from a custom folder or URL'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2 writes its entire preference state to a file named com.googlecode.iterm2.plist",
+    "tool": "iterm2",
+    "category": "path",
+    "locator": "Settings and version control: 'writes its entire preference state ... to com.googlecode.iterm2.plist'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2's plist is in Apple binary plist format by default and can be converted to XML with `plutil -convert xml1 com.googlecode.iterm2.plist`; iTerm2 reads either format",
+    "tool": "iterm2",
+    "category": "command",
+    "locator": "Binary plist diffs tip: 'plutil -convert xml1 com.googlecode.iterm2.plist. iTerm2 reads either format'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2 loads Dynamic Profiles (per-profile JSON files) from `~/Library/Application Support/iTerm2/DynamicProfiles/` on startup and refreshes on change",
+    "tool": "iterm2",
+    "category": "path",
+    "locator": "Dynamic profiles: 'iTerm2 loads from ~/Library/Application Support/iTerm2/DynamicProfiles/ on startup and refreshes on change'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "An iTerm2 Dynamic Profile JSON uses a top-level 'Profiles' array with fields including Guid, Name, 'Dynamic Profile Parent Name', 'Custom Command', Command, Tags, 'Badge Text'",
+    "tool": "iterm2",
+    "category": "default",
+    "locator": "Dynamic profiles JSON example: keys Guid, Name, Dynamic Profile Parent Name, Custom Command, Command, Tags, Badge Text"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2 shell integration provides it2dl filename for download and imgcat image.png for inline image rendering",
+    "tool": "iterm2",
+    "category": "command",
+    "locator": "Shell integration: 'Upload/download via it2dl filename ... Inline image rendering via imgcat image.png'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "iTerm2 has a native tmux integration mode invoked with `tmux -CC`, rendering tmux windows/panes as native iTerm2 tabs and split panes",
+    "tool": "iterm2",
+    "category": "command",
+    "locator": "iTerm2 + tmux integration mode: 'native tmux integration (tmux -CC)'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "`tmux -CC new-session -A -s work` starts or attaches a session named work in iTerm2 integration mode",
+    "tool": "tmux",
+    "category": "command",
+    "locator": "integration mode: 'tmux -CC new-session -A -s work'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "WezTerm on Debian/Ubuntu installs from the APT repo using gpg key URL https://apt.fury.io/wez/gpg.key and repo https://apt.fury.io/wez/",
+    "tool": "wezterm",
+    "category": "url",
+    "locator": "WezTerm install: 'curl -fsSL https://apt.fury.io/wez/gpg.key ... deb [signed-by=...] https://apt.fury.io/wez/'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "WezTerm on Fedora installs via Copr: `sudo dnf copr enable wezfurlong/wezterm-nightly` then `sudo dnf install wezterm`",
+    "tool": "wezterm",
+    "category": "command",
+    "locator": "WezTerm install: 'sudo dnf copr enable wezfurlong/wezterm-nightly / sudo dnf install wezterm'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "Kitty's configuration file is a plain INI-style file at `~/.config/kitty/kitty.conf`",
+    "tool": "kitty",
+    "category": "path",
+    "locator": "Kitty: 'plain INI-style file at ~/.config/kitty/kitty.conf'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "Kitty installs on Debian/Ubuntu via `sudo apt install kitty` and on Fedora via `sudo dnf install kitty`",
+    "tool": "kitty",
+    "category": "package-name",
+    "locator": "Kitty install: 'sudo apt install kitty / sudo dnf install kitty'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "Alacritty has no built-in multiplexer and its configuration is TOML at `~/.config/alacritty/alacritty.toml`",
+    "tool": "alacritty",
+    "category": "path",
+    "locator": "Alacritty: 'No built-in multiplexer ... Configuration is TOML at ~/.config/alacritty/alacritty.toml'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "Alacritty installs on Debian/Ubuntu via `sudo apt install alacritty` and on Fedora via `sudo dnf install alacritty`",
+    "tool": "alacritty",
+    "category": "package-name",
+    "locator": "Alacritty install: 'sudo apt install alacritty / sudo dnf install alacritty'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "The framework's tmux config lives at `~/.config/tmux/tmux.conf` (XDG-compliant)",
+    "tool": "tmux",
+    "category": "path",
+    "locator": "tmux configuration: 'tmux config lives at ~/.config/tmux/tmux.conf'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmux default prefix is C-b",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "tmux configuration: 'Keep the default C-b prefix'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmux `mode-keys emacs` and `status-keys emacs` set emacs-style keys for copy mode and status input",
+    "tool": "tmux",
+    "category": "command",
+    "locator": "tmux configuration: 'mode-keys emacs and status-keys emacs'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmux default splits open in the session's starting directory (not the current pane's directory)",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "tmux configuration: 'The default splits open in the session\\'s starting directory'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmux default key binding `prefix + \"` splits vertically and `prefix + %` splits horizontally",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "Key bindings table: 'prefix + \" Split vertically ... prefix + % Split horizontally'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmux default key binding `prefix + c` creates a new window",
+    "tool": "tmux",
+    "category": "default",
+    "locator": "Key bindings table: 'prefix + c New window'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "`tmux new-session -s NAME` creates a named session; `tmux attach -t NAME` attaches to it",
+    "tool": "tmux",
+    "category": "command",
+    "locator": "Session management: 'tmux new-session -s work ... tmux attach -t work'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmux flags: `-d` (detached), `-s` (session name), `-c` (start directory); `send-keys -t SESSION ... C-m` sends a command with Enter; `split-window -v` splits vertically",
+    "tool": "tmux",
+    "category": "flag",
+    "locator": "Project-specific startup scripts: 'tmux new-session -d -s ... -c ... / send-keys ... C-m / split-window -t ... -v -c'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tmuxp reads YAML session definitions and is installed via mise with `mise use -g tmuxp@latest`",
+    "tool": "tmuxp",
+    "category": "command",
+    "locator": "Session management: 'tmuxp reads YAML session definitions. Install via mise (mise use -g tmuxp@latest)'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "tpm (tmux plugin manager) is installed by cloning https://github.com/tmux-plugins/tpm into `~/.config/tmux/plugins/tpm`",
+    "tool": "tpm",
+    "category": "url",
+    "locator": "Optional tmux plugins: 'git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm'"
+  },
+  {
+    "file": "docs/shell-environment/terminal.md",
+    "claim": "After installing tpm, `prefix + I` installs plugins",
+    "tool": "tpm",
+    "category": "default",
+    "locator": "Optional tmux plugins: 'press prefix + I to install plugins'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "Core aliases live in conf.d/60-aliases.zsh and baseline functions in conf.d/80-functions.zsh",
+    "tool": "dotfiles",
+    "category": "path",
+    "locator": "intro: 'The core set in conf.d/60-aliases.zsh and the baseline functions in conf.d/80-functions.zsh'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`git branch --merged` lists branches already merged into the current branch (used by gclean), and `git branch -d` deletes a merged branch",
+    "tool": "git",
+    "category": "command",
+    "locator": "Git extensions gclean: 'git branch --merged | ... | xargs -n 1 git branch -d'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`git rebase -i HEAD~N` starts an interactive rebase on the last N commits",
+    "tool": "git",
+    "category": "command",
+    "locator": "Git extensions gir: 'git rebase -i \"HEAD~$1\"'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`git rebase --abort` aborts a rebase and `git rebase --continue` continues it",
+    "tool": "git",
+    "category": "command",
+    "locator": "Git extensions: 'alias gra=git rebase --abort / alias grc=git rebase --continue'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`git commit -m` commits with a message; `git checkout -b` creates and checks out a new branch",
+    "tool": "git",
+    "category": "command",
+    "locator": "Git extensions gcm/gcrb: 'git commit -m \"$*\" ... git checkout -b \"$1\"'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`bundle exec` runs a command in the bundle context and `bundle install` installs gems",
+    "tool": "bundler",
+    "category": "command",
+    "locator": "Ruby aliases: 'alias be=bundle exec / alias bi=bundle install'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`rails server` starts the Rails server and `rails console` opens the Rails console",
+    "tool": "rails",
+    "category": "command",
+    "locator": "Ruby aliases: 'alias rs=rails server / rails console'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "rspec supports `--format progress` and `--color` flags",
+    "tool": "rspec",
+    "category": "flag",
+    "locator": "Ruby aliases: 't-rspec=bundle exec rspec --format progress --color'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "uv subcommands: `uv run`, `uv sync`, `uv add`, and `uv run pytest` (with -v and -x pytest flags)",
+    "tool": "uv",
+    "category": "command",
+    "locator": "Python/uv aliases: 'uv run / uv sync / uv add / uv run pytest -v / -x'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "Jupyter is launched via `jupyter notebook` and `jupyter lab`",
+    "tool": "jupyter",
+    "category": "command",
+    "locator": "Python/uv aliases: 'jn=uv run jupyter notebook / jl=uv run jupyter lab'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "bun subcommands: `bun run`, `bun x`, `bun test`, `bun install`",
+    "tool": "bun",
+    "category": "command",
+    "locator": "JS/bun aliases: 'bun run / bun x / bun test / bun install'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "biome can be run via `bun x biome`",
+    "tool": "bun",
+    "category": "command",
+    "locator": "JS/bun aliases: 'alias biome=bun x biome'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "`mise tasks ls` lists project-local mise tasks (discoverable, shareable via mise.toml)",
+    "tool": "mise",
+    "category": "command",
+    "locator": "Organizing aliases at scale: 'discoverable via mise tasks ls'"
+  },
+  {
+    "file": "docs/shell-environment/aliases.md",
+    "claim": "The framework supports untracked per-machine files `$ZDOTDIR/aliases.local.zsh` and `$ZDOTDIR/env.local.zsh`, both sourced at the end of .zshrc if they exist",
+    "tool": "dotfiles",
+    "category": "path",
+    "locator": "Machine-local overrides: '$ZDOTDIR/aliases.local.zsh ... $ZDOTDIR/env.local.zsh ... sourced at the end of .zshrc'"
+  },
+  {
+    "file": "docs/shell-environment/philosophy.md",
+    "claim": "Starship's config file is starship.toml located at $XDG_CONFIG_HOME/starship.toml",
+    "tool": "starship",
+    "category": "path",
+    "locator": "What this does not include: 'Starship (starship.toml in XDG_CONFIG_HOME/starship.toml)'"
+  },
+  {
+    "file": "docs/shell-environment/index.md",
+    "claim": "macOS has shipped zsh as the default shell since Catalina",
+    "tool": "macos",
+    "category": "version",
+    "locator": "Why zsh: 'macOS shipping zsh as the default since Catalina'"
+  },
+  {
+    "file": "docs/shell-environment/index.md",
+    "claim": "The POSIX subprocess shim is `~/.profile`",
+    "tool": "dotfiles",
+    "category": "path",
+    "locator": "POSIX compatibility ... 'via ~/.profile'"
+  },
+  {
+    "file": "docs/shell-environment/index.md",
+    "claim": "The zsh bootstrap file referenced for XDG variables is `~/.zshenv`",
+    "tool": "zsh",
+    "category": "path",
+    "locator": "In this section: 'the ~/.zshenv bootstrap'"
+  },
+  {
+    "file": "docs/shell-environment/integration-strategy.md",
+    "claim": "The cache loader conf.d/25-tool-cache.zsh loads after 20-completion.zsh (so compinit has run) but before 70-tools.zsh",
+    "tool": "dotfiles",
+    "category": "path",
+    "locator": "The tool registry: 'loads after 20-completion.zsh ... but before 70-tools.zsh'"
+  }
+]

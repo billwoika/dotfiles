@@ -152,15 +152,18 @@ structural details differ:
 | Concept | Intel | AMD |
 |---------|-------|-----|
 | Chipset | Platform Controller Hub (PCH) | Fusion Controller Hub (FCH) |
-| CPU-chipset link | DMI (Direct Media Interface) | Infinity Fabric link |
-| Memory controller | On-die since Sandy Bridge (2011) | On-die since Athlon 64 (2003) |
-| iGPU | Intel UHD / Iris (most desktop + mobile CPUs) | Radeon (APUs only; absent on non-G desktop SKUs) |
+| CPU-chipset link | DMI (Direct Media Interface) | PCIe x4 uplink (PCIe 4.0 on X570/AM5) |
+| Memory controller | On-die since Nehalem (2008) | On-die since Athlon 64 (2003) |
+| iGPU | Intel UHD / Iris (most desktop + mobile CPUs) | Radeon RDNA2 on all AM5 desktop SKUs (since Ryzen 7000, 2022); fuller iGPUs on G-series APUs; older AM4 non-G had none |
 | CPU-direct PCIe | Gen 4/5, varies by SKU | Gen 4/5, varies by SKU |
 | Virtualization | VT-x (CPU), VT-d (IOMMU) | AMD-V / SVM (CPU), AMD-Vi (IOMMU) |
 
-AMD moved the memory controller on-die nearly a decade before Intel,
-and AMD's Infinity Fabric provides higher bandwidth between CPU and
-FCH than Intel's DMI on most platforms. These differences rarely
+AMD moved the memory controller on-die in 2003 (Athlon 64), about five
+years before Intel did with Nehalem (2008). AMD's CPU-to-chipset link
+is a PCIe x4 connection (PCIe 4.0 on X570/AM5), broadly comparable in
+bandwidth to Intel's DMI (itself a PCIe-derived x4/x8 link) rather than
+being the Infinity Fabric, which is the on-package interconnect between
+chiplets. These differences rarely
 affect firmware configuration decisions for a development
 workstation but explain why the same setting may appear in a
 different menu location or use a different name between Intel and

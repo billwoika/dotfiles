@@ -169,8 +169,12 @@ manual updates:
 1. Download the BIOS update from
    [Dell Support](https://www.dell.com/support/home/) — enter the
    Service Tag, navigate to "Drivers & Downloads" → "BIOS."
-2. Dell provides a Linux-compatible `.exe` that can be run under
-   Linux via fwupd's local firmware update mechanism:
+2. The normal Linux path is fwupd/LVFS: most Dell systems ship firmware
+   as `.cab` files on the LVFS, applied with `fwupdmgr`. Dell's
+   downloadable `.exe` is a Windows executable — it is NOT directly
+   runnable on Linux. (If a needed update is only offered as an .exe,
+   extract the firmware payload, or update via the BIOS's own
+   flash-from-USB feature.) When a `.cab` is available locally:
 
 ```bash
 # Apply a locally downloaded Dell firmware update

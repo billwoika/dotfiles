@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A combined dotfiles repo and MkDocs Material documentation site for a personal developer environment framework. The dotfiles are real configuration files (zsh, git, mise, direnv, tmux, vim, etc.) that get symlinked into `$HOME` via `bootstrap.sh`. The docs site explains the framework's design and opinions. Both ship in a single repo. Licensed GPLv3-or-later.
 
-Read `.claude-context.md` for the full project history, locked-in decisions, rejected paths, and collaboration patterns established across prior sessions. That document is the authoritative handoff artifact.
+Read `meta/context.md` for the full project history, locked-in decisions, rejected paths, and collaboration patterns established across prior sessions. That document is the authoritative handoff artifact. It is internal (it contains an error log and governance notes) and lives in `meta/` rather than `docs/` precisely so it is never published to the public site.
 
 ## Build and validation commands
 
@@ -63,7 +63,7 @@ Per `.editorconfig`: UTF-8, LF line endings, 2-space indent (tabs only in Makefi
 
 ## Deliberately excluded
 
-Plugin managers (oh-my-zsh, zinit), prompt frameworks (starship, powerlevel10k), dotfile managers (chezmoi, yadm), non-POSIX shells (fish, nushell), Cursor IDE. See `.claude-context.md` Section 3.10 for reasoning.
+Plugin managers (oh-my-zsh, zinit), prompt frameworks (starship, powerlevel10k), dotfile managers (chezmoi, yadm), non-POSIX shells (fish, nushell), Cursor IDE. See `meta/context.md` Section 3.10 for reasoning.
 
 ## Working patterns
 

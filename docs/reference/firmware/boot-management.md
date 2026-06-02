@@ -234,11 +234,14 @@ sudo mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
 sudo chroot /mnt
 
 # 7. Reinstall the bootloader (distribution-specific)
-# Fedora:
-grub2-mkconfig -o /boot/grub2/grub.cfg
-grub2-install --target=x86_64-efi --efi-directory=/boot/efi
+# Fedora (UEFI): do NOT run grub2-install on UEFI — it is unsupported
+# and can break Secure Boot. Reinstall the signed shim+grub packages
+# and regenerate the config instead:
+dnf reinstall shim-x64 grub2-efi-x64
+grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
 
-# Debian/Ubuntu:
+# Debian/Ubuntu (UEFI):
+apt install --reinstall grub-efi-amd64-signed shim-signed
 update-grub
 grub-install --target=x86_64-efi --efi-directory=/boot/efi
 

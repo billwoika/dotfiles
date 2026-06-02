@@ -36,8 +36,11 @@ placeholders is clean.
 A blanket `sed` pass after cloning gets most of the way:
 
 ```sh
+# sed -i.bak works on BOTH GNU and BSD/macOS sed (bare `sed -i` with no
+# suffix is GNU-only; BSD reads the next arg as the backup extension).
+# Delete the *.bak files afterward, or use `find ... -delete`.
 grep -rl 'zftadvancements\|billwoika\|your-username' . | \
-  xargs sed -i \
+  xargs sed -i.bak \
     -e 's/zftadvancements/your-org/g' \
     -e 's/billwoika/your-domain/g' \
     -e 's/your-username/your-user/g'

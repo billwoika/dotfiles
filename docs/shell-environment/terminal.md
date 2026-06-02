@@ -75,7 +75,7 @@ cross-platform session multiplexer.
     working directory is. Once installed, iTerm2 gains capabilities not
     possible with a dumb terminal:
 
-    - Cmd-up/Cmd-down to jump between prompts in the scrollback
+    - Cmd-Shift-up/Cmd-Shift-down to jump between prompts in the scrollback
     - Cmd-click on filenames to open them in your editor at the referenced
       line
     - Status line integration showing current directory, exit code, job

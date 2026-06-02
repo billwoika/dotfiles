@@ -41,7 +41,7 @@ filesystem:
 # /boot/efi/EFI/fedora/grub.cfg (stub)
 search --no-floppy --fs-uuid --set=dev <root-fs-uuid>
 set prefix=($dev)/boot/grub2
-export $prefix
+export prefix
 configfile $prefix/grub.cfg
 ```
 
@@ -277,8 +277,11 @@ When the root filesystem is on a LUKS-encrypted volume, GRUB must
 either:
 
 1. **Prompt for the passphrase in GRUB itself** (GRUB 2 supports
-   LUKS1; GRUB 2.06+ supports LUKS2 with PBKDF2 but not Argon2).
-   This is required when `/boot` is inside the LUKS volume.
+   LUKS1; GRUB 2.06–2.12 support LUKS2 with PBKDF2 only, not Argon2;
+   GRUB 2.14+ adds native Argon2id/Argon2i support). This is required
+   when `/boot` is inside the LUKS volume. If your GRUB predates 2.14
+   and the volume uses Argon2, convert the LUKS2 header's KDF to PBKDF2
+   for the boot device.
 
 2. **Load an unencrypted `/boot`**, which contains the kernel and
    initramfs. The initramfs then handles LUKS unlocking during

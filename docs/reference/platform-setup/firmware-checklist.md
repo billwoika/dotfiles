@@ -116,10 +116,11 @@ Virtualization, or Advanced → Virtualization Technology.
 - SVM Mode / AMD-V: **Enabled**
 - IOMMU / AMD-Vi: **Enabled**
 
-**Why:** Docker, Podman, QEMU/KVM, and most container runtimes
-require hardware virtualization. Without VT-x/AMD-V, containers
-run in degraded mode or refuse to start. VT-d/IOMMU provides DMA
-remapping — a security boundary that is especially important if
+**Why:** QEMU/KVM and other VM-based runtimes require hardware
+virtualization (VT-x/AMD-V). Native Linux containers (Docker, Podman)
+do NOT — they use namespaces/cgroups and run without it — but you want
+VT-x/AMD-V for the VMs that local dev frequently needs anyway. VT-d/IOMMU
+provides DMA remapping — a security boundary that is especially important if
 the machine has Thunderbolt ports (which allow direct memory access
 from connected devices).
 

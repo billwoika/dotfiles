@@ -71,10 +71,23 @@ rv --version
 Homebrew's installer is hardcoded to `/bin/bash -c "$(curl ...)"`. It
 does not modify any profile files — it prints post-install instructions
 and expects you to add `eval "$(brew shellenv)"` to your profile
-manually. In this framework, do not add the eval line. Instead,
-Homebrew's bin directory (`/opt/homebrew/bin` on Apple Silicon,
-`/usr/local/bin` on Intel) is already on PATH via `/etc/paths` and
-macOS's `path_helper`. Verify with `which brew` after installation.
+manually.
+
+On **Intel**, you do not need the eval line: Homebrew's `/usr/local/bin`
+is in the default `/etc/paths` (and `conf.d/10-path.zsh` also appends
+it), so brew is already on PATH via `path_helper`.
+
+On **Apple Silicon**, `/opt/homebrew/bin` is NOT in `/etc/paths` and is
+NOT added by this framework's PATH builder. To get brew on PATH, add a
+prepend for it in a machine-local `aliases.local.zsh` (or
+`env.local.zsh`):
+
+```sh
+# Apple Silicon only — framework does not add this for you
+[[ -d /opt/homebrew/bin ]] && path=("/opt/homebrew/bin" "${path[@]}")
+```
+
+Verify with `which brew` after installation.
 
 On Linux, use `apt` (Debian/Ubuntu) or `dnf` (Fedora/RHEL) for system
 tools. The distribution package manager is the natural choice — better

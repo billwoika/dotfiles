@@ -12,6 +12,18 @@
 # generated locally — see framework doc Section 18.2.
 # ─────────────────────────────────────────────────────────────────────
 
+# ── Portability guard (MUST be first) ───────────────────────────────
+# UseKeychain is an Apple-only OpenSSH patch. On standard OpenSSH
+# (Linux, *BSD, WSL, Homebrew's openssh) an unknown keyword is a FATAL
+# error — "Bad configuration option: usekeychain" — that aborts every
+# ssh/scp/sftp/git-over-ssh connection, because ssh parses the whole
+# file regardless of which Host matches. IgnoreUnknown turns that fatal
+# error into a silent skip, making UseKeychain genuinely benign off
+# macOS. It must appear BEFORE the first UseKeychain line: IgnoreUnknown
+# does not apply to options that appear before it.
+Host *
+    IgnoreUnknown UseKeychain
+
 # ── GitHub multi-identity host aliases ──────────────────────────────
 # Git URLs are rewritten by the work/personal profiles in
 # ~/.config/git/*.config to route through these aliases, which select
@@ -84,7 +96,9 @@ Host *
     UpdateHostKeys yes
 
     # macOS: let Keychain remember passphrases; agent holds decrypted keys.
-    # Benign on Linux (UseKeychain is silently ignored).
+    # On Linux this is NOT silently ignored — it would be a fatal config
+    # error, except the IgnoreUnknown UseKeychain guard at the top of the
+    # file neutralizes it. Keep that guard.
     UseKeychain yes
     AddKeysToAgent yes
 

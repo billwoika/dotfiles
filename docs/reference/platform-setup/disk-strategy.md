@@ -376,8 +376,10 @@ and built-in volume management — all in a single, integrated stack.
       the [Secure Boot](../firmware/secure-boot.md) page).
     - Some distributions (Ubuntu) provide pre-built ZFS packages;
       others require manual installation.
-- **Memory hunger.** ZFS's ARC wants RAM. The default ARC size is
-  half of system RAM. This is configurable (`zfs_arc_max`) but
+- **Memory hunger.** ZFS's ARC wants RAM. On current OpenZFS for Linux
+  the default ARC max (`zfs_arc_max=0`) is the larger of (system RAM −
+  1 GiB) and 5/8 of RAM — roughly 62.5% on a typical box, not half.
+  This is configurable (`zfs_arc_max`) but
   means ZFS competes with applications for memory. On a development
   workstation with 32GB or more, this is manageable. On 16GB, it
   requires tuning.

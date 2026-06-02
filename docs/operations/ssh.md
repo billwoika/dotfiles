@@ -226,9 +226,14 @@ at `$XDG_RUNTIME_DIR/gcr/ssh`, and provides the same "passphrase
 remembered across the session" behavior. (On pre-46 systems the
 equivalent was `gnome-keyring` at `$XDG_RUNTIME_DIR/keyring/ssh`.)
 
-The `UseKeychain yes` directive in the SSH config is silently ignored
-on Linux (OpenSSH 7.2+). It is safe to leave in a shared config that
-targets both platforms.
+The `UseKeychain yes` directive is Apple-only. On upstream OpenSSH
+(Linux, *BSD, WSL) it is NOT silently ignored — an unknown keyword is a
+fatal `Bad configuration option: usekeychain` that aborts every
+connection, because ssh parses the whole file regardless of host match.
+To share one config across macOS and Linux safely, add `IgnoreUnknown
+UseKeychain` before the first `UseKeychain` line (the framework's
+`ssh/config.example` does this at the top of the file); the directive
+then becomes a genuine no-op off macOS.
 
 ## 1Password SSH agent (recommended alternative)
 
