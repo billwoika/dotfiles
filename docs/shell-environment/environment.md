@@ -90,8 +90,11 @@ ANTHROPIC_API_KEY=<your personal key from console.anthropic.com>
 !!! info "Trust semantics"
 
     mise requires explicit trust for each `mise.toml` it loads via
-    `mise trust` (or automatic trust for files you have edited
-    yourself). This is the equivalent of direnv's `direnv allow` — a
+    `mise trust` (or automatic trust for files mise itself creates via
+    `mise use`, or paths listed in `trusted_config_paths`). Note that
+    hand-editing a config does NOT auto-trust it — editing is exactly
+    what re-triggers the trust prompt. This is the equivalent of
+    direnv's `direnv allow` — a
     security gate that prevents arbitrary code execution from untrusted
     repositories. You will be prompted the first time you `cd` into a
     cloned project; run `mise trust` to approve.

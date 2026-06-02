@@ -707,10 +707,8 @@ realpath /usr/local/bin/python3
 ```zsh
 # GNU sort (Linux): human-readable numeric sort
 du -sh * | sort -h
-
-# BSD sort (macOS): -h is not supported
-# Workaround: sort by raw bytes instead
-du -s * | sort -n
+# -h (human-numeric) works on both GNU sort and current macOS sort
+# (macOS adopted the FreeBSD-derived sort, which supports -h).
 ```
 
 ### The portable solution

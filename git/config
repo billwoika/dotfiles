@@ -103,7 +103,10 @@
     hunk-header-decoration-style = cyan box ul
 
 [interactive]
-    diffFilter = delta --color-only --features=interactive
+    # delta's recommended diffFilter. (Dropped --features=interactive:
+    # there is no built-in "interactive" feature and no [delta
+    # "interactive"] section is defined here, so it was inert config.)
+    diffFilter = delta --color-only
 
 # ── Aliases ─────────────────────────────────────────────────────────
 [alias]

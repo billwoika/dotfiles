@@ -47,9 +47,9 @@ it authorizes changes to the list of keys that sign bootloaders.
 
 **Signature Database (db).** The list of trusted signing
 certificates and hashes. Any bootloader signed by a certificate in
-the db is permitted to execute. The critical entry is **Microsoft's
-UEFI Third Party Marketplace CA** — this is the certificate that
-signs `shim`, the first-stage bootloader that most Linux
+the db is permitted to execute. The critical entry is the **Microsoft
+Corporation UEFI CA 2011** (the "Microsoft 3rd Party UEFI CA") — this
+is the certificate that signs `shim`, the first-stage bootloader that most Linux
 distributions use to boot under Secure Boot.
 
 **Forbidden Signature Database (dbx).** The revocation list.
@@ -72,8 +72,8 @@ Firmware (verifies shim against db)
 
 ### shim
 
-`shim` is a small first-stage bootloader signed by Microsoft's UEFI
-Third Party Marketplace CA. Because Microsoft's certificate is in
+`shim` is a small first-stage bootloader signed by the Microsoft
+Corporation UEFI CA 2011. Because Microsoft's certificate is in
 the firmware's db on virtually all machines, shim passes Secure
 Boot verification. shim then loads GRUB, verifying GRUB's signature
 against the distribution's own signing key, which is embedded in
@@ -234,8 +234,8 @@ the same trust chain:
 
 - Windows is signed by Microsoft's Windows Production CA (in the
   firmware's db).
-- Linux's shim is signed by Microsoft's UEFI Third Party
-  Marketplace CA (also in the firmware's db).
+- Linux's shim is signed by the Microsoft Corporation UEFI CA 2011
+  (also in the firmware's db).
 - Both pass firmware verification.
 
 GRUB can chainload the Windows Boot Manager without Secure Boot

@@ -190,7 +190,7 @@ pcie_aspm=off
 # Set ASPM policy to performance
 pcie_aspm.policy=performance
 
-# Set ASPM policy to powersave
+# Set ASPM policy to powersupersave (maximum power savings)
 pcie_aspm.policy=powersupersave
 ```
 

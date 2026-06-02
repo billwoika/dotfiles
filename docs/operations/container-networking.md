@@ -31,8 +31,9 @@ stack directly:
 - **iptables/nftables rules** handle NAT (masquerade for outbound
   traffic), port publishing (DNAT for inbound), and inter-container
   isolation.
-- **The embedded DNS server** (`127.0.0.11` inside containers)
-  resolves container names on user-defined networks.
+- **The embedded DNS server** (`127.0.0.11` on Docker; the network
+  gateway IP on Podman) resolves container names on user-defined
+  networks.
 
 This is actual networking — the same primitives that production
 infrastructure uses. Debugging tools (`tcpdump`, `iptables -L`,
@@ -164,7 +165,11 @@ network access (secret processing, offline builds).
 ### The embedded DNS server
 
 On user-defined bridge networks, the runtime provides an embedded DNS
-server at `127.0.0.11` inside each container. This server:
+server inside each container. The address differs by runtime: **Docker**
+listens at `127.0.0.11`; **Podman** (netavark + aardvark-dns) runs the
+resolver on the network's **gateway IP**, which is what appears as the
+`nameserver` in the container's `/etc/resolv.conf`. Either way, this
+server:
 
 - Resolves container names to their bridge IP addresses.
 - Resolves service names (in Compose) to the set of container IPs

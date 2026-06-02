@@ -25,8 +25,8 @@ lying":
 | Layer | What decides | Typical saboteurs |
 |-------|-------------|-------------------|
 | **Physical/virtual interface** | Which NIC or tunnel carries traffic | VPN clients adding utun interfaces, container bridge adapters |
-| **Routing table** | Where packets for a given destination go | VPN split-tunnel rules, container overlay networks, Tailscale MagicDNS |
-| **DNS resolution** | What IP a hostname resolves to | resolv.conf rewrites, scoped DNS on macOS, systemd-resolved stub listeners |
+| **Routing table** | Where packets for a given destination go | VPN split-tunnel rules, container overlay networks, Tailscale subnet routes / exit nodes |
+| **DNS resolution** | What IP a hostname resolves to | resolv.conf rewrites, scoped DNS on macOS, systemd-resolved stub listeners, Tailscale MagicDNS |
 | **Firewall / packet filter** | Whether traffic is allowed through | macOS pf, iptables/nftables, container runtime iptables rules, Little Snitch |
 | **Application proxy** | Whether traffic is intercepted before leaving | HTTP_PROXY vars, mitmproxy, PAC files, browser proxy settings |
 

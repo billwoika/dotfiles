@@ -116,7 +116,7 @@ Thunderbolt provides:
 | Version | Max bandwidth | PCIe lanes | DisplayPort | USB |
 |---------|-------------|-----------|-------------|-----|
 | Thunderbolt 3 | 40 Gbps | PCIe 3.0 x4 | DP 1.2 | USB 3.1 |
-| Thunderbolt 4 | 40 Gbps | PCIe 3.0 x4 (guaranteed) | DP 2.0 | USB4 |
+| Thunderbolt 4 | 40 Gbps | PCIe 3.0 x4 (guaranteed) | DP 1.4 (HBR3) | USB4 |
 | Thunderbolt 5 | 80/120 Gbps | PCIe 4.0 x4 | DP 2.1 | USB4 |
 
 The critical feature for firmware configuration is that Thunderbolt
@@ -147,8 +147,9 @@ Thunderbolt docks' PCIe functionality).
 
 ### Thunderbolt on Linux
 
-Linux has supported Thunderbolt authorization since kernel 4.17 via
-the `bolt` daemon and `boltctl` utility:
+Linux has supported Thunderbolt authorization since kernel 4.13 (the
+in-kernel security-level sysfs interface that `bolt`/`boltctl` rely on)
+via the `bolt` daemon and `boltctl` utility:
 
 ```bash
 # List connected Thunderbolt devices

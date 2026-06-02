@@ -80,10 +80,12 @@ internal-bound traffic through the VPN.
 
 ### The cost nobody mentions
 
-VPN infrastructure is not free. AWS Client VPN costs approximately
-$0.10 per client-connection per hour — that is nearly a dollar per
-engineer per full workday of connection time. Organizations that
-mandate always-on VPN are spending significant per-seat costs on
+VPN infrastructure is not free. AWS Client VPN charges roughly $0.05
+per active client connection per hour, plus a separate hourly charge
+per subnet (endpoint) association — so a full 8-hour workday of
+connection time runs about $0.40 per engineer before the association
+fee. Organizations that mandate always-on VPN are spending significant
+per-seat costs on
 gateway capacity that serves no purpose when the engineer is not
 accessing internal resources.
 

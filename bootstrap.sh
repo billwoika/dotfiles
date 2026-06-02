@@ -209,7 +209,10 @@ fi
 
 # ── Audit: scan shell startup files for rogue injections ────────────
 audit_shell_injections() {
-  local found=0 matches target
+  # NOTE: no `local` — it is not POSIX (shellcheck SC3043), and this
+  # file is POSIX-sh-only per its header. found/matches/target/f are
+  # unique to this function, so plain assignment is safe.
+  found=0
   log ""
   log "Auditing shell startup files for rogue injections..."
   for f in "${HOME}/.profile" "${HOME}/.bash_profile" "${HOME}/.bashrc" \

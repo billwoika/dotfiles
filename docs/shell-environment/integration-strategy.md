@@ -104,12 +104,15 @@ typeset -gA _ZSHTOOL_CACHE_ENTRIES=(
   mise-comp      "mise completion zsh"
   uv-comp        "uv generate-shell-completion zsh"
   uvx-comp       "uvx --generate-shell-completion zsh"
-  bun-comp       "bun completions"
   gh-comp        "gh completion -s zsh"
   kubectl-comp   "kubectl completion zsh"
-  rv-comp        "rv completions zsh"
+  rv-comp        "rv shell completions zsh"
   docker-comp    "docker completion zsh"
 )
+# Note: bun is intentionally absent here. `bun completions` WRITES
+# completion files to disk rather than emitting zsh to stdout, so it
+# cannot be captured-and-sourced like the entries above. Let bun install
+# its own completions at install time instead.
 ```
 
 Adding a new tool is a two-line change: add an entry to
@@ -187,7 +190,7 @@ files for rogue injections from known offenders (`NVM_DIR`,
 | Tool | Flag | Effect |
 |------|------|--------|
 | rustup | `--no-modify-path` | Skips all profile writes |
-| nvm | `--no-use` | Installs without modifying profiles |
+| nvm | `PROFILE=/dev/null` | Installs without modifying profiles (the `--no-use` flag only postpones activation; it still writes to your profile) |
 | Homebrew | *(none needed)* | Prints instructions only |
 | mise | *(base URL only)* | Binary-only, no profile injection |
 

@@ -92,9 +92,12 @@ export PATH
 | systemd user service | No | Does not spawn a login shell; use `Environment=` directives in the unit file or `~/.config/environment.d/*.conf` |
 | ssh `ForceCommand` | Varies | Depends on whether a login shell is spawned |
 
-Critically, bash reads `~/.profile` **only when `~/.bash_profile` does
-not exist**. If you have a `~/.bash_profile` from a previous bash-era
-configuration, bash will read that and ignore `~/.profile` entirely.
+Critically, an interactive login bash reads the first of
+`~/.bash_profile`, `~/.bash_login`, `~/.profile` that exists — so it
+reads `~/.profile` **only when neither `~/.bash_profile` nor
+`~/.bash_login` exists**. If you have a `~/.bash_profile` (or
+`~/.bash_login`) from a previous bash-era configuration, bash reads
+that and ignores `~/.profile` entirely.
 The cleanest migration path is to delete `~/.bash_profile` and
 `~/.bash_login` so bash falls through to `~/.profile` consistently.
 You are not a bash user — these files are cruft.
