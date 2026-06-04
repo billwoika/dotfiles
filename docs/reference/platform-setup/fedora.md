@@ -180,24 +180,76 @@ SELinux to "fix" a development problem is the container equivalent of
 running everything as root — it works until it doesn't, and the habits
 it builds are actively harmful in production.
 
-Common developer interactions with SELinux:
+On a fresh workstation you will not interact with SELinux at all — it
+sits in the background and stays out of the way. You only reach for the
+commands below once something is actually denied: a service won't start,
+a container can't read a mounted path, a file moved into place is
+suddenly unreadable. The workflow is always the same loop — confirm the
+denial, read what it objected to, decide whether the *labels* are wrong
+or the *policy* is, then fix the narrower of the two.
+
+First, confirm SELinux is on and find out whether anything has actually
+been denied:
 
 ```sh
-# Check current mode
-getenforce                        # should say "Enforcing"
+# Check current mode — should say "Enforcing"
+getenforce
 
-# See recent denials
-sudo ausearch -m avc -ts recent
+# See recent denials. On a fresh machine this prints nothing,
+# which is the expected and healthy result.
+sudo ausearch -m avc -ts recent 2>/dev/null || echo "no denials"
+```
 
-# Temporary permissive mode for a specific domain (debugging only)
+If `ausearch` prints nothing, there is nothing to fix and you are done —
+the rest of this section does not apply until you hit a real denial.
+
+Once you *do* have a denial, the decision is whether it is a labeling
+problem or a policy problem. Most developer-facing denials are labeling:
+a file or directory was created or moved somewhere SELinux expects a
+different context. The fix is to restore the correct context, not to
+loosen policy:
+
+```sh
+# Restore the default file contexts for a path (fixes most denials
+# caused by moving, copying, or extracting files into place)
+sudo restorecon -Rv /path/to/moved/files
+```
+
+If restoring contexts does not resolve it, the access may be legitimate
+but genuinely unanticipated by the shipped policy. The safe way to
+investigate is to put the *single offending domain* into permissive mode
+— not the whole system — so it logs what it would have blocked without
+actually blocking it. Reproduce the failure, collect the denials it
+logs, then turn the domain back to enforcing:
+
+```sh
+# Put one domain into permissive mode (example: the httpd domain).
+# This logs denials for httpd_t only; everything else stays enforcing.
 sudo semanage permissive -a httpd_t
 
-# Generate a local policy module from denials
+# ... reproduce the failure so the denials get logged ...
+
+# Turn the domain back to enforcing when you are done. Do not leave
+# a domain permissive — that is the per-domain version of disabling
+# SELinux, and it will quietly mask future problems.
+sudo semanage permissive -d httpd_t
+```
+
+With the denials now logged, you can generate a local policy module
+that allows exactly what was denied — and nothing more. Always read the
+rules `audit2allow` proposes before installing them; it will happily
+generate a module for a denial that was really a misconfiguration:
+
+```sh
+# Preview the policy audit2allow would generate (review this first)
+sudo ausearch -m avc -ts recent | audit2allow
+
+# If the rules are correct, build and install a named module
 sudo ausearch -m avc -ts recent | audit2allow -M my_local_fix
 sudo semodule -i my_local_fix.pp
 
-# Restore file contexts after moving files
-sudo restorecon -Rv /path/to/moved/files
+# A module you installed can be removed by name if you change your mind
+sudo semodule -r my_local_fix
 ```
 
 ### Container-specific SELinux
@@ -399,17 +451,51 @@ produces unpredictable behavior, often worse than either alone.
 profiles. `tuned-ppd` is a shim that exposes the same D-Bus API as
 the older `power-profiles-daemon`, so GNOME's power settings panel
 works without modification. This is the recommended approach for
-most users:
+most users.
+
+There are two CLIs, and the distinction matters. `powerprofilesctl`
+talks to the `tuned-ppd` shim and only sees the three
+PPD-compatible profiles (`power-saver`, `balanced`, `performance`).
+It is the right tool when all you want is to match what GNOME's
+panel does:
 
 ```sh
-# Check current profile (uses the same CLI as the old PPD)
+# List the three PPD-compatible profiles and show the active one
 powerprofilesctl list
 
-# Switch profiles — GNOME's Settings panel also does this
+# Switch profiles — GNOME's Settings panel sets the same three
 powerprofilesctl set power-saver
 powerprofilesctl set balanced
 powerprofilesctl set performance
 ```
+
+`tuned-adm` is `tuned`'s own CLI and the actually-installed tool.
+It exposes the full profile set, not just the three the shim maps
+to. Use it when one of the standard profiles does not fit — for
+example, pinning a desktop to `throughput-performance`, or choosing
+a more aggressive `powersave` than the shim's `power-saver` maps to:
+
+```sh
+# List every profile tuned ships (far more than the PPD three)
+tuned-adm list
+
+# Show the active profile and why it was chosen
+tuned-adm active
+
+# Switch to any profile by name
+tuned-adm profile powersave
+tuned-adm profile throughput-performance
+
+# Let tuned pick a profile based on the hardware it detects
+tuned-adm recommend
+```
+
+Setting a profile with `tuned-adm` is reflected in GNOME's panel
+and in `powerprofilesctl` when it maps to one of the three; a
+profile outside that set simply shows as the closest equivalent.
+Pick one CLI per task — `powerprofilesctl` for the common
+three-way toggle, `tuned-adm` when you need a profile it cannot
+name.
 
 **power-profiles-daemon (PPD)** was the Fedora default through
 Fedora 40. It provided the same three profiles over D-Bus. Fedora
@@ -420,11 +506,26 @@ automatically.
 
 **TLP** provides the most granular control: per-device USB
 autosuspend, PCIe ASPM policy, disk APM, WiFi power save, and
-battery charge thresholds on ThinkPads. However, TLP has no D-Bus
-API, so GNOME's power settings panel will not work with it. TLP
-conflicts with both `tuned`/`tuned-ppd` and `power-profiles-daemon`.
+battery charge thresholds. However, TLP has no D-Bus API, so
+GNOME's power settings panel will not work with it. TLP conflicts
+with both `tuned`/`tuned-ppd` and `power-profiles-daemon`.
 
-If TLP's granular control is needed, the installation must remove
+Stay on the `tuned` default unless you hit a specific limitation it
+cannot address. Concrete reasons to switch to TLP:
+
+- You need a tunable `tuned` does not expose — USB autosuspend
+  allow/deny lists, per-device PCIe ASPM policy, or SATA link power
+  management overrides for a device that misbehaves on the default.
+- You want **persistent** battery charge thresholds managed by a
+  daemon across reboots, rather than re-applying a sysfs write
+  yourself (see the ThinkPad note below).
+- Idle battery drain is still poor after trying `tuned-adm profile
+  powersave`, and `powertop --auto-tune` confirms specific devices
+  are not being suspended.
+
+If none of those apply, the default stack is the better choice — it
+keeps the GNOME panel working and needs no maintenance. If TLP's
+granular control is genuinely needed, the installation must remove
 the conflicting packages:
 
 ```sh
@@ -444,14 +545,39 @@ sudo systemctl enable --now tlp
 sudo tlp-stat -s
 ```
 
-TLP's defaults are sane for most hardware. For ThinkPads, the
-additional `kernel-devel` and `akmod-acpi_call` packages enable
-battery charge thresholds:
+TLP's defaults are sane for most hardware.
+
+For ThinkPad battery charge thresholds, no out-of-tree module is
+needed on any kernel Fedora currently ships. Since Linux 5.17 the
+in-tree `thinkpad_acpi` driver provides charge-threshold support
+for ThinkPads back to the Sandy Bridge generation (2011), exposed
+as the standard `charge_control_end_threshold` sysfs node. The old
+`akmod-acpi_call` package is unmaintained and rebuilds on every
+kernel update — do not install it on modern hardware.
+
+A raw sysfs write works but does not survive a reboot:
 
 ```sh
-# ThinkPad-specific: limit charge to 80% (extends battery lifespan)
-sudo dnf install kernel-devel akmod-acpi_call
+# Limit charge to 80% (extends battery lifespan) — NOT persistent;
+# this is reset on every reboot. Use it only for a one-off test.
 echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+```
+
+For a persistent threshold, let TLP manage it — that is one of the
+reasons to run TLP in the first place. Set the thresholds in
+`/etc/tlp.conf` and TLP re-applies them on every boot:
+
+```sh
+# /etc/tlp.conf — TLP applies these on every boot
+# Start charging at 75%, stop at 80% (values are ThinkPad-specific)
+START_CHARGE_THRESH_BAT0=75
+STOP_CHARGE_THRESH_BAT0=80
+```
+
+```sh
+# Apply the new config without rebooting, then confirm
+sudo tlp start
+sudo tlp-stat -b        # shows the active charge thresholds
 ```
 
 For most development workstations, the recommendation is to stay
@@ -474,7 +600,7 @@ sudo dnf install \
   sqlite-devel postgresql-devel \
   fd-find ripgrep fzf jq bat gh \
   direnv \
-  libsecret-tools \
+  libsecret \
   podman podman-compose podman-docker buildah skopeo \
   ShellCheck
 ```
@@ -492,9 +618,10 @@ Why each group:
   the framework's aliases and functions expect. `gh` is the GitHub
   CLI; its completions are wired in the shell startup chain.
 - **direnv** — already wired in `conf.d/70-tools.zsh`.
-- **libsecret-tools** — provides `secret-tool`, used by the
-  `keychain_get` shell function. Note: `libsecret` (without
-  `-tools`) installs only the shared library, not the CLI.
+- **libsecret** — provides `secret-tool`, used by the
+  `keychain_get` shell function. On Fedora the CLI ships in the
+  base `libsecret` package; the `libsecret-tools` package name is
+  Debian/Ubuntu-only and does not exist in Fedora's repos.
 - **podman, podman-compose, podman-docker, buildah, skopeo** — the
   full container toolchain. `podman-docker` provides a `docker`
   command that wraps podman, enabling compatibility with tools that
