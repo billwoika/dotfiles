@@ -75,6 +75,52 @@ start zsh manually:
 zsh
 ```
 
+Then confirm no leftover bash startup files remain. If
+`~/.bash_profile` or `~/.bash_login` exists, bash reads it instead
+of the framework's `~/.profile`, and the POSIX shim that supplies
+environment variables to cron, systemd user services, and other
+non-zsh subprocesses never loads:
+
+```sh
+ls -la ~/.bash_profile ~/.bash_login ~/.bashrc 2>/dev/null
+# Expected: no such files. If any exist, remove them:
+rm -f ~/.bash_profile ~/.bash_login ~/.bashrc
+```
+
+The platform setup pages cover this in their shell-change step;
+this check catches the case where a file was re-created (for
+example by a tool installer) after that step. See [when
+`~/.profile` is
+read](../shell-environment/posix-profile.md#when-profile-is-read).
+
+!!! warning "Run the remaining steps in a framework shell"
+
+    Every step from here on installs or first-runs a tool, and several
+    of those tools place their state based on an environment variable
+    the framework sets — `CARGO_HOME`, `RUSTUP_HOME`, `GNUPGHOME`,
+    `GOPATH`. If you run them from the original bash login session, those
+    variables are not set, and the tools fall back to `~/.cargo`,
+    `~/.rustup`, `~/.gnupg`, and `~/go` in your home directory instead of
+    their XDG locations.
+
+    Confirm you are in a shell that has loaded the framework environment
+    before continuing:
+
+    ```sh
+    echo "$CARGO_HOME"
+    # Should print: <your XDG_DATA_HOME>/cargo  (e.g. ~/.local/share/cargo)
+    # If it prints nothing, start a framework shell first: exec zsh
+    ```
+
+    This will not stop the genuinely unrelocatable directories
+    (`~/.mozilla`, `~/.pki`) from appearing — those honor no such
+    variable and no framework lever moves them. `~/.vim` is not in that
+    category: it is a deliberate config placement, not a leak. See
+    [directories that escape
+    XDG](../shell-environment/xdg-and-posix.md#directories-that-escape-xdg)
+    for which leaks are preventable, which are the cost of the tool, and
+    why Vim is neither.
+
 ### Step 4: Install mise
 
 ```sh

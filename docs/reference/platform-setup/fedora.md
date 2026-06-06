@@ -671,6 +671,36 @@ grep $(whoami) /etc/passwd
 # Should end with: /usr/bin/zsh
 ```
 
+### Remove the bash startup files
+
+Changing your login shell is not enough. Fedora ships a stock
+`~/.bashrc` and `~/.bash_profile` (copied from `/etc/skel` when the
+account was created), and these will silently shadow the
+framework's `~/.profile` that `bootstrap.sh` installs.
+
+The mechanism: an interactive login bash reads the first of
+`~/.bash_profile`, `~/.bash_login`, `~/.profile` that exists, and
+stops there. As long as `~/.bash_profile` is present, bash reads it
+and **never reads `~/.profile`** — so the POSIX subprocess shim
+(the environment variables relied on by cron, systemd user
+services, and any non-zsh process) never loads. The full read-order
+table is in the [POSIX profile
+reference](../../shell-environment/posix-profile.md#when-profile-is-read).
+
+You are not a bash user under this framework — these files are
+cruft. Delete them so bash falls through to `~/.profile`
+consistently:
+
+```sh
+# Remove the bash-era startup files that would shadow ~/.profile
+rm -f ~/.bash_profile ~/.bash_login ~/.bashrc
+```
+
+Do this before running `bootstrap.sh`. The bootstrap audit will
+also warn if any surviving startup file contains rogue
+installer-injected PATH lines, but it does not delete these files
+for you — removing the stock bash files is a manual step.
+
 ## Flatpak considerations
 
 Fedora ships with Flatpak and Flathub pre-configured. For GUI
