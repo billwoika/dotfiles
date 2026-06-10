@@ -120,3 +120,92 @@ The full XDG-compliant zsh config tree:
     renaming existing ones. Use two-digit prefixes — the sort order of
     `10` vs. `9` is alphabetic, so `09` sorts before `10` correctly, but
     single digits do not.
+
+## Directories that escape XDG
+
+XDG compliance is not total, and pretending otherwise sets a false
+expectation. Two different things put dot-directories back in `$HOME`,
+and they have different fixes.
+
+**Tools the framework relocates — but only once its environment is
+loaded.** These honor an environment variable, and the framework sets
+it. If the tool runs before that variable is exported — in a bash
+session, or in a shell that has not yet sourced the zsh chain or
+`~/.profile` — the tool falls back to its default `$HOME` location and
+the directory leaks:
+
+| Directory in `$HOME` | Relocated by | To |
+|----------------------|--------------|-----|
+| `~/.cargo` | `CARGO_HOME` | `$XDG_DATA_HOME/cargo` |
+| `~/.rustup` | `RUSTUP_HOME` | `$XDG_DATA_HOME/rustup` |
+| `~/.gnupg` | `GNUPGHOME` | `$XDG_DATA_HOME/gnupg` |
+| `~/go` | `GOPATH` | `$XDG_DATA_HOME/go` |
+| `~/.viminfo` | `set viminfofile` in `vimrc` | `$XDG_STATE_HOME/vim/viminfo` |
+
+Seeing one of these in `$HOME` means the tool ran with a stale
+environment, not that relocation failed. The fix is ordering: ensure
+the framework environment is active before installing or first running
+the tool (see the [onboarding runbook](../reference/onboarding.md)). If
+the directory already leaked, it is safe to remove the empty stub once
+the correctly-located one exists — but inspect first, because a tool
+that already wrote real data (gpg keys, cargo credentials) to the
+`$HOME` path will not find it at the XDG path.
+
+**Tools that ignore XDG entirely — the accepted-holdout list.** These
+hardcode a `$HOME` path and honor no usable environment variable, so
+the framework cannot redirect them. This is the canonical list of
+entries the framework considers *expected* in `$HOME`. Anything here is
+known cruft to be left alone; anything in `$HOME` that is **not** here
+(and not a framework symlink) is worth investigating as rogue.
+
+| Entry in `$HOME` | Created by | Why it cannot move |
+|------------------|------------|--------------------|
+| `~/.mozilla` | Firefox | Profile root is hardcoded; no XDG support upstream |
+| `~/.pki` | NSS / Chromium / some TLS clients | NSS database path is hardcoded |
+| `~/.claude.json` | Claude Code | Top-level config file path is fixed to `$HOME`; no override variable (upstream feature request open) |
+
+For `~/.mozilla` and `~/.pki` there is no framework lever at all; they
+are the cost of running a browser. Do not spend effort trying to
+relocate these.
+
+`~/.claude.json` deserves a precise note, because it is half-movable
+and easy to get wrong. The Claude Code **config directory** —
+`~/.claude/` (settings, skills, agents, memory) — does honor
+`CLAUDE_CONFIG_DIR`, and the framework works with that directory
+directly. The top-level **`~/.claude.json`** file is the part that
+stays: as of this writing it is written to `$HOME` with no documented
+way to relocate it. So the directory can move and the file cannot —
+treat the file as a holdout and leave it.
+
+This table is documentation, not enforcement. There is deliberately no
+script that deletes or relocates these — the framework states what is
+expected and stops there. If a future home-directory audit is added, it
+should read this list as its allowlist rather than hard-coding the
+entries a second time; keep this table the single source of truth.
+
+### Vim is a deliberate placement, not a holdout
+
+Vim is the opposite case, and worth calling out because it is easy to
+miscategorize. Vim is fully redirectable. `VIMINIT` controls the config
+entry point, and from there `'runtimepath'`, `'undodir'`,
+`'directory'`, `'backupdir'`, and `viminfofile` move every piece of
+state Vim writes. Vim 9.1+ goes further and reads
+`$XDG_CONFIG_HOME/vim/vimrc` natively when no `~/.vimrc` or `~/.vim/`
+exists. Nothing about Vim forces anything into `$HOME`.
+
+The framework already uses this. The shipped `vimrc` redirects undo,
+swap, backup, and `viminfo` into `$XDG_STATE_HOME/vim/` (see
+[editors](../tools/editors.md)), so none of Vim's runtime state lands
+in your home directory. What remains is `~/.vim/` as the **config
+home** — and that is a deliberate choice: `bootstrap.sh` symlinks the
+config to `~/.vim/vimrc` because that path works identically on every
+Vim version the framework targets, whereas the native
+`$XDG_CONFIG_HOME/vim/` path requires Vim 9.1+. It is a compatibility
+decision, not a limitation. A user who only runs Vim 9.1+ can move the
+config under `$XDG_CONFIG_HOME/vim/` and drop `~/.vim` entirely.
+
+Acknowledging the genuine holdouts (`~/.mozilla`, `~/.pki`,
+`~/.claude.json`) honestly is
+better than a config that claims a clean `$HOME` it cannot deliver —
+but do not pad that list with tools like Vim that are configurable and
+that the framework has, in fact, already configured.

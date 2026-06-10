@@ -10,7 +10,17 @@ optional GUI tools) are presented in tabbed sections.
 
     - macOS with Command Line Tools (`xcode-select --install`)
     - A GitHub account with SSH key access
-    - 1Password (recommended, not required)
+    - 1Password (recommended, not required):
+
+        ```sh
+        brew install --cask 1password
+        brew install 1password-cli
+        ```
+
+        We recommend installing 1Password before bootstrapping. It can
+        broker GitHub authentication through a stored passkey and act as
+        the SSH agent for commit signing, so having it in place first
+        means fewer credential prompts during the steps below.
 
 === "Debian / Ubuntu"
 
@@ -27,7 +37,22 @@ optional GUI tools) are presented in tabbed sections.
         ```
 
     - A GitHub account with SSH key access
-    - 1Password (recommended, not required)
+    - 1Password (recommended, not required). Add the 1Password apt
+      repository, then install the desktop app and the `op` CLI from it:
+
+        ```sh
+        curl -sS https://downloads.1password.com/linux/keys/1password.asc \
+          | sudo gpg --dearmor \
+            --output /usr/share/keyrings/1password-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" \
+          | sudo tee /etc/apt/sources.list.d/1password.list
+        sudo apt update && sudo apt install 1password 1password-cli
+        ```
+
+        We recommend installing 1Password before bootstrapping. It can
+        broker GitHub authentication through a stored passkey and act as
+        the SSH agent for commit signing, so having it in place first
+        means fewer credential prompts during the steps below.
 
 === "Fedora / RHEL"
 
@@ -36,7 +61,19 @@ optional GUI tools) are presented in tabbed sections.
       packages (including `zsh`, `git`, and `util-linux-user`), and
       setting zsh as the default shell.
     - A GitHub account with SSH key access
-    - 1Password (recommended, not required)
+    - 1Password (recommended, not required). Add the 1Password dnf
+      repository, then install the desktop app and the `op` CLI from it:
+
+        ```sh
+        sudo rpm --import https://downloads.1password.com/linux/keys/1password.asc
+        sudo sh -c 'echo -e "[1password]\nname=1Password Stable Channel\nbaseurl=https://downloads.1password.com/linux/rpm/stable/\$basearch\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=\"https://downloads.1password.com/linux/keys/1password.asc\"" > /etc/yum.repos.d/1password.repo'
+        sudo dnf install 1password 1password-cli
+        ```
+
+        We recommend installing 1Password before bootstrapping. It can
+        broker GitHub authentication through a stored passkey and act as
+        the SSH agent for commit signing, so having it in place first
+        means fewer credential prompts during the steps below.
 
 ## Step-by-step setup
 
@@ -74,6 +111,52 @@ start zsh manually:
 ```sh
 zsh
 ```
+
+Then confirm no leftover bash startup files remain. If
+`~/.bash_profile` or `~/.bash_login` exists, bash reads it instead
+of the framework's `~/.profile`, and the POSIX shim that supplies
+environment variables to cron, systemd user services, and other
+non-zsh subprocesses never loads:
+
+```sh
+ls -la ~/.bash_profile ~/.bash_login ~/.bashrc 2>/dev/null
+# Expected: no such files. If any exist, remove them:
+rm -f ~/.bash_profile ~/.bash_login ~/.bashrc
+```
+
+The platform setup pages cover this in their shell-change step;
+this check catches the case where a file was re-created (for
+example by a tool installer) after that step. See [when
+`~/.profile` is
+read](../shell-environment/posix-profile.md#when-profile-is-read).
+
+!!! warning "Run the remaining steps in a framework shell"
+
+    Every step from here on installs or first-runs a tool, and several
+    of those tools place their state based on an environment variable
+    the framework sets — `CARGO_HOME`, `RUSTUP_HOME`, `GNUPGHOME`,
+    `GOPATH`. If you run them from the original bash login session, those
+    variables are not set, and the tools fall back to `~/.cargo`,
+    `~/.rustup`, `~/.gnupg`, and `~/go` in your home directory instead of
+    their XDG locations.
+
+    Confirm you are in a shell that has loaded the framework environment
+    before continuing:
+
+    ```sh
+    echo "$CARGO_HOME"
+    # Should print: <your XDG_DATA_HOME>/cargo  (e.g. ~/.local/share/cargo)
+    # If it prints nothing, start a framework shell first: exec zsh
+    ```
+
+    This will not stop the genuinely unrelocatable directories
+    (`~/.mozilla`, `~/.pki`) from appearing — those honor no such
+    variable and no framework lever moves them. `~/.vim` is not in that
+    category: it is a deliberate config placement, not a leak. See
+    [directories that escape
+    XDG](../shell-environment/xdg-and-posix.md#directories-that-escape-xdg)
+    for which leaks are preventable, which are the cost of the tool, and
+    why Vim is neither.
 
 ### Step 4: Install mise
 

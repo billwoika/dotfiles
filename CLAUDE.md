@@ -48,7 +48,7 @@ Every content push must pass: `mkdocs build --strict`, `zsh -n` on all zsh files
 
 - Opinionated but honest about counter-positions. Every stance acknowledges where it's wrong.
 - No emoji in any content.
-- First-person plural ("we recommend") in docs, not second-person ("you should").
+- First-person plural ("we recommend") in docs, not second-person ("you should"). EXCEPTION: the **My Setup** section (`docs/my-setup/`) uses first-person singular ("I run X because Y") by design — it holds subjective, user-specific worked examples, deliberately distinct from the agnostic voice. Do not "correct" it back to plural.
 - Short sentences. Concrete over abstract. No "seamlessly integrates" prose.
 - Code examples: real languages (Ruby, Python primarily), realistic problem domains, sized to the point.
 - Admonitions (MkDocs callout blocks) for asides only; use sparingly.
