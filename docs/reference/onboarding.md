@@ -10,17 +10,14 @@ optional GUI tools) are presented in tabbed sections.
 
     - macOS with Command Line Tools (`xcode-select --install`)
     - A GitHub account with SSH key access
-    - 1Password (recommended, not required):
+    - 1Password (optional). If you want it for GitHub passkey
+      authentication or SSH commit signing, install it before
+      bootstrapping:
 
         ```sh
         brew install --cask 1password
         brew install 1password-cli
         ```
-
-        We recommend installing 1Password before bootstrapping. It can
-        broker GitHub authentication through a stored passkey and act as
-        the SSH agent for commit signing, so having it in place first
-        means fewer credential prompts during the steps below.
 
 === "Debian / Ubuntu"
 
@@ -37,8 +34,10 @@ optional GUI tools) are presented in tabbed sections.
         ```
 
     - A GitHub account with SSH key access
-    - 1Password (recommended, not required). Add the 1Password apt
-      repository, then install the desktop app and the `op` CLI from it:
+    - 1Password (optional). If you want it for GitHub passkey
+      authentication or SSH commit signing, add the 1Password apt
+      repository before bootstrapping, then install the desktop app and
+      the `op` CLI from it:
 
         ```sh
         curl -sS https://downloads.1password.com/linux/keys/1password.asc \
@@ -49,11 +48,6 @@ optional GUI tools) are presented in tabbed sections.
         sudo apt update && sudo apt install 1password 1password-cli
         ```
 
-        We recommend installing 1Password before bootstrapping. It can
-        broker GitHub authentication through a stored passkey and act as
-        the SSH agent for commit signing, so having it in place first
-        means fewer credential prompts during the steps below.
-
 === "Fedora / RHEL"
 
     - Complete the [Fedora setup page](platform-setup/fedora.md)
@@ -61,19 +55,16 @@ optional GUI tools) are presented in tabbed sections.
       packages (including `zsh`, `git`, and `util-linux-user`), and
       setting zsh as the default shell.
     - A GitHub account with SSH key access
-    - 1Password (recommended, not required). Add the 1Password dnf
-      repository, then install the desktop app and the `op` CLI from it:
+    - 1Password (optional). If you want it for GitHub passkey
+      authentication or SSH commit signing, add the 1Password dnf
+      repository before bootstrapping, then install the desktop app and
+      the `op` CLI from it:
 
         ```sh
         sudo rpm --import https://downloads.1password.com/linux/keys/1password.asc
         sudo sh -c 'echo -e "[1password]\nname=1Password Stable Channel\nbaseurl=https://downloads.1password.com/linux/rpm/stable/\$basearch\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=\"https://downloads.1password.com/linux/keys/1password.asc\"" > /etc/yum.repos.d/1password.repo'
         sudo dnf install 1password 1password-cli
         ```
-
-        We recommend installing 1Password before bootstrapping. It can
-        broker GitHub authentication through a stored passkey and act as
-        the SSH agent for commit signing, so having it in place first
-        means fewer credential prompts during the steps below.
 
 ## Step-by-step setup
 
