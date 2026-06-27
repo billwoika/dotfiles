@@ -40,13 +40,21 @@ output.
 # 1. System update (reboot after — kernel and firmware)
 sudo dnf upgrade --refresh
 sudo reboot
+```
 
+**The machine reboots here.** Log back in to the desktop, open a
+terminal, and continue with the rest of this block — RPM Fusion and
+firmware updates still need to run:
+
+```sh
 # 2. Enable RPM Fusion (free + nonfree)
 sudo dnf install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-# 3. Firmware updates via fwupd
+# 3. Firmware updates via fwupd (physical machines only — on a VM these
+#    report "no supported devices" or fail to find updatable firmware,
+#    which is expected; skip them)
 sudo fwupdmgr get-devices
 sudo fwupdmgr refresh --force
 sudo fwupdmgr get-updates
@@ -60,7 +68,19 @@ make it faster and more informative without sacrificing correctness.
 
 Fedora 41+ ships **dnf5**, which validates the config strictly and
 rejects some keys that dnf4 silently accepted. The set below is the
-dnf5-correct one. Edit `/etc/dnf/dnf.conf`:
+dnf5-correct one.
+
+Open `/etc/dnf/dnf.conf` as root — it is a system file, so it needs
+`sudo`. If you have no editor preference yet, `nano` ships on Fedora and
+saves with `Ctrl-O`, exits with `Ctrl-X`:
+
+```sh
+sudo nano /etc/dnf/dnf.conf
+```
+
+The file already has a `[main]` section. **Merge** these keys into that
+existing section — do not add a second `[main]`. Keys that are already
+present should be updated in place; the rest are added under `[main]`:
 
 ```ini
 [main]
@@ -113,18 +133,26 @@ Fusion:
 
 ```sh
 # GStreamer codecs (covers most media playback needs)
+# Quote the wildcard package names: by this point your login shell may
+# already be zsh, and zsh aborts the whole command on an unmatched glob
+# ("no matches found: gstreamer1-plugins-bad-*"). Quoting passes the
+# pattern to dnf literally in both bash and zsh.
 sudo dnf install \
-  gstreamer1-plugins-{bad-\*,good-\*,base} \
+  'gstreamer1-plugins-bad-*' 'gstreamer1-plugins-good-*' gstreamer1-plugins-base \
   gstreamer1-plugin-openh264 \
   gstreamer1-libav \
   --exclude=gstreamer1-plugins-bad-free-devel
 
 # Hardware-accelerated video decode (Intel/AMD)
+# Run ONLY the line matching your GPU — do not run both. Check which you
+# have first:
+#   lspci | grep -E 'VGA|3D'
+#
 # Intel: the Fedora package is libva-intel-media-driver (the bare
 # "intel-media-driver" name does not resolve). It provides the iHD
 # driver for Broadwell (5th gen) and newer.
-sudo dnf install libva-utils libva-intel-media-driver   # Intel (Gen5+)
-sudo dnf install libva-utils mesa-va-drivers            # AMD
+sudo dnf install libva-utils libva-intel-media-driver   # Intel (Gen5+) ONLY
+sudo dnf install libva-utils mesa-va-drivers            # AMD ONLY
 
 # OpenH264 from Cisco (fedora-cisco-openh264 repo, enabled by default)
 sudo dnf install mozilla-openh264
@@ -161,7 +189,11 @@ sudo btrfs subvolume list /
 mkdir -p ~/VMs
 chattr +C ~/VMs
 
-# Container storage — must be created before podman writes to it
+# Container storage — the +C flag only affects files created AFTER it is
+# set, so this must run before podman ever writes here. If podman has
+# already run (e.g. you ran `podman info` earlier), existing layers keep
+# copy-on-write and the benefit is lost — in that case the clean fix is
+# to stop podman, empty the directory, set +C, then let podman repopulate.
 sudo mkdir -p /var/lib/containers
 sudo chattr +C /var/lib/containers
 ```
@@ -331,7 +363,11 @@ ssh-agent user service as an alternative.
 ### Podman socket (for Docker-compatible tooling)
 
 Some tools expect a Docker-compatible socket. Podman provides one via
-a systemd user service:
+a systemd user service. This requires the podman packages from
+[Developer prerequisites](#developer-prerequisites) below — if you are
+reading top to bottom and have not run that `dnf install` yet, install
+it first or come back to this step (otherwise `podman.socket` is "not
+found" and `podman info` is "command not found"):
 
 ```sh
 systemctl --user enable --now podman.socket
@@ -354,17 +390,36 @@ the journal from consuming disk during long-running builds:
 sudo journalctl --vacuum-size=500M
 ```
 
-To make the limit permanent, edit `/etc/systemd/journald.conf`:
+To make the limit permanent, edit `/etc/systemd/journald.conf` as root
+and set `SystemMaxUse` under the existing `[Journal]` section (the line
+is usually present but commented out as `#SystemMaxUse=` — uncomment it
+and give it a value):
+
+```sh
+sudo nano /etc/systemd/journald.conf
+```
 
 ```ini
 [Journal]
 SystemMaxUse=500M
 ```
 
+Then reload so the new limit takes effect: `sudo systemctl restart
+systemd-journald`.
+
 ## GNOME desktop tuning
 
 Fedora Workstation ships GNOME. These are not cosmetic preferences —
 they are settings that affect developer productivity.
+
+!!! warning "Run these from inside your graphical GNOME session"
+
+    Every `gsettings` command below needs the session D-Bus that only
+    exists inside a running desktop session. Run them from a **graphical
+    terminal** (a Terminal window on your GNOME desktop) — not from a
+    text console (TTY), not over SSH, and not in the console right after
+    the post-install reboot. Outside a session they fail with
+    `Failed to connect to the session bus` / `Cannot autolaunch D-Bus`.
 
 !!! note "We assume GNOME on Wayland — and why"
 
@@ -558,6 +613,11 @@ kernel update — do not install it on modern hardware.
 A raw sysfs write works but does not survive a reboot:
 
 ```sh
+# ThinkPad only. First confirm the sysfs node exists — on non-ThinkPad
+# hardware it is usually absent and the write below fails with
+# "No such file or directory":
+ls /sys/class/power_supply/BAT0/charge_control_end_threshold
+
 # Limit charge to 80% (extends battery lifespan) — NOT persistent;
 # this is reset on every reboot. Use it only for a one-off test.
 echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
@@ -598,7 +658,7 @@ sudo dnf install \
   openssl-devel zlib-devel readline-devel \
   libffi-devel libyaml-devel \
   sqlite-devel postgresql-devel \
-  fd-find ripgrep fzf jq bat gh \
+  fd-find ripgrep fzf jq bat gh git-delta tree lsof \
   direnv \
   libsecret \
   podman podman-compose podman-docker buildah skopeo \
@@ -614,9 +674,14 @@ Why each group:
   native extensions (Ruby gems, Python C extensions, Node native
   addons). Without these, `rv install` and `uv sync` fail on packages
   that compile from source.
-- **fd-find, ripgrep, fzf, jq, bat, gh** — the modern CLI tools
-  the framework's aliases and functions expect. `gh` is the GitHub
-  CLI; its completions are wired in the shell startup chain.
+- **fd-find, ripgrep, fzf, jq, bat, gh, git-delta, tree, lsof** — the
+  modern CLI tools the framework's aliases and functions expect. `gh`
+  is the GitHub CLI; its completions are wired in the shell startup
+  chain. `git-delta` provides the `delta` binary that the framework's
+  `git/config` sets as the pager (`pager = delta`) — without it, every
+  paged `git` command (`diff`, `log`, `show`, `blame`) fails with
+  "cannot run delta". `tree` backs the `tree-trunk` function and `lsof`
+  backs the `port_kill` function and `listening` alias.
 - **direnv** — already wired in `conf.d/70-tools.zsh`.
 - **libsecret** — provides `secret-tool`, used by the
   `keychain_get` shell function. On Fedora the CLI ships in the

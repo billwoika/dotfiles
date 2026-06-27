@@ -70,6 +70,13 @@ optional GUI tools) are presented in tabbed sections.
 
 ### Step 1: Clone the dotfiles
 
+Clone over **HTTPS**, not SSH. This is deliberate: the repository is
+public, so an HTTPS clone needs no credentials — and at this point you
+have none. Your SSH keys do not exist yet (Step 8), and the GitHub
+passkey in 1Password is not wired up for git either. Cloning over SSH
+here would fail with `Permission denied (publickey)`. You will switch
+this clone's remote to SSH in Step 10, once the keys exist.
+
 ```sh
 git clone https://github.com/billwoika/dotfiles ~/dotfiles
 ```
@@ -219,15 +226,23 @@ ssh-keygen -t ed25519 \
 
 ### Step 9: Edit identity templates
 
+Run these from a framework shell so `$EDITOR` is set (it is exported by
+the zsh startup chain — if `$EDITOR` expands to nothing, you are not in a
+framework shell yet; run `exec zsh` first, or substitute `vim`):
+
 ```sh
 $EDITOR ~/.config/git/work.config
 $EDITOR ~/.config/git/personal.config
+$EDITOR ~/.config/git/opensource.config
 $EDITOR ~/.config/git/allowed_signers
 $EDITOR ~/.ssh/config
 ```
 
 Fill in your actual email addresses, signing key paths, and host
-aliases.
+aliases. `opensource.config` applies to repos cloned under
+`~/opensource/`; if you do not use that directory you can leave it, but
+note it ships with placeholder identity, so a repo cloned there would
+otherwise commit under the template email.
 
 ### Step 10: Register SSH keys
 
@@ -319,23 +334,94 @@ Load keys into the agent:
     With `AddKeysToAgent yes` in `~/.ssh/config`, keys are added
     automatically on first use for the duration of the session.
 
+#### Switch the dotfiles remote to SSH
+
+Now that your keys exist and are registered, point the dotfiles clone
+(cloned over HTTPS in Step 1) at your SSH host alias so future pulls and
+pushes use the key. Use the host alias you defined in `~/.ssh/config`
+(Step 9) — `github.com-personal` here, assuming the dotfiles are a
+personal repo:
+
+```sh
+cd ~/dotfiles
+git remote set-url origin git@github.com-personal:billwoika/dotfiles
+git remote -v   # confirm origin now shows the SSH URL
+```
+
 ### Step 11: Validate
 
 ```sh
 # POSIX profile test suite
 sh ~/dotfiles/sh/tests/profile_test.sh
 
-# Verify git identity
-cd ~/work && git config user.email    # should show work email
-cd ~/personal && git config user.email # should show personal email
-
-# Verify SSH
-ssh -T git@github.com-work
-ssh -T git@github.com-personal
-
 # Verify mise
 mise doctor
 ```
+
+**Verify SSH authentication to GitHub.** This requires that you finished
+Step 10 — both the host aliases in your edited `~/.ssh/config` and the
+keys registered at GitHub. The success message is GitHub greeting you by
+username (it then closes the connection — GitHub does not allow shell
+access, so "does not provide shell access" is the expected, healthy
+result):
+
+```sh
+ssh -T git@github.com-work
+ssh -T git@github.com-personal
+# Expected: "Hi <your-username>! You've successfully authenticated, but
+#            GitHub does not provide shell access."
+# "Permission denied (publickey)" means the key is not registered, or
+# the host alias is missing from ~/.ssh/config.
+```
+
+**Verify git identity.** The framework selects your work vs. personal
+identity by directory, using `includeIf "gitdir:..."` rules — and those
+rules only fire **inside a git repository** under `~/work` or
+`~/personal`. On a fresh machine those directories are still empty, so
+checking identity there shows the global default, not the work/personal
+email. Verify it properly after your first clone:
+
+```sh
+cd ~/work
+git clone git@github.com-work:your-org/some-repo   # any work repo
+cd some-repo
+git config user.email    # NOW shows your work email
+```
+
+### Step 12: Re-check for regenerated bash startup files
+
+The Fedora setup page had you delete `~/.bashrc`, `~/.bash_profile`, and
+`~/.bash_login` before bootstrapping. But several tools installed *during*
+this runbook — `mise`, `rv`, and other `curl | sh` installers — append to
+or re-create `~/.bashrc` (or `~/.bash_profile`) as part of their setup,
+*after* you deleted it. A regenerated `~/.bash_profile` silently shadows
+the framework's `~/.profile` again: bash reads the bash file and never
+falls through to `~/.profile`, so the POSIX subprocess shim stops loading
+for cron and systemd user services.
+
+Run this **last**, once every tool above is installed, to catch anything
+that came back:
+
+```sh
+# List any bash startup files that reappeared
+ls -la ~/.bashrc ~/.bash_profile ~/.bash_login 2>/dev/null
+
+# Remove any that did. (You are not a bash user under this framework;
+# these are installer cruft that re-shadows ~/.profile.)
+rm -f ~/.bashrc ~/.bash_profile ~/.bash_login
+```
+
+Then re-run the bootstrap audit, which scans the remaining startup files
+for rogue installer-injected `PATH` lines (it reports them but does not
+delete — that part is on you):
+
+```sh
+sh ~/dotfiles/bootstrap.sh
+```
+
+If an installer re-injected a `PATH` export into `~/.profile` or a zsh
+startup file, the audit flags it `[rogue]`. Remove those lines and rely
+on `conf.d/10-path.zsh` instead.
 
 ## Optional steps
 
