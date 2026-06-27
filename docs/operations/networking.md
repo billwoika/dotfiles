@@ -250,6 +250,59 @@ and never call the "give me everything as an array" convenience method
 on a result you can't afford to hold in memory** — especially when that
 memory transfer is crossing a VPN tunnel.
 
+### A war story: archiving a bloated cluster against the clock
+
+We learned the difference between these query mechanics the hard way,
+and the lesson was as much about access policy as it was about cursors.
+
+A managed-services contract was up for renewal, and the MongoDB cluster
+had grown so large that the next storage tier was, frankly,
+business-threatening. The renewal would lock us into that tier unless we
+archived enough data and instructed the provider to compact the cluster
+*by a hard date*. Miss the date and the cost was existential. When we
+dug into why the cluster was so bloated, we found the cause was also a
+long-standing performance bottleneck: each record stored the raw,
+partially-parsed, *and* normalized values from somewhere between 1 and
+20 API requests, upserted in layers as different services touched the
+same document. Every service that handled a record left its sediment
+behind. We confirmed the archived collections could be removed without
+breaking downstream systems, dumped them to S3, and lifecycled them into
+Glacier for compliance and governance retention.
+
+The technical work hinged on exactly the material above. These were not
+small result sets; naively fetching a collection would have OOM-killed
+the exporter long before it finished. Understanding how Mongo's cursor
+batches via `getMore`, tuning `batchSize`, and streaming documents
+straight to a multipart S3 upload — never materializing a collection in
+memory — was what made the export complete at all. Cursor mechanics
+stopped being trivia and became the thing standing between us and the
+deadline.
+
+What made it genuinely painful, though, was not the database — it was
+the access model, and it is a direct illustration of
+[the case against least privilege](../handbook/least-privilege.md#the-failure-mode).
+This was assigned top priority by the COO personally. Even so, simply
+getting an S3 bucket provisioned was a fight. A cloud-native Lambda or
+equivalent — the obvious right tool, which could have run the export
+server-side next to the data — was out of the question entirely. So with
+the clock running, we did what we could: the whole thing was
+orchestrated locally, from engineer laptops, pulling a critical dataset
+down over the corporate link, compressing it, and pushing it back up to
+S3. We archived enough, in time, to defuse the bomb.
+
+The galling part is how trivial this should have been. With the right
+permission set — `UNLOAD`-style server-side export, a provisioned bucket,
+and Lambda infrastructure to run the job next to the data — this is a
+few hours of routine work, no laptops streaming gigabytes across a VPN
+involved. Instead, a top-priority, business-critical task assigned by
+the COO was bottlenecked for days by the reflexive "no" of an access
+model that could not distinguish "engineer needs a bucket to save the
+company money" from "engineer wants access to something sensitive." The
+restriction did not protect anything. It nearly cost the business its
+margin, and it turned a routine archive into a laptop-bound scramble.
+That cost never appeared in any report — exactly the invisible failure
+mode the least-privilege argument warns about.
+
 ## In this section
 
 - **[VPN and Tunnels](vpn.md)** — corporate VPN configuration, split
