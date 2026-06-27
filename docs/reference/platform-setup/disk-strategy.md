@@ -174,6 +174,92 @@ sits in the volume group doing nothing until it is needed. The cost
 of allocating everything at install time is the wedding-vows
 failure.
 
+### Building this layout in the Fedora installer
+
+The layout above is a decision made *once*, at install time, in
+Anaconda (the Fedora installer). The default automatic partitioning
+will **not** produce it — Fedora Workstation's default is a single
+Btrfs partition with no LVM and no `/var` boundary, which is precisely
+the layout that leads to the wedding-vows failure. To get the LVM
+layout, you select it by hand. These are the literal steps.
+
+!!! warning "Two different Anaconda installers — check which you have"
+
+    Fedora 42 (April 2025) introduced a new **web-UI** installer for
+    Workstation, replacing the older GTK installer. The two reach the
+    same result by slightly different paths, and the web UI's quick
+    manual-partitioning mode is more limited. The reliable LVM path on
+    current Fedora is **Advanced Custom (blivet-gui)**, available in
+    both. The steps below give the GTK/blivet-gui flow; if you are on
+    the web UI, choose **Advanced Custom (Blivet-GUI)** when you reach
+    Storage Configuration and the blivet-gui steps are identical.
+
+**1. Reach custom partitioning.** On the installer summary screen,
+open **Installation Destination**. Select your target disk. Under
+**Storage Configuration**, choose **Custom** (or **Advanced Custom
+(Blivet-GUI)** for the most control), then click **Done**. This opens
+the Manual Partitioning screen instead of letting Anaconda auto-size
+everything.
+
+**2. Start from empty.** If the disk has existing partitions you do
+not need, delete them so the space is free to allocate. (On a brand-new
+machine the disk is already empty.)
+
+**3. Choose LVM as the scheme.** On the Manual Partitioning screen,
+find the dropdown labelled **"New mount points will use the following
+partitioning scheme"** and select **LVM**. From now on, every mount
+point you create becomes a logical volume inside a volume group that
+Anaconda manages for you.
+
+!!! danger "Do NOT click 'create them automatically'"
+
+    Anaconda offers a **"Click here to create them automatically"**
+    shortcut. It is a trap for this layout: it creates default mount
+    points *and allocates the entire disk*, leaving zero free space in
+    the volume group — exactly the all-allocated condition this page
+    exists to prevent. Create the mount points by hand instead, and
+    stop before the disk is full.
+
+**4. Create each mount point.** Use the **+** button to add mount
+points one at a time, giving each the size from the recommended-layout
+table:
+
+| Mount point | Size to enter |
+|-------------|---------------|
+| `/boot/efi` | `512 MiB` (created as a plain EFI partition, not LVM) |
+| `/boot`     | `1 GiB` (plain partition; required outside LVM so the bootloader can read it) |
+| `/`         | `50 GiB` |
+| `/var`      | `150 GiB` |
+| `/home`     | `200 GiB` |
+| swap        | `16 GiB` (set its type to swap) |
+
+As you add `/`, `/var`, `/home`, and swap, Anaconda places them as
+logical volumes in a single volume group (you can rename it — e.g.
+`vg-workstation` — and confirm all four share it). `/boot/efi` and
+`/boot` stay as standard partitions; the firmware and bootloader read
+them before LVM is available, so they cannot live inside the volume
+group.
+
+**5. Stop before the disk is full — this is the whole point.** Add up
+the sizes above and confirm they total **only 60-80% of the disk**.
+The remaining 20-40% must be left **unallocated in the volume group** —
+do not assign it to any mount point. That free space is the resize
+budget; without it, the entire LVM exercise is pointless. After
+install, `sudo vgs` should show a non-zero `VFree` (compare with the
+example output in the LVM section above).
+
+**6. Finish.** Click **Done**, review the summary of changes Anaconda
+will write, and **Accept Changes**. Proceed with the rest of the
+install. When the machine boots, the [Fedora setup
+page](fedora.md) and the [Onboarding Runbook](../onboarding.md) pick up
+from a freshly provisioned system — now with a layout that can absorb a
+full `/var` at 3am instead of failing to boot.
+
+For encrypted installs, check **Encrypt my data** on Installation
+Destination *before* opening custom partitioning; Anaconda then builds
+LVM-inside-LUKS automatically, the layout described in the
+[Encryption layout](#encryption-layout) section below.
+
 ### What lives in /var
 
 Understanding what consumes `/var` on a development workstation
