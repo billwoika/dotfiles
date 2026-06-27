@@ -144,6 +144,112 @@ legacy `tun`/`tap` kext-based clients. WireGuard's macOS app is clean
 here. Most corporate Cisco AnyConnect and GlobalProtect deployments
 are not.
 
+## Result sets are network traffic
+
+A database query result is not a value that materializes on your
+machine. It is a stream of rows the server sends over a socket — the
+same socket that, on a developer workstation, often runs through a VPN
+tunnel with the latency and [MTU constraints](vpn.md#mtu-and-fragmentation)
+a tunnel imposes. How your
+client *pulls* those rows is therefore a networking decision, not just
+a database one, and the default behavior of most drivers is the wrong
+one for large results.
+
+### Client-side vs. server-side cursors
+
+The distinction is *where the result set lives* while you iterate it:
+
+- **Client-side cursor (buffer-all)** — the driver executes the query,
+  then reads the *entire* result set into client memory before handing
+  you the first row. Simple, and fine for a hundred rows. For a query
+  that returns ten million rows it means the client tries to buffer ten
+  million rows: the process balloons, often OOM-kills, and the first row
+  is not available until the last byte has crossed the link. This is the
+  **default** in libpq, psycopg (unnamed cursor), `mysql-connector`, and
+  most ORMs.
+- **Server-side cursor (streaming)** — the server holds the result set
+  (or generates it lazily) and ships rows in bounded batches as the
+  client asks for them. Client memory stays flat regardless of result
+  size, the first row arrives quickly, and you can stop early — closing
+  the cursor cancels the rest of the transfer instead of paying for rows
+  you never read. The cost is a longer-lived server-side resource and a
+  round trip per batch.
+
+The networking consequence of "buffer-all" is worse over a VPN:
+fetch-all turns one logical query into a single large bulk transfer
+that competes with everything else on the tunnel and cannot be
+interrupted. Streaming spreads it into batches you can pace and abort.
+
+### Streaming vs. fetching
+
+"Fetching" is pulling the whole answer, then working on it. "Streaming"
+is processing rows as they arrive and never holding more than a batch.
+Reach for streaming whenever the result set is unbounded or large, an
+export or ETL is reading row-by-row, or you may stop early. Stick with
+fetching when the result is small and bounded and you genuinely need all
+of it in memory (sorting, aggregation the database can't do). The knob
+that controls batch size — **fetch size** — is the single most important
+setting here: too small and you pay a network round trip per handful of
+rows (latency murder over a VPN); too large and you are back to
+buffering. A few thousand rows per batch is a reasonable starting point.
+
+### Per-engine behavior
+
+The three engines differ in how much "server-side cursor" actually
+means at the protocol level:
+
+| Engine | Default | Streaming mechanism | Caveat |
+|--------|---------|---------------------|--------|
+| **PostgreSQL** | Client buffers entire result | `DECLARE … CURSOR` + `FETCH`, or libpq single-row mode; psycopg *named* cursor | Cursor must live inside a transaction; rows stream from the server as generated |
+| **Redshift** | Client buffers entire result | `DECLARE`/`FETCH` cursors exist, but the result is **materialized on the leader node first** | Not true streaming — the leader node assembles the whole result before paging it to you, and cursor result size is capped by cluster limits; for large extracts `UNLOAD` to S3 beats a cursor |
+| **MongoDB** | Returns a cursor (batched) by default | Wire-protocol `getMore`: the driver fetches an initial batch, then more on demand as you iterate | Closer to streaming out of the box; watch the default cursor *timeout* (idle cursors are reaped) and `batchSize` |
+
+The key correction to intuition: **Postgres and Redshift default to
+buffering the whole result client-side**, so you have to opt into
+streaming. **Mongo's cursor is batched by default**, so you mostly have
+to avoid accidentally materializing it (`.toArray()` on a huge cursor
+re-creates the buffer-all problem). Redshift is the trap — it offers
+cursor *syntax* that looks like Postgres streaming but materializes on
+the leader node first, so it neither bounds leader memory nor starts
+fast; for genuinely large data, `UNLOAD` to S3 and read the files.
+
+### Driver-level controls
+
+How to actually request server-side streaming in common drivers:
+
+```python
+# psycopg (Postgres) — a *named* cursor is server-side; itersize sets
+# the fetch batch. An unnamed cursor would buffer the whole result.
+with conn.cursor(name="export") as cur:   # named => server-side
+    cur.itersize = 5000                    # rows per network round trip
+    cur.execute("SELECT * FROM events")    # must be inside a transaction
+    for row in cur:                        # rows stream in batches of 5000
+        handle(row)
+```
+
+```java
+// JDBC (Postgres/Redshift) — fetch size is ignored unless autocommit
+// is off; without this the driver buffers the entire ResultSet.
+conn.setAutoCommit(false);
+PreparedStatement st = conn.prepareStatement("SELECT * FROM events");
+st.setFetchSize(5000);                       // batch size per round trip
+ResultSet rs = st.executeQuery();            // streams, not buffered
+```
+
+```javascript
+// MongoDB (node driver) — cursors stream by default; iterate, don't
+// collect. .toArray() would buffer everything into client memory.
+const cursor = db.collection('events').find({}).batchSize(5000);
+for await (const doc of cursor) {            // getMore fetches batches
+  handle(doc);
+}
+```
+
+The unifying rule: **iterate the cursor, set a sane fetch/batch size,
+and never call the "give me everything as an array" convenience method
+on a result you can't afford to hold in memory** — especially when that
+memory transfer is crossing a VPN tunnel.
+
 ## In this section
 
 - **[VPN and Tunnels](vpn.md)** — corporate VPN configuration, split
