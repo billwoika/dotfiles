@@ -218,11 +218,14 @@ audit_shell_injections() {
   for f in "${HOME}/.profile" "${HOME}/.bash_profile" "${HOME}/.bashrc" \
            "${HOME}/.zshenv" "${HOME}/.zshrc" "${HOME}/.zprofile"; do
     [ -f "$f" ] || continue
-    # Skip files that are symlinks into our dotfiles repo (those are us)
+    # Skip files that are symlinks into our dotfiles repo (those are us).
+    # Match the actual $DOTFILES source path rather than a hardcoded
+    # "dotfiles" substring, so the audit is correct regardless of where
+    # the repo was cloned.
     if [ -L "$f" ]; then
       target=$(readlink "$f")
       case "$target" in
-        */dotfiles/*) continue ;;
+        "$DOTFILES"/*) continue ;;
       esac
     fi
     matches=$(grep -nE \
@@ -274,24 +277,34 @@ log ""
 log "  6. Edit the profile templates with your real identity:"
 log "       \$EDITOR ~/.config/git/work.config"
 log "       \$EDITOR ~/.config/git/personal.config"
+log "       \$EDITOR ~/.config/git/opensource.config"
 log "       \$EDITOR ~/.config/git/allowed_signers"
 log "       \$EDITOR ~/.ssh/config"
 log ""
 log "  7. Validate the ~/.profile with the POSIX test suite:"
 log "       sh ${DOTFILES}/sh/tests/profile_test.sh"
 log ""
+log "  8. AFTER installing mise/rv above, re-check for bash startup"
+log "     files they may have re-created. A regenerated ~/.bash_profile"
+log "     silently shadows ~/.profile, so the POSIX shim stops loading"
+log "     for cron and systemd user services. Remove any that came back,"
+log "     then re-run this script so the audit re-scans:"
+log "       ls -la ~/.bashrc ~/.bash_profile ~/.bash_login 2>/dev/null"
+log "       rm -f ~/.bashrc ~/.bash_profile ~/.bash_login"
+log "       sh ${DOTFILES}/bootstrap.sh"
+log ""
 if [ "$_os" = "macos" ]; then
   log "  Optional macOS-specific steps:"
   log ""
-  log "  8. Install TextMate and MarkEdit if you want them:"
+  log "  9. Install TextMate and MarkEdit if you want them:"
   log "       brew install --cask textmate markedit"
   log "     Then re-run bootstrap.sh to create their CLI shortcuts."
   log ""
-  log "  9. Configure file associations interactively (requires duti):"
+  log "  10. Configure file associations interactively (requires duti):"
   log "       brew install duti"
   log "       sh ${DOTFILES}/macos/setup-file-associations.sh"
   log ""
-  log "  10. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
+  log "  11. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
   log "      can find mise-managed tools without being launched from a shell:"
   log "       echo \"\$HOME/.local/share/mise/shims\" | \\"
   log "         sudo tee /etc/paths.d/mise > /dev/null"
@@ -302,14 +315,17 @@ fi
 if [ "$_os" = "linux" ]; then
   log "  Optional Linux-specific steps:"
   log ""
-  log "  8. Ensure zsh is the default shell (if not already):"
-  log "       chsh -s \$(which zsh)"
+  log "  9. Verify zsh is your default shell. The platform setup page"
+  log "     sets this BEFORE bootstrap; this is only a fallback if it"
+  log "     was missed (note: it does not take effect until re-login):"
+  log "       echo \$SHELL          # expect /usr/bin/zsh"
+  log "       chsh -s \$(which zsh)  # only if it is not already zsh"
   log ""
-  log "  9. Install libsecret for the keychain_get shell function:"
+  log "  10. Install libsecret for the keychain_get shell function:"
   log "       Debian/Ubuntu: sudo apt install libsecret-tools"
   log "       Fedora/RHEL:   sudo dnf install libsecret"
   log ""
-  log "  10. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
+  log "  11. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
   log "      can find mise-managed tools without being launched from a shell:"
   log "       mkdir -p ~/.config/environment.d"
   log "       echo 'PATH=\$HOME/.local/share/mise/shims:\$PATH' > \\"

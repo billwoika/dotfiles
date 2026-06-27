@@ -117,6 +117,146 @@ lab). If your corporate VPN is misconfigured, the right move is to
 document the impact and advocate for a better configuration through
 proper channels — not to silently subvert it.
 
+## MTU and fragmentation
+
+The single most common "the VPN is mysteriously broken" failure is not
+routes or DNS — it is MTU. It produces a signature that fools people for
+hours: `ping` works, DNS resolves, small requests succeed, but large
+transfers hang. SSH connects then freezes after the banner; a `git
+clone` stalls at "Receiving objects"; an HTTPS page loads its HTML but
+never its images; a `psql` query that returns a few rows is fine but one
+that returns many rows wedges. Connectivity is fine. Packet *size* is
+the problem.
+
+### What MTU is
+
+The **MTU** (Maximum Transmission Unit) is the largest payload a network
+interface will send in a single packet, in bytes. Ethernet's standard
+MTU is **1500**. Anything larger must be split into multiple packets —
+**fragmentation** — or rejected. MTU is a property of every hop along a
+path; the **path MTU** is the smallest MTU of any link between you and
+the destination, and it is what actually constrains your packets.
+
+### Why a tunnel lowers it
+
+A VPN wraps every one of your packets inside another packet — it adds an
+outer IP header, plus the protocol's own encapsulation and encryption
+overhead. That wrapper consumes bytes that would otherwise carry your
+data. If the physical link is 1500 and WireGuard's overhead is ~60
+bytes, the *usable* MTU inside the tunnel is ~1440. OpenVPN's overhead
+is larger and varies with cipher and transport (TCP vs UDP). The tunnel
+interface therefore has a **smaller MTU than the physical NIC it rides
+on**, and any packet sized for the physical link is now too big for the
+tunnel.
+
+### How it is supposed to be handled
+
+Two mechanisms exist, and both can fail:
+
+1. **Fragmentation** — a router that receives an oversized packet can
+   split it into fragments that each fit the next link's MTU, to be
+   reassembled at the destination. This works but is costly, and IPv6
+   forbids in-flight fragmentation by routers entirely.
+2. **Path MTU Discovery (PMTUD)** — the sender marks packets
+   "Don't Fragment" (DF). A router that can't forward an oversized DF
+   packet drops it and sends back an **ICMP "fragmentation needed"**
+   message telling the sender the correct MTU. The sender then lowers
+   its packet size. This is the modern, correct mechanism — *when the
+   ICMP message gets through*.
+
+### What breaks (the black hole)
+
+PMTUD depends entirely on that ICMP "fragmentation needed" reply
+reaching the sender. Many firewalls — corporate and cloud alike — block
+all ICMP as a blunt security measure. Now the chain is broken: the
+oversized packet is dropped, the ICMP that would have said "send smaller"
+is also dropped, and the sender never learns anything. It keeps
+retransmitting the same too-large packet, which keeps getting silently
+discarded. This is an **MTU black hole**, and it is exactly why small
+packets succeed (they fit) while large ones vanish (they don't, and
+nobody is told). The connection does not error — it hangs.
+
+### Diagnosing it
+
+Find the largest packet that survives the path with `ping` and the
+don't-fragment flag, shrinking the payload until it stops failing:
+
+=== "macOS"
+
+    ```sh
+    # -D sets DF; -s sets payload bytes. 1472 payload + 28 header = 1500.
+    ping -D -s 1472 vpn-internal-host    # fails if path MTU < 1500
+    ping -D -s 1400 vpn-internal-host    # try smaller until it succeeds
+    # Add 28 (20 IP + 8 ICMP) to the largest working -s value for the MTU.
+    ```
+
+=== "Linux"
+
+    ```sh
+    # -M do sets DF and prohibits fragmentation; -s sets payload bytes.
+    ping -M do -s 1472 vpn-internal-host
+    ping -M do -s 1400 vpn-internal-host
+    # Largest working payload + 28 = path MTU.
+
+    # Or let the kernel discover and report it directly:
+    tracepath vpn-internal-host          # prints "pmtu NNNN" per hop
+    ```
+
+If `-s 1472` fails but a smaller size works, the path MTU is below 1500
+and something is not signaling it — the black-hole signature.
+
+### Fixing it
+
+In order of preference:
+
+1. **Fix the firewall (the real fix).** ICMP type 3 code 4
+   ("fragmentation needed") must be permitted for PMTUD to work. Blocking
+   *all* ICMP is the root cause; allow this type. If it is corporate
+   infrastructure, this is the configuration to advocate for — see the
+   compliance note above.
+2. **Lower the tunnel interface MTU** so packets are sized to fit before
+   they hit the constrained hop:
+
+    === "macOS"
+
+        ```sh
+        sudo ifconfig utun4 mtu 1400
+        ```
+
+    === "Linux"
+
+        ```sh
+        sudo ip link set dev wg0 mtu 1400
+        ```
+
+    For WireGuard, set it declaratively in the config instead so it
+    survives reconnects:
+
+    ```ini
+    [Interface]
+    MTU = 1400
+    ```
+
+3. **MSS clamping** — for TCP specifically, have the tunnel rewrite the
+   Maximum Segment Size announced in the handshake so each end never
+   sends a segment too big for the tunnel. This sidesteps PMTUD entirely
+   for TCP (it does nothing for UDP-based protocols like QUIC or
+   WireGuard's own transport). On Linux with nftables/iptables:
+
+    ```sh
+    sudo iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN \
+      -j TCPMSS --clamp-mss-to-pmtu
+    ```
+
+    Many VPN servers offer this as a one-line option (OpenVPN's
+    `mssfix`, which is on by default in recent versions). If you control
+    the server, prefer enabling it there over per-client MTU tuning.
+
+The order matters: clamping and lowering MTU are *mitigations* that make
+the symptom disappear, but the honest fix is restoring the ICMP path
+that PMTUD needs. Reach for the mitigations when you do not control the
+firewall; advocate for the ICMP fix when you do.
+
 ## The protocol landscape
 
 ### OpenVPN / OpenVPN3 and AWS Client VPN
