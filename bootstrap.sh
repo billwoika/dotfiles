@@ -81,6 +81,7 @@ for dir in \
   "${XDG_STATE_HOME}/zsh" \
   "${XDG_CACHE_HOME}/zsh" \
   "${HOME}/.ssh/control" \
+  "${XDG_DATA_HOME}/gnupg" \
   "${HOME}/.local/bin" \
   "${HOME}/work" \
   "${HOME}/personal" \
@@ -89,6 +90,12 @@ for dir in \
   run mkdir -p "$dir"
 done
 run chmod 700 "${HOME}/.ssh/control"
+# GnuPG refuses to operate against a homedir with permissions looser
+# than 0700 (silent failure or a "keyblock resource: No such file or
+# directory" from callers like mise that gpg --import into it before
+# it has ever been initialized). Belongs alongside the other
+# security-sensitive dirs above.
+run chmod 700 "${XDG_DATA_HOME}/gnupg"
 
 # ── Zsh ─────────────────────────────────────────────────────────────
 log ""

@@ -32,10 +32,10 @@ export LANG="en_US.UTF-8"
 # We only fill it in when unset — e.g. non-GNOME setups using a custom
 # systemd ssh-agent.service, whose socket lives at the path below. The
 # -z guard means we never override a value the desktop already set.
-if [ -z "${SSH_AUTH_SOCK}" ]; then
+if [ -z "${SSH_AUTH_SOCK:-}" ]; then
   for _ssh_sock in \
-    "${XDG_RUNTIME_DIR}/gcr/ssh" \
-    "${XDG_RUNTIME_DIR}/ssh-agent.socket" \
+    "${XDG_RUNTIME_DIR:-}/gcr/ssh" \
+    "${XDG_RUNTIME_DIR:-}/ssh-agent.socket" \
   ; do
     if [ -S "$_ssh_sock" ]; then
       export SSH_AUTH_SOCK="$_ssh_sock"
@@ -67,3 +67,10 @@ for _dir in \
 done
 unset _dir
 export PATH
+
+# Only source cargo's env shim if cargo was actually installed (e.g. via
+# rustup) — this file does not exist by default, and the framework does
+# not require Rust.
+if [ -f "${HOME}/.cargo/env" ]; then
+  . "${HOME}/.cargo/env"
+fi
