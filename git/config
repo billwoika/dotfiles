@@ -10,7 +10,7 @@
 # ─────────────────────────────────────────────────────────────────────
 
 [user]
-    name = Your Name
+    name = Bill Woika
     # email and signingkey set per-profile below
 
 [core]
