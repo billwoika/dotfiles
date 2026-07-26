@@ -231,6 +231,7 @@ the zsh startup chain — if `$EDITOR` expands to nothing, you are not in a
 framework shell yet; run `exec zsh` first, or substitute `vim`):
 
 ```sh
+$EDITOR ~/.config/git/local.config       # user.name (shared across profiles)
 $EDITOR ~/.config/git/work.config
 $EDITOR ~/.config/git/personal.config
 $EDITOR ~/.config/git/opensource.config
@@ -238,11 +239,13 @@ $EDITOR ~/.config/git/allowed_signers
 $EDITOR ~/.ssh/config
 ```
 
-Fill in your actual email addresses, signing key paths, and host
-aliases. `opensource.config` applies to repos cloned under
-`~/opensource/`; if you do not use that directory you can leave it, but
-note it ships with placeholder identity, so a repo cloned there would
-otherwise commit under the template email.
+`local.config` holds `user.name` only — bootstrap copies it from
+`git/local.config.example` (placeholder `Your Name`). Email, signing
+keys, and host aliases stay in the path-based profile files.
+`opensource.config` applies to repos cloned under `~/opensource/`; if
+you do not use that directory you can leave it, but note it ships with
+placeholder identity, so a repo cloned there would otherwise commit
+under the template email.
 
 ### Step 10: Register SSH keys
 

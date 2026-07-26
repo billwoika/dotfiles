@@ -1,0 +1,12 @@
+# ~/.config/git/local.config
+# ─────────────────────────────────────────────────────────────────────
+# Per-machine / per-user git identity. Copied (not symlinked) into
+# place by bootstrap.sh so edits here never dirty the dotfiles repo.
+#
+# EDIT ME: set your real name. Email and signing keys belong in the
+# path-based profile files (work.config / personal.config /
+# opensource.config), not here.
+# ─────────────────────────────────────────────────────────────────────
+
+[user]
+    name = Your Name
