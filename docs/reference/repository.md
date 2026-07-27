@@ -42,11 +42,13 @@ dotfiles/
 ├── direnv/direnvrc          1Password / Vault / sops helpers
 │
 ├── git/                     Git configuration
-│   ├── config               Main config with includeIf profiles
+│   ├── config               Main config (include local + includeIf profiles)
 │   ├── ignore               Global gitignore
 │   ├── attributes           Global gitattributes
+│   ├── local.config.example # user.name (copied, not symlinked)
 │   ├── work.config.example
 │   ├── personal.config.example
+│   ├── opensource.config.example
 │   └── allowed_signers.example
 │
 ├── ssh/config.example       SSH config template

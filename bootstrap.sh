@@ -136,7 +136,7 @@ link "${DOTFILES}/git/attributes" "${XDG_CONFIG_HOME}/git/attributes"
 
 # Profile templates: copy (not symlink) so user can edit locally without
 # dirtying the dotfiles repo. Skip if target already exists.
-for tpl in work personal opensource allowed_signers; do
+for tpl in local work personal opensource allowed_signers; do
   src="${DOTFILES}/git/${tpl}.config.example"
   [ "$tpl" = "allowed_signers" ] && src="${DOTFILES}/git/allowed_signers.example"
   dst="${XDG_CONFIG_HOME}/git/${tpl}.config"
@@ -282,6 +282,7 @@ log "       ssh-keygen -t ed25519 -C 'dev@zftadvancements.com (work, laptop, YYY
 log "         -f ~/.ssh/id_ed25519_work"
 log ""
 log "  6. Edit the profile templates with your real identity:"
+log "       \$EDITOR ~/.config/git/local.config     # user.name"
 log "       \$EDITOR ~/.config/git/work.config"
 log "       \$EDITOR ~/.config/git/personal.config"
 log "       \$EDITOR ~/.config/git/opensource.config"

@@ -10,7 +10,7 @@ min_version = "2026.4.0"
 # Note: Ruby is intentionally NOT listed here. rv owns Ruby. See
 # framework doc Section 8.1 for rationale.
 [tools]
-python = "3.12"       # managed alongside uv
+python = "3.14"       # managed alongside uv
 bun    = "1.2"        # primary JS runtime
 node   = "22"         # retain for legacy tooling that requires Node
 uv     = "latest"     # Astral's Python package manager
