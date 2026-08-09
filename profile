@@ -67,10 +67,3 @@ for _dir in \
 done
 unset _dir
 export PATH
-
-# Only source cargo's env shim if cargo was actually installed (e.g. via
-# rustup) — this file does not exist by default, and the framework does
-# not require Rust.
-if [ -f "${HOME}/.cargo/env" ]; then
-  . "${HOME}/.cargo/env"
-fi
