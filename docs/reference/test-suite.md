@@ -7,7 +7,10 @@ harness compatibility and runs under any POSIX-compliant shell.
 ## Running the suite
 
 ```sh
-# Single shell
+# From anywhere, via the global mise task
+mise run dotfiles:test
+
+# Single shell, direct invocation
 sh sh/tests/profile_test.sh
 
 # Multi-shell sweep (dash, bash --posix, busybox)

@@ -309,8 +309,8 @@ through the correct alias based on repository path.
 
 The end-to-end flow:
 
-1. Clone `~/work/zftadvancements/api` — git sees
-   `includeIf "gitdir:~/work/"`, loads `work.config`
+1. Clone `~/development/work/repos/api` — git sees
+   `includeIf "gitdir:~/development/work/"`, loads `work.config`
 2. `work.config` rewrites `github.com:zftadvancements/` to
    `github.com-work:zftadvancements/`
 3. SSH resolves `github.com-work` to `github.com` + work identity file

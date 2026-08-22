@@ -35,10 +35,14 @@ alternatives.
 
 ### Installation
 
-```sh
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh | sh
+Nothing to run: rv is declared in mise's `[tools]` as
+`"github:spinel-coop/rv"` (it is not in the mise registry; the
+`github:` backend resolves it straight from GitHub releases), so
+`mise bootstrap` on a fresh machine — or `mise install` any time —
+delivers the binary. mise delivers only the binary; rv still owns
+Ruby and `.ruby-version`.
 
+```sh
 # Shell activation is already wired in conf.d/70-tools.zsh:
 #   eval "$(rv shell zsh)"
 
@@ -106,6 +110,15 @@ and dependency resolution.
     mise config, `cd` into a project creates and activates `.venv`
     automatically. You can also run `mise sync python --uv` to share
     a single Python installation between the two tools.
+
+    The cooperation runs deeper than interpreters: mise's `pipx:`
+    backend shells out to `uv tool install` whenever uv is present
+    (`pipx.uvx` defaults to true), so the Python CLI tools in the
+    framework's `[tools]` — ansible, mitmproxy — are uv-managed too.
+    Real pipx never touches this machine. One caveat, verified on
+    2026.8.6: declare such tools with the fully-qualified
+    `"pipx:<name>"` key. The bare short name resolves down a code
+    path that demands real pipx and fails.
 
 ### Project initialization
 
@@ -257,6 +270,19 @@ As a package manager, bun is genuinely superior:
   npm registry, produces a standard `node_modules/` directory that
   Node runs against.
 - **Workspace support** — monorepo workspaces work correctly.
+
+### bun as mise's npm backend
+
+The same modern-manager preference is wired into mise itself:
+`npm.package_manager = "bun"` in the framework's `[settings]` makes
+mise's `npm:` backend run `bun install` for global CLI tools (e.g.
+`wrangler`) instead of npm. One interaction to know about: mise
+passes its default 24-hour `minimum_release_age` down to the
+installer, and bun has no such flag — it misparses the value as a
+package name. The framework carries
+`minimum_release_age_excludes = ["npm:wrangler"]` for this; add any
+new `npm:` tool to that list if its install fails with a `404` for a
+numeric "package".
 
 ### Project setup
 

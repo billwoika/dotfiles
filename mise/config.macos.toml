@@ -1,0 +1,27 @@
+# ~/.config/mise/config.macos.toml
+# ─────────────────────────────────────────────────────────────────────
+# Loaded only on macOS, via auto_env (see mise/miserc.toml).
+#
+# This file is why the per-OS split exists: brew FORMULAS are not
+# platform-gated. Declaring `brew:duti` in the shared config made a
+# Fedora host dry-run as:
+#   sudo mkdir -p /home/linuxbrew/.linuxbrew && sudo chown -R ...
+#   pour m4, autoconf (dependencies)
+#   build duti from source (no linux bottles)
+# i.e. it silently bootstrapped Linuxbrew as root. Scoping the file to
+# macOS removes that risk entirely.
+# ─────────────────────────────────────────────────────────────────────
+
+[bootstrap.packages]
+# brew-cask: is the manager for GUI apps — NOT "cask:" (unknown manager)
+# and NOT "brew:" (formula-only; brew:textmate errors). Casks DO self-gate
+# to macOS, but they live here anyway for symmetry.
+"brew-cask:textmate" = "latest"   # bootstrap.sh then links its `mate` CLI
+"brew-cask:markedit" = "latest"   # bootstrap.sh then writes the wrapper
+"brew:duti"          = "latest"   # macos/setup-file-associations.sh
+
+# Counterparts to the dnf/apt entries in config.linux.toml — keeping
+# ffmpeg, imagemagick and mysql-client off the conda backend.
+"brew:ffmpeg"        = "latest"
+"brew:imagemagick"   = "latest"
+"brew:mysql-client"  = "latest"

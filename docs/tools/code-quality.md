@@ -149,13 +149,11 @@ pre-push:
       run: bun test
 ```
 
-Install lefthook once per machine via mise, then register hooks once
-per repository:
+lefthook is already declared in the framework's `[tools]`
+(`mise/config.toml`), so every machine gets it at bootstrap. Register
+hooks once per repository:
 
 ```sh
-# One time per machine (or add to ~/.config/mise/config.toml)
-mise use -g lefthook
-
 # In each project
 lefthook install
 ```

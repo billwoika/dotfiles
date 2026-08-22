@@ -4,7 +4,7 @@
 # Replaces eval "$(tool init zsh)" with cached file sources.
 # Cache is auto-invalidated when a tool's --version output changes.
 #
-# See framework doc Appendix C for the full strategy.
+# See docs/shell-environment/performance.md for the full strategy.
 # ─────────────────────────────────────────────────────────────────────
 
 # ── Tool registry ───────────────────────────────────────────────────

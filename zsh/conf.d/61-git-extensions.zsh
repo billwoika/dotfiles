@@ -41,10 +41,10 @@ gswitch() {
 alias gfp='git fetch --prune && git pull --rebase'
 alias gf='git fetch'
 
-# Show active git profile (which includeIf matched, Section 17.3)
+# Show active git profile (which includeIf matched — docs/git/configuration.md)
 alias gwhoami='git config --show-origin user.email'
 
-# Safe force-push (Section 17.8)
+# Safe force-push (docs/git/configuration.md)
 alias gpushf='git push --force-with-lease --force-if-includes'
 
 # Clean merged local branches, excluding main/master/develop

@@ -12,6 +12,7 @@ set -eu
 
 DOTFILES="$(cd "$(dirname "$0")" && pwd)"
 DRY_RUN=0
+AUDIT_ONLY=0
 
 case "$(uname -s)" in
   Darwin) _os="macos" ;;
@@ -20,18 +21,20 @@ case "$(uname -s)" in
 esac
 
 case "${1:-}" in
-  --dry-run|-n) DRY_RUN=1 ;;
+  --dry-run|-n)    DRY_RUN=1 ;;
+  --audit-only|-a) AUDIT_ONLY=1 ;;
   -h|--help)
     cat <<EOF
-Usage: sh bootstrap.sh [--dry-run]
+Usage: sh bootstrap.sh [--dry-run|--audit-only]
 
 Installs symlinks from this dotfiles repository into \$HOME and
 \$XDG_CONFIG_HOME, creating directories as needed. Does NOT install
 any software — that is handled by mise/rv/etc. after bootstrap.
 
 Options:
-  --dry-run, -n   Print what would be done without making changes
-  -h, --help      Show this message
+  --dry-run, -n     Print what would be done without making changes
+  --audit-only, -a  Run only the rogue-injection audit, then exit
+  -h, --help        Show this message
 EOF
     exit 0 ;;
 esac
@@ -68,6 +71,58 @@ link() {
   printf "  [new] %s -> %s\n" "$dst" "$src"
 }
 
+# ── Audit: scan shell startup files for rogue injections ────────────
+audit_shell_injections() {
+  # NOTE: no `local` — it is not POSIX (shellcheck SC3043), and this
+  # file is POSIX-sh-only per its header. found/matches/target/f are
+  # unique to this function, so plain assignment is safe.
+  found=0
+  log ""
+  log "Auditing shell startup files for rogue injections..."
+  for f in "${HOME}/.profile" "${HOME}/.bash_profile" "${HOME}/.bashrc" \
+           "${HOME}/.zshenv" "${HOME}/.zshrc" "${HOME}/.zprofile"; do
+    [ -f "$f" ] || continue
+    # Skip files that are symlinks into our dotfiles repo (those are us).
+    # Match the actual $DOTFILES source path rather than a hardcoded
+    # "dotfiles" substring, so the audit is correct regardless of where
+    # the repo was cloned.
+    if [ -L "$f" ]; then
+      target=$(readlink "$f")
+      case "$target" in
+        "$DOTFILES"/*) continue ;;
+      esac
+    fi
+    matches=$(grep -nE \
+      'NVM_DIR|VOLTA_HOME|BUN_INSTALL|cargo/env|rustup|pyenv init|asdf\.sh|conda init|emsdk_env' \
+      "$f" 2>/dev/null) || matches=""
+    if [ -n "$matches" ]; then
+      printf "  [rogue] %s\n" "$f"
+      printf "%s\n" "$matches" | sed 's/^/    /'
+      found=$((found + 1))
+    fi
+  done
+  if [ "$found" -gt 0 ]; then
+    log ""
+    log "  ^^ Remove these lines and rely on conf.d/10-path.zsh instead."
+    log "     The framework's deterministic PATH builder is the single"
+    log "     source of truth; ad-hoc installer-injected lines duplicate"
+    log "     or conflict with it."
+    return 1
+  else
+    log "  All shell startup files are clean."
+    return 0
+  fi
+}
+
+
+# --audit-only short-circuits here: the audit is the one part of this
+# script worth re-running on its own, because mise and rv can re-create
+# bash startup files when they install. Exposed as `mise run dotfiles:audit`.
+if [ "$AUDIT_ONLY" = "1" ]; then
+  audit_shell_injections
+  exit $?
+fi
+
 # ── Create XDG directories ──────────────────────────────────────────
 log ""
 log "Creating XDG directories..."
@@ -83,9 +138,9 @@ for dir in \
   "${HOME}/.ssh/control" \
   "${XDG_DATA_HOME}/gnupg" \
   "${HOME}/.local/bin" \
-  "${HOME}/work" \
-  "${HOME}/personal" \
-  "${HOME}/opensource" \
+  "${HOME}/development/personal/repos" \
+  "${HOME}/development/work/repos" \
+  "${HOME}/development/opensource/repos" \
 ; do
   run mkdir -p "$dir"
 done
@@ -121,6 +176,16 @@ link "${DOTFILES}/profile" "${HOME}/.profile"
 log ""
 log "Installing mise configuration..."
 link "${DOTFILES}/mise/config.toml" "${XDG_CONFIG_HOME}/mise/config.toml"
+# miserc.toml carries auto_env, which decides WHICH config files mise
+# loads (config.linux.toml / config.macos.toml). It therefore cannot be
+# applied by mise's own [dotfiles] pass — that pass has already happened
+# by the time it would matter. Linked here, before mise ever runs.
+link "${DOTFILES}/mise/miserc.toml" "${XDG_CONFIG_HOME}/mise/miserc.toml"
+# Platform configs, selected by auto_env. Same reasoning: mise resolves
+# config.<env>.toml out of MISE_CONFIG_DIR while deciding what to load,
+# so they must already be in place — [dotfiles] runs too late.
+link "${DOTFILES}/mise/config.linux.toml" "${XDG_CONFIG_HOME}/mise/config.linux.toml"
+link "${DOTFILES}/mise/config.macos.toml" "${XDG_CONFIG_HOME}/mise/config.macos.toml"
 
 # ── direnv ──────────────────────────────────────────────────────────
 log ""
@@ -147,6 +212,31 @@ for tpl in local work personal opensource allowed_signers; do
   elif [ -f "$src" ]; then
     run cp "$src" "$dst"
     printf "  [copy] %s -> %s (EDIT ME)\n" "$src" "$dst"
+  fi
+done
+
+# ── Per-profile mise seeds ──────────────────────────────────────────
+# Copied, not symlinked: mise walks up from a repo to ~/development/<p>/
+# and merges these with the user-scope config. They are seeds meant to be
+# edited in place, so they stay out of [dotfiles] — same reasoning as the
+# git profile configs above.
+log ""
+log "Installing per-profile mise seeds..."
+for prof in personal work opensource; do
+  src="${DOTFILES}/mise/${prof}.mise.toml.example"
+  dst="${HOME}/development/${prof}/mise.toml"
+  if [ -f "$dst" ]; then
+    printf "  [keep] %s (edit in place)\n" "$dst"
+  elif [ -f "$src" ]; then
+    run cp "$src" "$dst"
+    printf "  [copy] %s (EDIT ME)\n" "$dst"
+  fi
+  # mise refuses to load an untrusted config, and these are new files on
+  # every fresh machine. Without this, the first command run from inside
+  # ~/development/<profile>/ fails with "Config files are not trusted"
+  # rather than doing anything useful.
+  if [ "$DRY_RUN" != "1" ] && [ -f "$dst" ] && command -v mise >/dev/null 2>&1; then
+    mise trust "$dst" >/dev/null 2>&1 && printf "  [trust] %s\n" "$dst"
   fi
 done
 
@@ -214,74 +304,41 @@ else
   fi
 fi
 
-# ── Audit: scan shell startup files for rogue injections ────────────
-audit_shell_injections() {
-  # NOTE: no `local` — it is not POSIX (shellcheck SC3043), and this
-  # file is POSIX-sh-only per its header. found/matches/target/f are
-  # unique to this function, so plain assignment is safe.
-  found=0
-  log ""
-  log "Auditing shell startup files for rogue injections..."
-  for f in "${HOME}/.profile" "${HOME}/.bash_profile" "${HOME}/.bashrc" \
-           "${HOME}/.zshenv" "${HOME}/.zshrc" "${HOME}/.zprofile"; do
-    [ -f "$f" ] || continue
-    # Skip files that are symlinks into our dotfiles repo (those are us).
-    # Match the actual $DOTFILES source path rather than a hardcoded
-    # "dotfiles" substring, so the audit is correct regardless of where
-    # the repo was cloned.
-    if [ -L "$f" ]; then
-      target=$(readlink "$f")
-      case "$target" in
-        "$DOTFILES"/*) continue ;;
-      esac
-    fi
-    matches=$(grep -nE \
-      'NVM_DIR|VOLTA_HOME|BUN_INSTALL|cargo/env|rustup|pyenv init|asdf\.sh|conda init|emsdk_env' \
-      "$f" 2>/dev/null) || matches=""
-    if [ -n "$matches" ]; then
-      printf "  [rogue] %s\n" "$f"
-      printf "%s\n" "$matches" | sed 's/^/    /'
-      found=$((found + 1))
-    fi
-  done
-  if [ "$found" -gt 0 ]; then
-    log ""
-    log "  ^^ Remove these lines and rely on conf.d/10-path.zsh instead."
-    log "     The framework's deterministic PATH builder is the single"
-    log "     source of truth; ad-hoc installer-injected lines duplicate"
-    log "     or conflict with it."
-    return 1
-  else
-    log "  All shell startup files are clean."
-    return 0
-  fi
-}
-
 audit_shell_injections || true
 
 # ── Final instructions ──────────────────────────────────────────────
 log ""
 log "─────────────────────────────────────────────────────────────────"
-log "Symlinks installed. Next steps:"
+log "Filesystem prepared. Next steps:"
 log ""
-log "  1. Install mise:"
-log "       curl https://mise.run | sh"
+log "  1. Provision everything else with mise. bin/mise is vendored and"
+log "     version-pinned; it fetches mise into the cache on first run, so"
+log "     there is no 'curl | sh' step any more:"
+log "       ${DOTFILES}/bin/mise bootstrap"
 log ""
-log "  2. Install rv:"
-log "       curl --proto '=https' --tlsv1.2 -LsSf \\"
-log "         https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh | sh"
+log "     That one command does three jobs:"
+log "       - system packages (zsh, libsecret, ffmpeg, ...) via dnf/apt/brew,"
+log "         from [bootstrap.packages] — this is the part that runs sudo"
+log "       - the symlink farm, from the [dotfiles] section"
+log "       - every tool in [tools], rv included"
+log "     (The login shell is NOT among them — see the chsh step below.)"
 log ""
-log "  3. Reload the shell:"
+log "     This script already linked ~/.config/mise/config.toml, so plain"
+log "     'bin/mise bootstrap' finds the config. The MISE_CONFIG_FILE prefix"
+log "     is a fallback for running mise bootstrap WITHOUT this script"
+log "     having run first (e.g. after --dry-run); mise will then ask you"
+log "     to 'mise trust' the repo config on that first run."
+log ""
+log "  2. Reload the shell:"
 log "       exec zsh"
 log ""
-log "  4. Install runtimes declared in ~/.config/mise/config.toml:"
-log "       mise install"
-log ""
-log "  5. Generate SSH keys (adjust email / machine label):"
+log "  3. Generate SSH keys (adjust email / machine label):"
 log "       ssh-keygen -t ed25519 -C 'dev@zftadvancements.com (work, laptop, YYYY-MM)' \\"
 log "         -f ~/.ssh/id_ed25519_work"
 log ""
-log "  6. Edit the profile templates with your real identity:"
+log "  4. Edit the seed templates with your real identity. These are COPIES,"
+log "     not symlinks, and are deliberately kept OUT of [dotfiles] so they"
+log "     can drift locally without mise converging them back:"
 log "       \$EDITOR ~/.config/git/local.config     # user.name"
 log "       \$EDITOR ~/.config/git/work.config"
 log "       \$EDITOR ~/.config/git/personal.config"
@@ -289,30 +346,33 @@ log "       \$EDITOR ~/.config/git/opensource.config"
 log "       \$EDITOR ~/.config/git/allowed_signers"
 log "       \$EDITOR ~/.ssh/config"
 log ""
-log "  7. Validate the ~/.profile with the POSIX test suite:"
-log "       sh ${DOTFILES}/sh/tests/profile_test.sh"
+log "  5. Verify the whole setup:"
+log "       mise run dotfiles:doctor"
 log ""
-log "  8. AFTER installing mise/rv above, re-check for bash startup"
-log "     files they may have re-created. A regenerated ~/.bash_profile"
-log "     silently shadows ~/.profile, so the POSIX shim stops loading"
-log "     for cron and systemd user services. Remove any that came back,"
-log "     then re-run this script so the audit re-scans:"
-log "       ls -la ~/.bashrc ~/.bash_profile ~/.bash_login 2>/dev/null"
-log "       rm -f ~/.bashrc ~/.bash_profile ~/.bash_login"
-log "       sh ${DOTFILES}/bootstrap.sh"
+log "     Runs the rogue-injection audit plus the POSIX profile test suite,"
+log "     then prints 'mise bootstrap status'. Re-run it after any installer"
+log "     touches your shell startup files — a regenerated ~/.bash_profile"
+log "     silently shadows ~/.profile, so the POSIX shim stops loading for"
+log "     cron and systemd user services."
 log ""
 if [ "$_os" = "macos" ]; then
   log "  Optional macOS-specific steps:"
   log ""
-  log "  9. Install TextMate and MarkEdit if you want them:"
-  log "       brew install --cask textmate markedit"
-  log "     Then re-run bootstrap.sh to create their CLI shortcuts."
+  log "  6. TextMate and MarkEdit install declaratively now, as"
+  log "     brew-cask: entries in [bootstrap.packages]. Step 1 brings"
+  log "     them in; re-run THIS script afterwards to create their CLI"
+  log "     shortcuts, which are detected from /Applications and so"
+  log "     cannot be declared in [dotfiles]:"
+  log "       sh ${DOTFILES}/bootstrap.sh"
   log ""
-  log "  10. Configure file associations interactively (requires duti):"
-  log "       brew install duti"
+  log "  7. Configure file associations interactively. duti itself is"
+  log "     declarative — a brew: entry in mise/config.macos.toml, which"
+  log "     only loads on macOS (formulas are not platform-gated, so it"
+  log "     must NOT move into the shared config — see the comment in"
+  log "     that file). Step 1 installs it; this script stays manual:"
   log "       sh ${DOTFILES}/macos/setup-file-associations.sh"
   log ""
-  log "  11. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
+  log "  8. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
   log "      can find mise-managed tools without being launched from a shell:"
   log "       echo \"\$HOME/.local/share/mise/shims\" | \\"
   log "         sudo tee /etc/paths.d/mise > /dev/null"
@@ -323,17 +383,16 @@ fi
 if [ "$_os" = "linux" ]; then
   log "  Optional Linux-specific steps:"
   log ""
-  log "  9. Verify zsh is your default shell. The platform setup page"
-  log "     sets this BEFORE bootstrap; this is only a fallback if it"
-  log "     was missed (note: it does not take effect until re-login):"
-  log "       echo \$SHELL          # expect /usr/bin/zsh"
-  log "       chsh -s \$(which zsh)  # only if it is not already zsh"
+  log "  6. Set zsh as your login shell. libsecret IS declarative now via"
+  log "     [bootstrap.packages], but the login shell is NOT: mise takes a"
+  log "     single absolute path for it with no per-OS override, and zsh"
+  log "     sits at a different path on macOS. Resolve it locally instead."
+  log "     Run this AFTER step 1, which is what installs zsh:"
+  log "       command -v zsh                  # confirm it exists"
+  log "       chsh -s \"\$(command -v zsh)\"     # only if \$SHELL is not zsh"
+  log "       echo \$SHELL                     # expect zsh after re-login"
   log ""
-  log "  10. Install libsecret for the keychain_get shell function:"
-  log "       Debian/Ubuntu: sudo apt install libsecret-tools"
-  log "       Fedora/RHEL:   sudo dnf install libsecret"
-  log ""
-  log "  11. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
+  log "  7. (Opt-in) Add mise shims to the system PATH so GUI-launched IDEs"
   log "      can find mise-managed tools without being launched from a shell:"
   log "       mkdir -p ~/.config/environment.d"
   log "       echo 'PATH=\$HOME/.local/share/mise/shims:\$PATH' > \\"
@@ -353,6 +412,6 @@ log "       ${DOTFILES}/vscode/settings.json.example  → <project>/.vscode/sett
 log "       ${DOTFILES}/vscode/extensions.json.example → <project>/.vscode/extensions.json"
 log "       ${DOTFILES}/vscode/launch.json.example   → <project>/.vscode/launch.json"
 log "       ${DOTFILES}/jetbrains/runConfigurations/* → <project>/.idea/runConfigurations/"
-log "       ${DOTFILES}/devcontainer/*               → <project>/.devcontainer/  (see Section 21.6)"
+log "       ${DOTFILES}/devcontainer/*               → <project>/.devcontainer/  (see devcontainer/README.md)"
 log ""
 log "─────────────────────────────────────────────────────────────────"

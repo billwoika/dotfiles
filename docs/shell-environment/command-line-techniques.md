@@ -329,9 +329,9 @@ rg "TODO"
 rg -o 'customer_id=\d+' server.log
 ```
 
-`ripgrep` is not installed by default on either platform. Install via
-`brew install ripgrep` (macOS) or `apt install ripgrep` /
-`dnf install ripgrep` (Linux).
+`ripgrep` is not installed by default on either platform — in this
+framework it is declared in mise's `[tools]` (aqua-backed), so
+`mise install` delivers `rg` everywhere.
 
 ## sed
 

@@ -5,7 +5,7 @@
 #
 # Deterministic init/completion output (fzf, gh, kubectl, mise/uv/bun
 # completions, iTerm2 shell integration) is handled by
-# 25-tool-cache.zsh — see framework doc Appendix C.
+# 25-tool-cache.zsh — see docs/shell-environment/performance.md.
 # ─────────────────────────────────────────────────────────────────────
 
 # ── mise ────────────────────────────────────────────────────────────

@@ -12,11 +12,6 @@ alias rc='DISABLE_PRY_RAILS=1 rails console'
 alias rake='bundle exec rake'
 alias sidekiq='bundle exec sidekiq'
 
-# Yarn — kept as a transitional alias for teams migrating to bun.
-# Drop once the team is fully on bun (Section 8.3).
-alias yi='yarn install'
-alias yd='yarn deps'
-
 # DB migrations — adjust schema names to match your app.
 migrate-rails-db() {
   rails db:migrate:primary && rails db:migrate:data_warehouse

@@ -4,7 +4,7 @@
 # ─────────────────────────────────────────────────────────────────────
 
 # ── tmux ────────────────────────────────────────────────────────────
-# Attach or create a `main` session (Section 19.8.1)
+# Attach or create a `main` session (docs/shell-environment/terminal.md)
 alias t='tmux new-session -A -s main'
 alias td='tmux detach'
 alias tls='tmux list-sessions'

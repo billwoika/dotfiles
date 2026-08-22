@@ -1,0 +1,36 @@
+# ~/.config/mise/config.linux.toml
+# ─────────────────────────────────────────────────────────────────────
+# Loaded only on Linux, via auto_env (see mise/miserc.toml).
+# ─────────────────────────────────────────────────────────────────────
+
+# Values MUST be plain strings — [bootstrap.packages] rejects inline
+# tables ("invalid type: map, expected a string"), so there is no
+# os = [...] gate. Per-OS FILES are the conditional mechanism instead.
+#
+# Both managers are listed; the one absent on this host reports
+# `skipped (apt-get not found)` and does not fail the run.
+#
+# NOTE: `mise bootstrap packages apply` shells out to `sudo dnf install`.
+# It is step 1 of `mise bootstrap`, so an otherwise unprivileged command
+# escalates before doing anything else. Run it deliberately.
+[bootstrap.packages]
+"dnf:zsh"             = "latest"
+"apt:zsh"             = "latest"
+"dnf:libsecret"       = "latest"   # provides secret-tool for keychain_get
+"apt:libsecret-tools" = "latest"   # same binary, different package name
+
+# Media + db clients. These live here rather than in [tools] because
+# their only mise backends are conda: (blocked) or source-building asdf
+# plugins. Distro packages are the modern-enough, cheap answer.
+#
+# ffmpeg-free, NOT ffmpeg: on Fedora plain `ffmpeg` comes from
+# rpmfusion-free, a third-party repo that [bootstrap.packages] cannot
+# enable and a fresh machine will not have. ffmpeg-free ships in the
+# official repos. Swap to "dnf:ffmpeg" if you enable RPM Fusion and want
+# the extra codecs.
+"dnf:ffmpeg-free"          = "latest"
+"apt:ffmpeg"               = "latest"
+"dnf:ImageMagick"          = "latest"   # capitalised on Fedora
+"apt:imagemagick"          = "latest"
+"dnf:mysql"                = "latest"   # provides the mysql client
+"apt:default-mysql-client" = "latest"

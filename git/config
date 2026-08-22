@@ -133,11 +133,11 @@
 # Profiles are evaluated in order; later matches override earlier ones.
 # ─────────────────────────────────────────────────────────────────────
 
-[includeIf "gitdir:~/work/"]
+[includeIf "gitdir:~/development/work/"]
     path = ~/.config/git/work.config
 
-[includeIf "gitdir:~/personal/"]
+[includeIf "gitdir:~/development/personal/"]
     path = ~/.config/git/personal.config
 
-[includeIf "gitdir:~/opensource/"]
+[includeIf "gitdir:~/development/opensource/"]
     path = ~/.config/git/opensource.config

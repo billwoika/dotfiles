@@ -15,7 +15,7 @@ lint-current() {
     xargs -r -I{} bunx eslint {}
 }
 
-# Alternative using biome (preferred in this framework, Section 10.3)
+# Alternative using biome (preferred in this framework — docs/tools/code-quality.md)
 biome-current() {
   git diff --name-only HEAD | \
     grep -E '\.(ts|tsx|js|jsx|json)$' | \

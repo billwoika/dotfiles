@@ -15,7 +15,7 @@
   // Mount the host's dotfiles into the container so post-create.sh can
   // bootstrap the same shell environment as the host.
   "mounts": [
-    "source=${localEnv:HOME}/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/development/personal/repos/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached"
   ],
 
   // Forward common dev ports back to the host. Adjust per project.
