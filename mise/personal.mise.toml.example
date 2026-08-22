@@ -1,0 +1,23 @@
+# ~/development/personal/mise.toml
+# ─────────────────────────────────────────────────────────────────────
+# Personal profile defaults. mise walks UP the directory tree, so this applies
+# to every repo under ~/development/personal/ and merges with the user-scope
+# config at ~/.config/mise/config.toml.
+#
+# Merge semantics: [tools] and [env] are additive-with-override (the
+# closer file wins per key). [tasks] are REPLACED WHOLE per task name.
+#
+# SETUP: bootstrap.sh copies this to ~/development/personal/mise.toml (dropping
+# the .example suffix). It is a SEED — edit it in place. It is deliberately
+# NOT in [dotfiles], so it drifts locally without mise converging it back,
+# and personal-specific tooling never lands in this public repo.
+#
+# Needs `mise trust` on first use.
+# ─────────────────────────────────────────────────────────────────────
+
+[env]
+DEV_PROFILE = "personal"
+
+[tools]
+# Personal-only tools go here, e.g.:
+# terraform = "1.9"

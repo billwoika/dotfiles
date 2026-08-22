@@ -96,6 +96,14 @@ mise run --watch test # re-run on file changes
 mise tasks ls         # list all available tasks
 ```
 
+The framework also ships **global** tasks in the user-scope config —
+`dotfiles:link`, `dotfiles:audit`, `dotfiles:test`,
+`dotfiles:capabilities`, and the aggregate `dotfiles:doctor` — visible
+from any directory. One caveat carries over to projects: unlike
+`[tools]` and `[env]`, which merge additively across the config
+hierarchy, tasks are **replaced whole per name** — a project defining
+`dotfiles:doctor` shadows the global one entirely.
+
 ## Make as the wrapper layer
 
 Make has been around since 1976 and remains the closest thing to a
@@ -227,8 +235,9 @@ to mise tasks as the only entry point, **just** (`casey/just`) is a
 Make replacement designed specifically for the task-runner use case.
 It uses recipe-and-target syntax with sane defaults: spaces are fine,
 errors fail by default, recipes run in their own shell, and the help
-target is built in. Available via mise (`mise use -g just@latest`) or
-Homebrew.
+target is built in. Available via mise — declare `just = "latest"` in
+`mise/config.toml` (never `mise use -g`, which rewrites the symlinked
+global config), or pin it per-project with `mise use just@latest`.
 
 ```just
 # justfile

@@ -8,12 +8,13 @@ site).
 ## Layout
 
 ```
-dotfiles/
+dotfiles/                    # lives at ~/development/personal/repos/dotfiles
 ├── LICENSE                  GPLv3-or-later, Bill Woika 2026
 ├── README.md                Layer-1 short-form intro
-├── CLAUDE.md                Claude Code guidance
 ├── mkdocs.yml               MkDocs Material site config
-├── bootstrap.sh             Idempotent symlink installer
+├── bootstrap.sh             Idempotent filesystem installer
+├── bin/mise                 Vendored, version-pinned mise launcher
+│                            (mise generate bootstrap — no curl | sh)
 ├── profile                  ~/.profile — POSIX shim
 ├── .editorconfig            Editor formatting rules
 ├── .editorconfig.example    Template for projects
@@ -38,7 +39,19 @@ dotfiles/
 │   ├── .zlogout             Cleanup on login shell exit
 │   └── conf.d/              Numbered fragments (05-80)
 │
-├── mise/config.toml         User-scope mise config
+├── mise/                    mise configuration
+│   ├── config.toml          User-scope config: [tools], [settings],
+│   │                        [dotfiles], global tasks
+│   ├── miserc.toml          Early-init settings (auto_env) — decides
+│   │                        WHICH configs load, so lives outside them
+│   ├── config.linux.toml    [bootstrap.packages] via dnf/apt
+│   ├── config.macos.toml    [bootstrap.packages] via brew/brew-cask
+│   ├── mise.lock            Resolved versions + URLs for every [tools]
+│   │                        entry (settings.lockfile = true); mise
+│   │                        writes it here through the ~/.config/mise
+│   │                        symlink. Refresh with `mise lock -g`
+│   └── *.mise.toml.example  Per-profile seeds, copied to
+│                            ~/development/{personal,work,opensource}/
 ├── direnv/direnvrc          1Password / Vault / sops helpers
 │
 ├── git/                     Git configuration
@@ -73,6 +86,7 @@ dotfiles/
 │
 ├── macos/                   macOS-specific setup
 │   └── setup-file-associations.sh
+├── linux/README.md          Linux-specific notes
 │
 ├── sh/tests/                POSIX test suite
 │   └── profile_test.sh
@@ -88,17 +102,25 @@ The bootstrap script is the framework's installer. It is written in
 POSIX sh (no bashisms) so it runs on a freshly-provisioned machine
 before any zsh framework is active.
 
-What it does:
+It prepares the filesystem; software installation is mise's job
+(`bin/mise bootstrap`). What it does:
 
-1. **Creates XDG directories** — `~/.config/zsh/conf.d`,
+1. **Creates directories** — the XDG tree (`~/.config/zsh/conf.d`,
    `~/.config/mise`, `~/.config/direnv`, `~/.config/git`,
    `~/.config/tmux`, `~/.local/share`, `~/.local/state/zsh`,
-   `~/.cache/zsh`, `~/.ssh/control`, `~/.local/bin`
+   `~/.cache/zsh`, `~/.local/bin`), security-sensitive dirs with 0700
+   (`~/.ssh/control`, `$XDG_DATA_HOME/gnupg`), and the profile tree
+   `~/development/{personal,work,opensource}/repos`
 2. **Symlinks configuration files** — zsh, mise, direnv, git, tmux,
-   vim into their XDG-compliant locations
-3. **Copies templates** — git profiles (work, personal,
-   allowed_signers) and SSH config are *copied* not symlinked, so
-   users can edit them locally without dirtying the dotfiles repo
+   vim into their XDG-compliant locations. This includes the mise
+   files that mise's own `[dotfiles]` pass cannot self-apply because
+   they decide what mise loads: `miserc.toml` (early-init `auto_env`)
+   and the per-OS `config.linux.toml` / `config.macos.toml`
+3. **Copies editable seeds** — git profiles (local, work, personal,
+   opensource, allowed_signers), SSH config, and the per-profile
+   `mise.toml` files under `~/development/` (then `mise trust`s them).
+   *Copied* not symlinked, so users edit them locally without dirtying
+   the dotfiles repo
 4. **Detects optional apps** — creates CLI wrappers for TextMate and
    MarkEdit if they're installed
 5. **Audits shell startup files** — scans for rogue tool-installer
@@ -107,9 +129,10 @@ What it does:
 Usage:
 
 ```sh
-sh bootstrap.sh              # install
-sh bootstrap.sh --dry-run    # preview what would be done
-sh bootstrap.sh --help       # show usage
+sh bootstrap.sh               # install
+sh bootstrap.sh --dry-run     # preview what would be done
+sh bootstrap.sh --audit-only  # run only the rogue-injection audit
+sh bootstrap.sh --help        # show usage
 ```
 
 ## What's symlinked vs. copied
@@ -118,6 +141,7 @@ sh bootstrap.sh --help       # show usage
 |---------|-----------|--------|
 | Shared config (zsh, mise, direnv, git core, tmux, vim) | Yes | |
 | Identity templates (git profiles, SSH config, allowed_signers) | | Yes (first run only) |
+| Per-profile mise seeds (`~/development/*/mise.toml`) | | Yes (first run only) |
 | Project templates (.editorconfig, .gitignore, vscode, jetbrains, devcontainer) | | Manual copy per project |
 
 The distinction: symlinked files are managed by the framework and

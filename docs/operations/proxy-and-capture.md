@@ -36,9 +36,9 @@ framework's recommendation for engineers who want programmatic access
 to captured traffic.
 
 ```sh
-# Install
-brew install mitmproxy      # macOS
-pipx install mitmproxy      # Linux or cross-platform
+# Install: nothing to run — mitmproxy is declared in the framework's
+# [tools] (mise/config.toml) and lands via `uv tool install` (mise's
+# pipx: backend delegates to uv; real pipx never touches the machine).
 
 # Start the proxy (default: localhost:8080)
 mitmproxy                   # terminal UI

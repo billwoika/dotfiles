@@ -330,19 +330,20 @@ sudo apt install \
   libssl-dev zlib1g-dev libreadline-dev \
   libffi-dev libyaml-dev \
   libsqlite3-dev libpq-dev \
-  fd-find ripgrep fzf jq bat \
-  direnv \
+  jq \
   libsecret-tools \
   podman buildah skopeo \
   shellcheck
 ```
 
-!!! note "fd and bat binary names on Debian/Ubuntu"
+!!! note "fd and bat naming quirk — sidestepped entirely"
 
-    Due to naming conflicts with other packages, Debian/Ubuntu ship
-    `fd` as `fdfind` and `bat` as `batcat`. The framework's shell
-    configuration creates aliases (`fd=fdfind`, `bat=batcat`) in
-    `conf.d/` to normalize this. No manual symlinking needed.
+    Debian/Ubuntu ship `fd` as `fdfind` and `bat` as `batcat` due to
+    package-name conflicts. This framework never hits that: `fd` and
+    `bat` are mise-managed (aqua-backed GitHub release binaries), so
+    they arrive under their real names. If you ever install the apt
+    versions instead, you will need `fd=fdfind` / `bat=batcat`
+    aliases yourself — the framework does not ship them.
 
 Why each group:
 
@@ -350,14 +351,37 @@ Why each group:
 - **build-essential, cmake, pkg-config, lib*-dev** — build toolchain
   for native extensions. Without these, compiling Ruby, Python C
   extensions, and Node native addons fails.
-- **fd-find, ripgrep, fzf, jq, bat** — modern CLI tools the
-  framework's aliases and functions expect.
-- **direnv** — already wired in `conf.d/70-tools.zsh`.
+- **jq** — pre-mise CLI dependency (also mise-managed later; see the
+  overlap note below). `bat`, `fd`, `ripgrep`, `fzf`, and `direnv` are
+  deliberately NOT in this list — they are declared in mise's
+  `[tools]` with aqua-backed resolution and arrive with
+  `mise bootstrap`; their shell wiring is `command -v` guarded.
 - **libsecret-tools** — provides `secret-tool`, used by the
   `keychain_get` shell function.
 - **podman, buildah, skopeo** — container toolchain. Note: on older
   Ubuntu (22.04), Podman may need the Kubic repository for a current
   version.
+
+!!! note "Deliberate overlap with mise `[tools]`, and two gaps"
+
+    `jq`, `shellcheck`, `zsh`, and `libsecret-tools` are *also*
+    declared in the mise config and will be managed by mise after
+    `mise bootstrap` — mise's shims sit earlier on `PATH`, so the
+    mise-managed versions win from then on. The apt copies cover the
+    window before mise exists. Two tools deserve the same treatment
+    but have unreliable apt package names across releases, so they are
+    not in the list above:
+
+    - **`gh`** — worth installing *before* `mise bootstrap` if your
+      release ships it (`sudo apt install gh`, or GitHub's own apt
+      repo): `gh auth login` raises the GitHub API limit from 60 to
+      5000 requests/hour, and mise's `github:` backend and attestation
+      checks spend that budget during the bootstrap itself.
+    - **`git-delta`** — git's configured pager. Until mise delivers
+      `delta`, paged git commands fail; either install it if your
+      release has it, or ride out the few minutes between
+      `bootstrap.sh` and `mise bootstrap` with
+      `git -c core.pager=less <cmd>`.
 - **shellcheck** — shell script static analysis for pre-commit hooks.
 
 ### Podman version (Ubuntu 22.04)

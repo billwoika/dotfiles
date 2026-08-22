@@ -11,7 +11,7 @@ must never be committed. This directory provides:
    shared-run-config pattern (`runConfigurations/RSpec_current_file.xml`
    and `runConfigurations/Pytest_current_file.xml`)
 
-See **Section 22.6** of the framework document for the full breakdown
+See [docs/tools/editors.md](../docs/tools/editors.md) for the full breakdown
 of which `.idea/` files to commit and which to gitignore. The summary:
 
 | File | Commit? | Why |
@@ -37,11 +37,11 @@ In a project that uses JetBrains:
 
 ```sh
 # Apply the recommended .gitignore additions
-cat ~/dotfiles/gitignore.example >> .gitignore
+cat ~/development/personal/repos/dotfiles/gitignore.example >> .gitignore
 
 # Create the runConfigurations directory and copy the templates
 mkdir -p .idea/runConfigurations
-cp ~/dotfiles/jetbrains/runConfigurations/*.xml .idea/runConfigurations/
+cp ~/development/personal/repos/dotfiles/jetbrains/runConfigurations/*.xml .idea/runConfigurations/
 
 # Edit the example XML files to match the project's conventions
 # (e.g., point Pytest_current_file.xml at the right interpreter)
@@ -51,7 +51,7 @@ cp ~/dotfiles/jetbrains/runConfigurations/*.xml .idea/runConfigurations/
 
 The framework's recommendation is to gitignore **all** of `.idea/dataSources*`
 and document database connections in a project `db/README.md` (see
-Section 23.1.4). This is more portable across editors and reduces the
+docs/tools/editors.md). This is more portable across editors and reduces the
 risk of accidentally leaking connection details.
 
 Some teams prefer to commit a sanitized `.idea/dataSources.xml` for the
@@ -67,7 +67,7 @@ clicking through "Edit Configurations" in JetBrains learn what tasks
 the team has set up. This is genuinely useful in a way that command-line
 incantations buried in a README are not.
 
-Pair this with `mise run` task definitions and a Makefile (Section 7.2)
+Pair this with `mise run` task definitions and a Makefile (docs/tools/mise-and-make.md)
 and you give engineers three discoverable entry points:
 
 - IDE users: pick a Run Configuration from the dropdown
