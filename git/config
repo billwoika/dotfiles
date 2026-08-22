@@ -4,14 +4,16 @@
 # identity-specific settings (email, signing key) based on repository
 # location.
 #
-# Replace "Your Name" with your actual name. Leave user.email, user.
-# signingkey, and any URL rewrites to the profile files — they load
-# automatically via the includeIf directives at the bottom.
+# Identity lives OUTSIDE this file: user.name comes from
+# ~/.config/git/local.config (copied from git/local.config.example by
+# bootstrap.sh — edit it there). user.email, user.signingkey, and any
+# URL rewrites live in the per-profile files loaded via the includeIf
+# directives at the bottom. This file stays machine- and user-agnostic.
 # ─────────────────────────────────────────────────────────────────────
 
-[user]
-    name = Your Name
-    # email and signingkey set per-profile below
+# Per-machine identity (user.name). Silently skipped if absent.
+[include]
+    path = ~/.config/git/local.config
 
 [core]
     editor = vim
@@ -131,11 +133,11 @@
 # Profiles are evaluated in order; later matches override earlier ones.
 # ─────────────────────────────────────────────────────────────────────
 
-[includeIf "gitdir:~/work/"]
+[includeIf "gitdir:~/development/work/"]
     path = ~/.config/git/work.config
 
-[includeIf "gitdir:~/personal/"]
+[includeIf "gitdir:~/development/personal/"]
     path = ~/.config/git/personal.config
 
-[includeIf "gitdir:~/opensource/"]
+[includeIf "gitdir:~/development/opensource/"]
     path = ~/.config/git/opensource.config

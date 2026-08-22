@@ -6,7 +6,7 @@
 " Heavier configurations (plugins, LSP, color schemes) belong in
 " ~/.vimrc.local, sourced at the bottom of this file if present.
 " ─────────────────────────────────────────────────────────────────────
-
+runtime xdg.vim
 set nocompatible
 filetype plugin indent on
 syntax on

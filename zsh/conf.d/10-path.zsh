@@ -58,9 +58,11 @@ _path_prepend "${XDG_DATA_HOME}/mise/shims"
 # at the shell level and through mise shims above for subprocesses.
 # Adding their bin dirs directly would bypass version resolution.
 
-# ── rv: Ruby version & gem manager (not managed by mise in this stack) ──
-# rv has its own shell integration (installed in conf.d/70-tools.zsh).
-# Its bin directory is added by `rv shell init zsh` activation, not here.
+# ── rv: Ruby version & gem manager ──────────────────────────────────
+# mise delivers the rv BINARY ("github:spinel-coop/rv" in [tools]), but
+# rv owns Ruby and .ruby-version — mise does not resolve Ruby versions.
+# rv has its own shell integration (installed in conf.d/70-tools.zsh);
+# its bin directory is added by `rv shell init zsh` activation, not here.
 
 # ── Cleanup: unset private helpers to avoid namespace pollution ─────
 unfunction _path_prepend _path_append 2>/dev/null || true

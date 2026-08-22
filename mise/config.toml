@@ -4,22 +4,116 @@
 # found in the directory tree.
 # ─────────────────────────────────────────────────────────────────────
 
-min_version = "2026.4.0"
+min_version = "2026.8.10"
 
 # ── Runtime defaults ────────────────────────────────────────────────
 # Note: Ruby is intentionally NOT listed here. rv owns Ruby. See
-# framework doc Section 8.1 for rationale.
+# docs/tools/package-managers.md for rationale.
 [tools]
-python = "3.12"       # managed alongside uv
-bun    = "1.2"        # primary JS runtime
-node   = "22"         # retain for legacy tooling that requires Node
-uv     = "latest"     # Astral's Python package manager
-ruff   = "latest"     # Python linter/formatter
+# ── Runtimes ────────────────────────────────────────────────────────
+python = "3.14"       # managed alongside uv
+node   = "lts"        # THE JS runtime (bun is the package manager)
+go     = "latest"     # core:go
+rust   = "stable"     # core:rust — ships cargo, rustc, clippy, rustfmt.
+                      # No separate "cargo" tool exists; the cargo: in the
+                      # registry is a BACKEND for installing crates. Using
+                      # core:rust over rustup also avoids rustup's writes
+                      # to ~/.profile, ~/.bashrc and ~/.zshenv — see
+                      # docs/shell-environment/installer-behavior.md.
+
+# ── JS/TS ───────────────────────────────────────────────────────────
+bun    = "1.2"        # JS/TS PACKAGE MANAGER, and the npm-backend
+                      # installer (settings.npm.package_manager below).
+                      # Node stays the runtime — bun's runtime breaks
+                      # native bindings; see docs/tools/package-managers.md
+pnpm   = "latest"     # kept for team-repo compatibility; bun is the default
+wrangler = "latest"   # npm: backend -> installed via bun
 biome  = "latest"     # JS/TS linter/formatter
+
+# ── Python ──────────────────────────────────────────────────────────
+uv     = "latest"     # Astral's package manager; REQUIRED by every pipx:
+                      # tool below — mise shells out to `uv tool install`
+                      # and does NOT auto-install uv. Do not remove.
+ruff   = "latest"     # Python linter/formatter
+cookiecutter = "latest"
+
+# ── Cloud / infra ───────────────────────────────────────────────────
+aws      = "latest"   # THE AWS CLI (aqua:aws/aws-cli). Replaced awscli-local:
+                      # the LocalStack wrapper wasn't actually used. Registry
+                      # names aws/aws-cli/awscli all alias this same entry.
+awsebcli = "latest"
+awsls    = "latest"
+# Fully-qualified backend on purpose. The SHORT name resolves down a
+# different code path that demands real pipx ("pipx is required to install
+# ansible but was not found"), while the qualified form correctly uses
+# `uv tool install`. Verified on 2026.8.6.
+"pipx:ansible" = "latest"       # bundle: ships ONLY `ansible-community`
+"pipx:ansible-core" = "latest"  # ...the actual CLI (ansible-playbook,
+                                # -galaxy, -vault, +7 more). Both needed.
+# gcloud is declared as an http: tool below (after the bare keys) —
+# its registry backends are vfox:/asdf: plugins only, and plugin
+# runtimes are not welcome here (same stance as conda). See the
+# [tools."http:gcloud"] table at the end of this section.
+terraform = "latest"
+cloudflared = "latest"
+caddy = "latest"
+
+# ── Data ────────────────────────────────────────────────────────────
+duckdb = "latest"
+mongosh = "latest"
+# ffmpeg, imagemagick and mysql-client are NOT here on purpose. Their only
+# registry backends are conda: (mysql-client is conda-ONLY) and heavyweight
+# asdf plugins that build from source. They are system packages instead —
+# see mise/config.{linux,macos}.toml. conda is hard-blocked below.
+mitmproxy = "latest"      # pipx: -> installed via uv
+
+# ── Shell / CLI ─────────────────────────────────────────────────────
+# bat/fd/ripgrep/fzf/direnv were distro packages; they moved here
+# because their short names resolve aqua-first (plain GitHub release
+# binaries, no plugin runtime). The platform-setup pages no longer
+# list them. All shell wiring (direnv hook, fzf init) is command -v
+# guarded, so nothing breaks in the window before mise installs them.
+bat     = "latest"    # aqua:sharkdp/bat
+fd      = "latest"    # aqua:sharkdp/fd
+ripgrep = "latest"    # aqua:BurntSushi/ripgrep; provides `rg`
+fzf     = "latest"    # aqua:junegunn/fzf
+direnv  = "latest"    # aqua:direnv/direnv; hooked in conf.d/70-tools.zsh
+github-cli = "latest"     # canonical name; "gh" is an alias
+1password  = "latest"     # aliases: 1password-cli, op
+claude     = "latest"     # canonical; "claude-code" is an ALIAS of this
+                          # same entry — declaring both installs it twice
+jq       = "latest"
+delta    = "latest"   # syntax-highlighting git pager
 lefthook = "latest"   # git hook runner
-tmux   = "latest"     # terminal multiplexer
-delta  = "latest"     # syntax-highlighting git pager
-usage  = "latest"     # required by mise's shell completions
+tmux     = "latest"   # terminal multiplexer
+shellcheck = "latest"
+usage    = "latest"   # required by mise's shell completions
+pandoc   = "latest"
+
+# rv delivers the Ruby toolchain; mise only delivers the rv binary.
+# Not in the registry — resolved from GitHub releases. Per
+# docs/tools/package-managers.md: rv still owns Ruby and .ruby-version.
+# github:, NOT ubi: — ubi is deprecated, removal slated for 2027.1.0.
+"github:spinel-coop/rv" = "latest"
+
+# ── gcloud via the http backend ─────────────────────────────────────
+# No native distro exists: aqua does not package the SDK (it is a
+# Python bundle, not a single binary) and the only registry backends
+# are vfox:/asdf: plugins. The http backend fetches Google's official
+# tarball directly — no plugin runtime, checksummed into mise.lock.
+# Cost: the version is PINNED here; "latest" is not a thing for http:.
+# To bump: update `version` and the four URLs below (the filename
+# embeds the version), then `mise install`. Do NOT use
+# `gcloud components update` — it mutates the immutable install dir.
+[tools."http:gcloud"]
+version = "581.0.0"
+bin_path = "google-cloud-sdk/bin"
+
+[tools."http:gcloud".platforms]
+linux-x64   = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-linux-x86_64.tar.gz" }
+linux-arm64 = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-linux-arm.tar.gz" }
+macos-x64   = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-darwin-x86_64.tar.gz" }
+macos-arm64 = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-darwin-arm.tar.gz" }
 
 [settings]
 # Auto-install missing versions when they are referenced.
@@ -40,10 +134,153 @@ idiomatic_version_file_enable_tools = ["python", "node"]
 # Verify GitHub attestations on precompiled binaries by default.
 github_attestations = true
 
+# gh stores its OAuth token in the system keyring, not hosts.yml, so
+# gh_cli_tokens (which reads the file) finds nothing and mise falls back
+# to the anonymous 60/hr GitHub API budget — version fetches then 403
+# once the registry's github:/aqua: lookups exhaust it. This makes mise
+# ask gh (which CAN read the keyring) whenever it needs a token.
+# Degrades gracefully: if gh is absent or logged out, mise just goes
+# anonymous again.
+github.credential_command = "gh auth token"
+
+# ── Modern package managers over the defaults ───────────────────────
+# npm: backend installs via bun instead of npm. ("npm.bun = true" is the
+# older equivalent; both produce `bun install <pkg>`.)
+npm.package_manager = "bun"
+
+# conda, vfox and asdf are not welcome on this system: no plugin runtimes.
+# Blocking the BACKENDS is stronger than simply not declaring tools that
+# use them: any future `mise use <tool>` that would resolve to conda:,
+# vfox: or asdf: fails loudly instead of silently pulling a plugin runtime
+# onto the machine.
+# (vfox mattered in practice: the short names `gcloud` and `yarn` both
+# resolve vfox-first in the registry. asdf matters for `mise doctor`:
+# mise pre-registers every registry tool that declares idiomatic files —
+# yarn included — even when nothing installs or references it, and with
+# only vfox blocked, yarn fell through to asdf:mise-plugins/mise-yarn and
+# doctor reported "plugin yarn is not installed" indefinitely. With asdf
+# blocked too, yarn resolves to aqua:yarnpkg/berry and doctor is clean.)
+disable_backends = ["conda", "vfox", "asdf"]
+
+# mise applies a 24h minimum_release_age by default (86400s) even though
+# the setting reads as unset, and passes it to the backend installer.
+# uv understands it (--exclude-newer); bun does NOT support
+# --minimum-release-age, so it parses "86400" as a second package name:
+#   bun install wrangler@4.123.0 --global --minimum-release-age 86400
+#   error: GET https://registry.npmjs.org/86400 - 404
+# Excluding the npm-backed tools drops the flag and bun installs cleanly.
+# Revisit if mise stops passing the flag to bun.
+minimum_release_age_excludes = ["npm:wrangler"]
+
+# pipx: backend already defaults to `uv tool install` whenever uv is
+# present (pipx.uvx defaults true), so no setting is needed for it.
+# cargo: backend already defaults to cargo-binstall over source builds
+# (cargo.binstall defaults true). Set cargo.binstall_only = true to make
+# a missing prebuilt binary a hard failure instead of a slow source build.
+
+# `mise bootstrap` and [dotfiles] are gated behind this flag — the command
+# hard-errors without it. Largest risk in delegating provisioning to mise.
+experimental = true
+
+# Pin resolved versions + download URLs in mise.lock rather than
+# re-resolving "latest" on every fresh machine. The lock for THIS config
+# is mise/mise.lock in the repo: mise canonicalises the symlinked
+# ~/.config/mise/config.toml and writes next to the real file, so it is
+# tracked alongside the config it pins. `mise install` honours it;
+# `mise upgrade` / `mise lock -g` move it forward.
+lockfile = true
+
+# NOTE: auto_env canNOT go here. It is an early-init setting — it decides
+# which config files to load, so it cannot be read from one. Setting it in
+# [settings] silently does nothing. It lives in mise/miserc.toml, symlinked
+# to ~/.config/mise/miserc.toml (undotted at global scope; the dotted
+# .miserc.toml form only works in project dirs).
+
 # Show informative status output on cd but suppress for scripts.
 status.show_tools = true
 status.show_env   = false
 
 [env]
-# Sensible defaults available everywhere. Project configs can override.
-EDITOR = "vim"
+# Deliberately empty of EDITOR/VISUAL/LANG: the shell startup chain
+# (~/.profile for POSIX subprocesses, zsh/.zshenv for zsh) is the single
+# source of truth for those — an entry here would silently overlay it in
+# every mise-activated directory. Project configs may still add their own.
+
+# ── Dotfiles ────────────────────────────────────────────────────────
+# Desired-state symlinks. Sources MUST be absolute: a relative source
+# resolves against the config file's directory *as reached*, and this file
+# is itself symlinked to ~/.config/mise/, so "../zsh/zshenv" would resolve
+# to ~/.config/zsh/zshenv. Several such wrong paths exist (they are
+# themselves managed symlinks), so it fails silently rather than loudly.
+#
+# NOT listed here: the git profile templates, ~/.ssh/config, and the
+# work/personal mise seeds. Those are seeds meant to be edited in place
+# and to drift; [dotfiles] models desired state and would fight that.
+# Also absent: the macOS `mate`/`markedit` CLI wrappers — they are
+# detected from /Applications, and [dotfiles] has NO conditional support
+# (os/platform/when/enable all parse and are silently ignored).
+[dotfiles]
+"~/.zshenv"                   = { source = "~/development/personal/repos/dotfiles/zsh/zshenv" }
+"~/.config/zsh/.zshenv"       = { source = "~/development/personal/repos/dotfiles/zsh/.zshenv" }
+"~/.config/zsh/.zprofile"     = { source = "~/development/personal/repos/dotfiles/zsh/.zprofile" }
+"~/.config/zsh/.zshrc"        = { source = "~/development/personal/repos/dotfiles/zsh/.zshrc" }
+"~/.config/zsh/.zlogout"      = { source = "~/development/personal/repos/dotfiles/zsh/.zlogout" }
+# symlink-each so conf.d can also hold fragments mise doesn't manage
+"~/.config/zsh/conf.d"        = { source = "~/development/personal/repos/dotfiles/zsh/conf.d", mode = "symlink-each" }
+"~/.profile"                  = { source = "~/development/personal/repos/dotfiles/profile" }
+"~/.config/mise/config.toml"  = { source = "~/development/personal/repos/dotfiles/mise/config.toml" }
+"~/.config/mise/miserc.toml"  = { source = "~/development/personal/repos/dotfiles/mise/miserc.toml" }
+"~/.config/direnv/direnvrc"   = { source = "~/development/personal/repos/dotfiles/direnv/direnvrc" }
+"~/.config/git/config"        = { source = "~/development/personal/repos/dotfiles/git/config" }
+"~/.config/git/ignore"        = { source = "~/development/personal/repos/dotfiles/git/ignore" }
+"~/.config/git/attributes"    = { source = "~/development/personal/repos/dotfiles/git/attributes" }
+"~/.config/tmux/tmux.conf"    = { source = "~/development/personal/repos/dotfiles/tmux/tmux.conf" }
+"~/.vim/vimrc"                = { source = "~/development/personal/repos/dotfiles/vim/vimrc" }
+
+# ── Tasks ───────────────────────────────────────────────────────────
+# Global tasks: visible from any directory via `mise tasks ls`.
+# NOTE: [tasks] merge semantics differ from [tools]/[env] — a task is
+# REPLACED WHOLE per name, so a project defining dotfiles:doctor shadows
+# this one entirely rather than merging.
+[tasks."dotfiles:link"]
+description = "Apply symlinks, dirs, templates and permissions"
+run = "sh ~/development/personal/repos/dotfiles/bootstrap.sh"
+
+[tasks."dotfiles:audit"]
+description = "Scan shell startup files for rogue installer injections"
+run = "sh ~/development/personal/repos/dotfiles/bootstrap.sh --audit-only"
+
+[tasks."dotfiles:test"]
+description = "Run the POSIX profile test suite"
+run = "sh ~/development/personal/repos/dotfiles/sh/tests/profile_test.sh"
+
+[tasks."dotfiles:capabilities"]
+description = "Assert required binaries are present, whatever provided them"
+# Checks the CAPABILITY, not the package name. A declared package can
+# silently fail to install three ways: wrong distro (skipped), wrong
+# platform (skipped), or a typo'd manager prefix (WARN + exit 0). This
+# is the only check that catches all three.
+run = """
+#!/usr/bin/env bash
+set -u
+status=0
+check() {
+  if command -v "$1" >/dev/null 2>&1; then
+    printf '  [ok]      %s\n' "$1"
+  else
+    printf '  [MISSING] %s — %s\n' "$1" "$2"
+    status=1
+  fi
+}
+echo "Checking required capabilities..."
+check secret-tool "dnf:libsecret / apt:libsecret-tools; needed by keychain_get"
+check zsh         "dnf:zsh / apt:zsh; the login shell"
+check git         "precedes mise entirely — install via the system package manager"
+check gh          "github-cli; 'gh auth login' raises the GitHub API limit 60 -> 5000/hr"
+exit "$status"
+"""
+
+[tasks."dotfiles:doctor"]
+description = "Full health check: capabilities + audit + profile tests"
+depends = ["dotfiles:capabilities", "dotfiles:audit", "dotfiles:test"]
+run = "mise bootstrap status"

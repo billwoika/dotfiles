@@ -88,12 +88,12 @@ shell session.
 ### What to install via Homebrew
 
 ```sh
-# Core developer tools (not available via mise)
+# Core developer tools NOT covered by the mise config
+# (jq, shellcheck, bat, fd, ripgrep, fzf, and direnv are deliberately
+# absent here — they are declared in mise's [tools] and arrive with
+# `mise bootstrap`)
 brew install \
   coreutils findutils gnu-sed gnu-tar \
-  direnv \
-  jq bat fd ripgrep fzf \
-  shellcheck \
   podman
 
 # Terminal emulator
@@ -102,10 +102,12 @@ brew install --cask iterm2
 # (alacritty's cask is deprecated as of 2026 — fails the macOS
 # Gatekeeper check — and is scheduled to be disabled; avoid for new
 # installs.)
-
-# Optional GUI apps
-brew install --cask textmate markedit
 ```
+
+TextMate, MarkEdit, and duti need no manual install: they are declared
+in `mise/config.macos.toml` (`brew-cask:` / `brew:` entries under
+`[bootstrap.packages]`), so `mise bootstrap` installs them through
+Homebrew for you.
 
 Why GNU coreutils: macOS ships BSD versions of `sed`, `tar`, `find`,
 etc. with different flags than the GNU versions that Linux uses and

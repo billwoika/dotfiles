@@ -658,8 +658,7 @@ sudo dnf install \
   openssl-devel zlib-devel readline-devel \
   libffi-devel libyaml-devel \
   sqlite-devel postgresql-devel \
-  fd-find ripgrep fzf jq bat gh git-delta tree lsof \
-  direnv \
+  jq gh git-delta tree lsof \
   libsecret \
   podman podman-compose podman-docker buildah skopeo \
   ShellCheck
@@ -674,15 +673,17 @@ Why each group:
   native extensions (Ruby gems, Python C extensions, Node native
   addons). Without these, `rv install` and `uv sync` fail on packages
   that compile from source.
-- **fd-find, ripgrep, fzf, jq, bat, gh, git-delta, tree, lsof** — the
-  modern CLI tools the framework's aliases and functions expect. `gh`
+- **jq, gh, git-delta, tree, lsof** — pre-mise CLI dependencies. `gh`
   is the GitHub CLI; its completions are wired in the shell startup
   chain. `git-delta` provides the `delta` binary that the framework's
   `git/config` sets as the pager (`pager = delta`) — without it, every
   paged `git` command (`diff`, `log`, `show`, `blame`) fails with
   "cannot run delta". `tree` backs the `tree-trunk` function and `lsof`
   backs the `port_kill` function and `listening` alias.
-- **direnv** — already wired in `conf.d/70-tools.zsh`.
+  (`bat`, `fd`, `ripgrep`, `fzf`, and `direnv` are deliberately NOT in
+  this list — they are declared in mise's `[tools]` with aqua-backed
+  resolution and arrive with `mise bootstrap`. All their shell wiring
+  is `command -v` guarded, so nothing breaks before that.)
 - **libsecret** — provides `secret-tool`, used by the
   `keychain_get` shell function. On Fedora the CLI ships in the
   base `libsecret` package; the `libsecret-tools` package name is
@@ -694,6 +695,20 @@ Why each group:
   registry inspection without pulling.
 - **ShellCheck** — static analysis for shell scripts. Used by the
   framework's lefthook pre-commit configuration.
+
+!!! note "Deliberate overlap with mise `[tools]`"
+
+    Several of these (`jq`, `gh`, `git-delta`, `ShellCheck`, `zsh`,
+    `libsecret`) are *also* declared in the mise config and will be
+    managed by mise after `mise bootstrap` runs — mise's shims sit
+    earlier on `PATH`, so the mise-managed versions win from then on.
+    The dnf copies exist for the window before mise does: `gh` in
+    particular must be present *first*, because `gh auth login` raises
+    the GitHub API limit from 60 to 5000 requests/hour — and mise's
+    `github:` backend and attestation checks spend that budget during
+    the bootstrap itself. `git-delta` covers git paging from the moment
+    `bootstrap.sh` links the git config until mise delivers its own
+    `delta`. This is sequencing, not drift.
 
 ## Set zsh as the default shell
 

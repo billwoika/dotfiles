@@ -20,9 +20,12 @@ per-repo `git config user.email` dance.
     clone requires remembering to set them, and the state lives inside
     the git directory where it is easy to miss during audits.
     Path-based profiles via `includeIf` move the policy up one level —
-    as long as you clone work repos under `~/work/` and personal ones
-    under `~/personal/`, identity is correct without any per-repo
-    action. The filesystem layout becomes the contract.
+    as long as you clone work repos under `~/development/work/` and
+    personal ones under `~/development/personal/`, identity is correct
+    without any per-repo action. The filesystem layout becomes the
+    contract. (The dotfiles repo itself lives at
+    `~/development/personal/repos/dotfiles`, so even its commits get
+    the personal identity with no local override.)
 
 ## File layout
 
@@ -31,9 +34,9 @@ per-repo `git config user.email` dance.
 ├── config                       # Main config — global defaults + includeIf rules
 ├── ignore                       # Global gitignore (backstop)
 ├── attributes                   # Global gitattributes
-├── work.config                  # Loaded when gitdir matches ~/work/
-├── personal.config              # Loaded when gitdir matches ~/personal/
-├── opensource.config            # Loaded when gitdir matches ~/opensource/
+├── work.config                  # Loaded when gitdir matches ~/development/work/
+├── personal.config              # Loaded when gitdir matches ~/development/personal/
+├── opensource.config            # Loaded when gitdir matches ~/development/opensource/
 └── allowed_signers              # SSH signing key registry for git verify-commit
 ```
 
@@ -159,10 +162,10 @@ expected.
 
 !!! warning "includeIf pattern gotchas"
 
-    The pattern `gitdir:~/work/` matches when the repository's `.git`
-    directory resolves to a path starting with `~/work/`. The trailing
-    slash is **required** — without it, only a literal file at `~/work`
-    would match. Use `gitdir/i:` for case-insensitive matching
+    The pattern `gitdir:~/development/work/` matches when the
+    repository's `.git` directory resolves to a path starting with
+    `~/development/work/`. The trailing slash is **required** — without
+    it, only a literal file at `~/development/work` would match. Use `gitdir/i:` for case-insensitive matching
     (relevant on macOS with case-insensitive filesystems). Symlinks
     are resolved, so cloning into a symlinked directory still matches
     the real path.

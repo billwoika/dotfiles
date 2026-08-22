@@ -20,7 +20,8 @@ cross-platform session multiplexer.
 
     The most important first-run setting: **iTerm2 > Settings > General >
     Preferences > Load preferences from a custom folder or URL**. Point
-    this at a directory in your dotfiles repository (`~/dotfiles/iterm2/`),
+    this at a directory in your dotfiles repository
+    (`~/development/personal/repos/dotfiles/iterm2/`),
     and enable "Save changes to folder when iTerm2 quits." iTerm2 writes
     its entire preference state — profiles, key bindings, colors, triggers,
     window arrangements — to `com.googlecode.iterm2.plist` in that folder.
@@ -79,7 +80,7 @@ cross-platform session multiplexer.
     they diff cleanly and can live in the dotfiles tree too.
 
     ```json
-    // ~/dotfiles/iterm2/DynamicProfiles/work-ssh.json
+    // <dotfiles>/iterm2/DynamicProfiles/work-ssh.json
     // Symlinked into ~/Library/Application Support/iTerm2/DynamicProfiles/
     {
       "Profiles": [
@@ -432,15 +433,16 @@ tmux attach -t work
 #!/bin/sh
 # bin/tmux-project.sh
 SESSION="myproject"
-tmux new-session -d -s "$SESSION" -c ~/work/myproject
+tmux new-session -d -s "$SESSION" -c ~/development/work/repos/myproject
 tmux send-keys -t "$SESSION" "mise run dev" C-m
-tmux split-window -t "$SESSION" -v -c ~/work/myproject
+tmux split-window -t "$SESSION" -v -c ~/development/work/repos/myproject
 tmux send-keys -t "$SESSION" "mise run test --watch" C-m
 tmux attach -t "$SESSION"
 ```
 
 For declarative configs, **tmuxp** reads YAML session definitions.
-Install via mise (`mise use -g tmuxp@latest`).
+Install via mise — add `tmuxp = "latest"` to `mise/config.toml` (never
+`mise use -g`, which rewrites the symlinked global config).
 
 ### Nested tmux (SSH use case)
 

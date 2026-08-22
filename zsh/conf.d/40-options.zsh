@@ -1,7 +1,7 @@
 # $ZDOTDIR/conf.d/40-options.zsh
 # ─────────────────────────────────────────────────────────────────────
 # Shell behavior options. Each is a deliberate choice; see the framework
-# document Section 4.7 for rationale on specific settings.
+# docs/shell-environment/architecture.md for rationale on specific settings.
 # ─────────────────────────────────────────────────────────────────────
 
 # ── Directory navigation ────────────────────────────────────────────

@@ -241,7 +241,8 @@ installation immediately reveals unauthorized writes.
 **The bootstrap.sh audit hook.** The bootstrap installer scans shell startup
 files for rogue injections from known offenders (`NVM_DIR`,
 `VOLTA_HOME`, `BUN_INSTALL`, `cargo/env`, `pyenv init`, `asdf.sh`,
-`conda init`). Run it after any tool installation.
+`conda init`). Run it after any tool installation:
+`mise run dotfiles:audit` (or `sh bootstrap.sh --audit-only`).
 
 **Installer flags worth memorizing:**
 

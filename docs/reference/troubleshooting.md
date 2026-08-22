@@ -63,13 +63,15 @@ git config --list --show-origin | grep user
 
 **Common causes:**
 
-- **Repository not under `~/work/` or `~/personal/`.** The `includeIf`
-  directives in `~/.config/git/config` match on directory path. Clone
-  work repos under `~/work/` and personal repos under `~/personal/`.
+- **Repository not under `~/development/work/` or
+  `~/development/personal/`.** The `includeIf` directives in
+  `~/.config/git/config` match on directory path. Clone work repos
+  under `~/development/work/repos/` and personal repos under
+  `~/development/personal/repos/`.
 - **Legacy `~/.gitconfig` exists.** Delete it; the framework uses
   `~/.config/git/config` exclusively.
-- **Trailing slash missing.** `includeIf "gitdir:~/work/"` requires
-  the trailing slash.
+- **Trailing slash missing.** `includeIf "gitdir:~/development/work/"`
+  requires the trailing slash.
 
 ## SSH authentication failures
 
@@ -133,9 +135,9 @@ direnv status     # or: ds (alias)
 **Common causes:**
 
 - **Not allowed.** Run `direnv allow` (or `da`).
-- **direnv not installed.** `command -v direnv` — install via
-  `brew install direnv` (macOS), `sudo apt install direnv`
-  (Debian/Ubuntu), or `sudo dnf install direnv` (Fedora/RHEL).
+- **direnv not installed.** `command -v direnv` — it is declared in
+  mise's `[tools]`, so `mise install` delivers it; a missing binary
+  usually means the toolchain install has not run yet.
 - **mise handling the env.** If you moved env vars to `mise.toml`'s
   `[env]` block, direnv is no longer needed for those variables.
 

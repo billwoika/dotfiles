@@ -70,26 +70,51 @@ optional GUI tools) are presented in tabbed sections.
 
 ### Step 1: Clone the dotfiles
 
+The repository lives inside the profile tree, not at `~/dotfiles`: it
+is a personal repo, so it belongs under `~/development/personal/repos/`
+where the path-based git identity and the personal mise profile apply
+to it like any other repo. Export the path once; the rest of this
+runbook uses `$DOTFILES`:
+
+```sh
+export DOTFILES="$HOME/development/personal/repos/dotfiles"
+```
+
 Clone over **HTTPS**, not SSH. This is deliberate: the repository is
 public, so an HTTPS clone needs no credentials — and at this point you
-have none. Your SSH keys do not exist yet (Step 8), and the GitHub
+have none. Your SSH keys do not exist yet (Step 5), and the GitHub
 passkey in 1Password is not wired up for git either. Cloning over SSH
 here would fail with `Permission denied (publickey)`. You will switch
-this clone's remote to SSH in Step 10, once the keys exist.
+this clone's remote to SSH in Step 7, once the keys exist.
 
 ```sh
-git clone https://github.com/billwoika/dotfiles ~/dotfiles
+git clone https://github.com/billwoika/dotfiles "$DOTFILES"
 ```
 
-### Step 2: Bootstrap
+(`git clone` creates the missing `~/development/personal/repos/`
+parents itself; `bootstrap.sh` creates the sibling `work/` and
+`opensource/` trees in the next step.)
+
+### Step 2: Bootstrap the filesystem
 
 ```sh
-sh ~/dotfiles/bootstrap.sh
+sh "$DOTFILES/bootstrap.sh"
 ```
 
-This creates XDG directories, symlinks configuration files, copies
-identity templates, and audits for rogue shell injections. Review the
-output — anything marked `[rogue]` needs cleanup.
+This prepares the filesystem only — it installs no software:
+
+- creates XDG directories and the
+  `~/development/{personal,work,opensource}/repos` profile tree
+- symlinks configuration files, including the mise configs:
+  `config.toml`, the early-init `miserc.toml` (which carries
+  `auto_env`), and the per-OS `config.linux.toml` /
+  `config.macos.toml` — files mise's own `[dotfiles]` pass cannot
+  self-apply because they decide what mise loads
+- copies the editable seeds: git identity templates, the per-profile
+  `mise.toml` files under `~/development/`, and `~/.ssh/config`
+- audits shell startup files for rogue installer injections
+
+Review the output — anything marked `[rogue]` needs cleanup.
 
 ### Step 3: Verify zsh is the login shell
 
@@ -156,61 +181,50 @@ read](../shell-environment/posix-profile.md#when-profile-is-read).
     for which leaks are preventable, which are the cost of the tool, and
     why Vim is neither.
 
-### Step 4: Install mise
+### Step 4: Provision everything with mise
+
+There is no `curl | sh` step. `bin/mise` is vendored in the repository
+and version-pinned: on first run it downloads that exact mise release,
+verifies its checksum, caches it, and executes it.
 
 ```sh
-curl https://mise.run | sh
+"$DOTFILES/bin/mise" bootstrap
 ```
 
-Reload the shell so mise is available on `$PATH`:
+One command replaces what used to be four separate installs (mise
+itself, the `usage` CLI, rv, and `mise install`):
+
+- **System packages** from `[bootstrap.packages]` in the per-OS config
+  (zsh, libsecret, ffmpeg, ImageMagick, the mysql client). This is the
+  part that escalates: mise shells out to `sudo dnf|apt|brew install`
+  as its *first* step, before anything else — run it deliberately.
+- **The symlink farm** from `[dotfiles]`, converging what
+  `bootstrap.sh` already applied. `bootstrap.sh` stays authoritative
+  for the early-init files mise cannot self-apply (see Step 2).
+- **Every tool in `[tools]`** — `rv` included (resolved from GitHub
+  releases via the `github:` backend, so its `curl | sh` installer is
+  gone too), with the modern installers doing the work: `uv tool
+  install` for `pipx:` tools, `bun` for `npm:` tools, `cargo-binstall`
+  for `cargo:` tools. `usage` is in `[tools]` as well, so mise's shell
+  completions work from the first reload.
+
+Afterwards, reload the shell so the new tools are on `$PATH` and
+verify:
 
 ```sh
 exec zsh
-```
-
-Verify mise is working:
-
-```sh
 mise --version
 ```
 
-### Step 5: Install the usage CLI
+!!! warning "Never `mise use -g`"
 
-mise's shell completions depend on the `usage` CLI. Without it,
-the completion script has broken quoting that produces errors on
-shell startup.
+    `mise use -g <tool>` rewrites the global config file to add a pin —
+    but that file is a symlink back into your dotfiles repo, so the
+    rewrite dirties your working tree (or clobbers the symlink).
+    Declarations live in version control: add the tool to
+    `mise/config.toml`, then run `mise install` to materialize it.
 
-`usage` is already pinned in the framework's `~/.config/mise/config.toml`,
-so Step 7 (`mise install`) would install it anyway. Install it now, on
-its own, so completions work the next time the shell reloads — before
-the full toolchain install:
-
-```sh
-mise install usage
-```
-
-Do **not** run `mise use -g usage`. That command rewrites the global
-config file to add the pin — but the framework already ships that pin,
-and the file is a symlink back into your dotfiles repo, so the rewrite
-would dirty your working tree (or clobber the symlink). The declaration
-lives in version control; you only need to materialize the binary.
-
-### Step 6: Install rv (Ruby manager)
-
-```sh
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/spinel-coop/rv/releases/latest/download/rv-installer.sh | sh
-```
-
-### Step 7: Install user-scope runtimes
-
-```sh
-mise install
-```
-
-This installs the tools declared in `~/.config/mise/config.toml`.
-
-### Step 8: Generate SSH keys
+### Step 5: Generate SSH keys
 
 ```sh
 # Work key
@@ -224,13 +238,14 @@ ssh-keygen -t ed25519 \
   -f ~/.ssh/id_ed25519_personal
 ```
 
-### Step 9: Edit identity templates
+### Step 6: Edit identity templates
 
 Run these from a framework shell so `$EDITOR` is set (it is exported by
 the zsh startup chain — if `$EDITOR` expands to nothing, you are not in a
 framework shell yet; run `exec zsh` first, or substitute `vim`):
 
 ```sh
+$EDITOR ~/.config/git/local.config       # user.name (shared across profiles)
 $EDITOR ~/.config/git/work.config
 $EDITOR ~/.config/git/personal.config
 $EDITOR ~/.config/git/opensource.config
@@ -238,13 +253,16 @@ $EDITOR ~/.config/git/allowed_signers
 $EDITOR ~/.ssh/config
 ```
 
-Fill in your actual email addresses, signing key paths, and host
-aliases. `opensource.config` applies to repos cloned under
-`~/opensource/`; if you do not use that directory you can leave it, but
-note it ships with placeholder identity, so a repo cloned there would
-otherwise commit under the template email.
+`local.config` holds `user.name` only — bootstrap copies it from
+`git/local.config.example` (placeholder `Your Name`). Email, signing
+keys, and host aliases stay in the path-based profile files.
+`opensource.config` applies to repos cloned under
+`~/development/opensource/`; if
+you do not use that directory you can leave it, but note it ships with
+placeholder identity, so a repo cloned there would otherwise commit
+under the template email.
 
-### Step 10: Register SSH keys
+### Step 7: Register SSH keys
 
 Add both keys to GitHub (Settings > SSH and GPG keys):
 - Once as "Authentication Key"
@@ -339,27 +357,29 @@ Load keys into the agent:
 Now that your keys exist and are registered, point the dotfiles clone
 (cloned over HTTPS in Step 1) at your SSH host alias so future pulls and
 pushes use the key. Use the host alias you defined in `~/.ssh/config`
-(Step 9) — `github.com-personal` here, assuming the dotfiles are a
-personal repo:
+(Step 6) — `github.com-personal` here, the repo living under
+`~/development/personal/` like any other personal repo:
 
 ```sh
-cd ~/dotfiles
+cd "$DOTFILES"
 git remote set-url origin git@github.com-personal:billwoika/dotfiles
 git remote -v   # confirm origin now shows the SSH URL
 ```
 
-### Step 11: Validate
+### Step 8: Validate
 
 ```sh
-# POSIX profile test suite
-sh ~/dotfiles/sh/tests/profile_test.sh
+# Full framework health check: required capabilities, the
+# rogue-injection audit, the POSIX profile test suite, then
+# `mise bootstrap status`
+mise run dotfiles:doctor
 
-# Verify mise
+# Verify mise itself
 mise doctor
 ```
 
 **Verify SSH authentication to GitHub.** This requires that you finished
-Step 10 — both the host aliases in your edited `~/.ssh/config` and the
+Step 7 — both the host aliases in your edited `~/.ssh/config` and the
 keys registered at GitHub. The success message is GitHub greeting you by
 username (it then closes the connection — GitHub does not allow shell
 access, so "does not provide shell access" is the expected, healthy
@@ -376,24 +396,25 @@ ssh -T git@github.com-personal
 
 **Verify git identity.** The framework selects your work vs. personal
 identity by directory, using `includeIf "gitdir:..."` rules — and those
-rules only fire **inside a git repository** under `~/work` or
-`~/personal`. On a fresh machine those directories are still empty, so
-checking identity there shows the global default, not the work/personal
-email. Verify it properly after your first clone:
+rules only fire **inside a git repository** under `~/development/work/`
+or `~/development/personal/`. The dotfiles clone itself is one such
+repository — `git config user.email` inside `$DOTFILES` should already
+show your personal email. Verify the work profile after your first
+work clone:
 
 ```sh
-cd ~/work
+cd ~/development/work/repos
 git clone git@github.com-work:your-org/some-repo   # any work repo
 cd some-repo
 git config user.email    # NOW shows your work email
 ```
 
-### Step 12: Re-check for regenerated bash startup files
+### Step 9: Re-check for regenerated bash startup files
 
 The Fedora setup page had you delete `~/.bashrc`, `~/.bash_profile`, and
 `~/.bash_login` before bootstrapping. But several tools installed *during*
-this runbook — `mise`, `rv`, and other `curl | sh` installers — append to
-or re-create `~/.bashrc` (or `~/.bash_profile`) as part of their setup,
+this runbook can append to or re-create `~/.bashrc` (or
+`~/.bash_profile`) as part of their first run,
 *after* you deleted it. A regenerated `~/.bash_profile` silently shadows
 the framework's `~/.profile` again: bash reads the bash file and never
 falls through to `~/.profile`, so the POSIX subprocess shim stops loading
@@ -416,7 +437,8 @@ for rogue installer-injected `PATH` lines (it reports them but does not
 delete — that part is on you):
 
 ```sh
-sh ~/dotfiles/bootstrap.sh
+mise run dotfiles:audit
+# equivalent: sh "$DOTFILES/bootstrap.sh" --audit-only
 ```
 
 If an installer re-injected a `PATH` export into `~/.profile` or a zsh
@@ -427,26 +449,28 @@ on `conf.d/10-path.zsh` instead.
 
 === "macOS"
 
-    ### Install Homebrew packages
+    ### GUI editors and their CLI wrappers
+
+    TextMate, MarkEdit, and duti are declarative — `brew-cask:` /
+    `brew:` entries in `mise/config.macos.toml` — so Step 4 already
+    installed them. Their `mate` / `markedit` CLI shortcuts are
+    detected from `/Applications`, which mise's `[dotfiles]` cannot
+    express, so re-run bootstrap once to create them:
 
     ```sh
-    brew install --cask iterm2 textmate markedit
-    # Re-run bootstrap to create CLI wrappers
-    sh ~/dotfiles/bootstrap.sh
+    sh "$DOTFILES/bootstrap.sh"
     ```
 
-    ### Install direnv
+    iTerm2 stays a manual install:
 
     ```sh
-    brew install direnv
-    # Already wired in conf.d/70-tools.zsh
+    brew install --cask iterm2
     ```
 
     ### Configure file associations
 
     ```sh
-    brew install duti
-    sh ~/dotfiles/macos/setup-file-associations.sh
+    sh "$DOTFILES/macos/setup-file-associations.sh"
     ```
 
     ### Add mise shims to system PATH (for GUI IDEs)
@@ -461,18 +485,17 @@ on `conf.d/10-path.zsh` instead.
 
 === "Debian / Ubuntu"
 
-    ### Install system packages
+    ### System packages
 
-    ```sh
-    sudo apt install direnv libsecret-tools fd-find ripgrep fzf
-    ```
-
-    `direnv` is already wired in `conf.d/70-tools.zsh`. `libsecret-tools`
-    provides `secret-tool`, used by the `keychain_get` shell function.
+    Nothing left to install by hand: `bat`, `fd`, `ripgrep`, `fzf`,
+    and `direnv` are declared in mise's `[tools]` (aqua-backed), and
+    `libsecret-tools` (providing `secret-tool` for the `keychain_get`
+    shell function) is an `apt:` entry in `mise/config.linux.toml` —
+    Step 4 delivered all of them.
 
     ### SSH agent persistence
 
-    See the systemd user service in Step 10 above. On GNOME 46+
+    See the systemd user service in Step 7 above. On GNOME 46+
     desktops (Ubuntu 24.04+), the SSH agent is provided by
     `gcr-ssh-agent`, not `gnome-keyring` — its socket is
     `$XDG_RUNTIME_DIR/gcr/ssh`, normally already active.
@@ -489,14 +512,15 @@ on `conf.d/10-path.zsh` instead.
 
 === "Fedora / RHEL"
 
-    System packages (`direnv`, `fd-find`, `ripgrep`, `fzf`, etc.)
-    are covered in the
-    [Fedora setup page](platform-setup/fedora.md#developer-prerequisites).
-    If that page was followed, these are already installed.
+    System packages are covered in the
+    [Fedora setup page](platform-setup/fedora.md#developer-prerequisites);
+    if that page was followed, they are already installed. `bat`,
+    `fd`, `ripgrep`, `fzf`, and `direnv` are not among them — they are
+    mise-managed (aqua-backed) and arrived with Step 4.
 
     ### SSH agent persistence
 
-    See the systemd user service in Step 10 above. On Fedora
+    See the systemd user service in Step 7 above. On Fedora
     Workstation (GNOME 46+), the SSH agent is provided by
     `gcr-ssh-agent`, not `gnome-keyring` — its socket is
     `$XDG_RUNTIME_DIR/gcr/ssh`, enabled by default.
@@ -517,7 +541,7 @@ on `conf.d/10-path.zsh` instead.
 After the machine is set up, the per-project workflow:
 
 ```sh
-cd ~/work
+cd ~/development/work/repos
 git clone <repo-url>
 cd <project>
 

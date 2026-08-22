@@ -68,7 +68,8 @@ mixing.
 
 This framework takes the position that providing clean structure for
 the messy reality is better than pretending the reality does not
-exist. Path-based git identity (`~/work/` vs `~/personal/`), separate
+exist. Path-based git identity (`~/development/work/` vs
+`~/development/personal/`), separate
 SSH keys per context, host aliases that route through the correct
 credentials — these are the operational patterns that make the
 work/personal boundary explicit, auditable, and reversible. They do

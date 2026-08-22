@@ -1,0 +1,16 @@
+# ~/.config/mise/miserc.toml  (undotted at global scope — the dotted
+# .miserc.toml form only works in project directories)
+# ─────────────────────────────────────────────────────────────────────
+# EARLY-INIT settings only. These decide WHICH config files get loaded,
+# so they cannot be read from mise.toml/config.toml — putting auto_env in
+# [settings] there parses cleanly and silently does nothing.
+# ─────────────────────────────────────────────────────────────────────
+
+# Activate platform config environments automatically, with no MISE_ENV
+# export and no -E flag: `unix`, the OS name (`linux`/`macos`), and
+# `{os}-{arch}` (e.g. macos-arm64). This is what makes config.linux.toml
+# and config.macos.toml load on the right host.
+#
+# Defaults to false today; mise flips it to true in 2027.6.0. Declared
+# explicitly so behaviour does not change under us at that release.
+auto_env = true
