@@ -242,144 +242,264 @@ cross-platform session multiplexer.
     This integration mode is macOS-only. On Linux, tmux runs directly
     inside the terminal emulator with its own pane and window rendering.
 
-=== "Linux"
+=== "Linux: Ptyxis"
 
-    **Use WezTerm.** It is the framework's recommended Linux terminal,
-    and the recommendation turns on a principle, not taste: WezTerm
-    integrates from the *shell* side, on the framework's terms.
-    `conf.d/25-tool-cache.zsh` loads WezTerm's integration when
-    `$TERM_PROGRAM` is `WezTerm`, giving you OSC 7/133 semantics — prompt
-    marks, command timing, working-directory tracking — through the same
-    gated loader that handles every other tool. The shell startup chain
-    stays in control of itself. It is also the same emulator you can run
-    on macOS, so a single Lua config follows you across every machine.
+    **Use Ptyxis.** It is Fedora's default terminal (since 41), which
+    means the recommendation costs nothing: zero install, official
+    repo, GNOME-maintained, updated with the distro. It is VTE 0.84
+    underneath — truecolor, OSC 7 working-directory tracking, OSC 8
+    hyperlinks, OSC 133 prompt marks — and it is container-first: a
+    tab can open directly into a toolbox/distrobox container, with the
+    host and each container presented as peers in the new-tab menu.
+
+    The deeper reason it fits this framework: Ptyxis satisfies the
+    integration principle that disqualified Kitty (see the alternatives
+    tab). It never touches the shell's boot path. It reads what the
+    shell chooses to emit, and nothing else.
+
+    ### Shell integration: the framework emits, Ptyxis listens
+
+    Fedora's own answer to terminal integration is
+    `/etc/profile.d/vte.sh` — a well-behaved script that emits OSC 7
+    and OSC 133 from precmd/preexec hooks. But it only reaches zsh
+    through `/etc/zprofile`, which runs in **login shells**, and
+    Ptyxis (like most GUI terminals) spawns non-login shells by
+    default. Net effect on a stock Fedora + zsh setup: no integration
+    at all, silently.
+
+    The framework closes the gap on its own terms:
+    `conf.d/26-terminal-osc.zsh` emits OSC 7 (percent-encoded cwd) and
+    OSC 133 (prompt start / output start / command done + exit code)
+    from native zsh hooks — ~30 lines, no vendor script, works in
+    *any* terminal that understands the sequences. It defers to
+    integrations that already emit them (vte.sh in a login shell,
+    iTerm2's and WezTerm's scripts from `25-tool-cache.zsh`, VS Code's
+    injection, kitty's opt-in), so nothing double-fires.
+
+    What that buys in Ptyxis today: **new tabs and windows open in
+    your current directory** (the `preserve-directory` setting honors
+    OSC 7), and correct directory behavior when detaching tabs. The
+    OSC 133 marks are cheap future-proofing — Ptyxis does not yet
+    expose prompt-jumping UI, but tmux ≥3.4 uses the same marks for
+    copy-mode prompt navigation, and WezTerm/kitty/iTerm2 all light up
+    on them if you ever sit in front of one.
+
+    ### Recommended settings
+
+    Ptyxis is configured through GSettings — there is no config file
+    to symlink, but that makes every setting scriptable.
+    `mise run dotfiles:ptyxis` applies the framework's defaults
+    idempotently to the app schema and the current default profile:
+
+    | Setting | Key | Value | Why |
+    |---------|-----|-------|-----|
+    | Silence the bell | `audible-bell` | `false` | The visual bell stays on; sound is noise in a busy session. |
+    | Steady cursor | `cursor-blink-mode` | `'off'` | A non-blinking block reads position at a glance. |
+    | No blinking text | `text-blink-mode` | `'never'` | TUIs that blink are asking for attention they haven't earned. |
+    | Deep scrollback | `scrollback-lines` | `100000` | Match the 100k tmux/iTerm2 history. The 10k default forces re-running commands to see output you already produced. |
+    | Follow the shell's cwd | `preserve-directory` | `'safe'` | Honors the OSC 7 the framework emits; `safe` skips it for custom commands. |
+
+    Deliberately not applied (personal, the task prints hints
+    instead): font, palette, opacity, `interface-style`.
+
+    **Font.** Same stance as iTerm2 on macOS: a Nerd Font, so prompt
+    and CLI glyphs render instead of tofu. Fedora doesn't package the
+    patched builds — drop one into `~/.local/share/fonts` and
+    `fc-cache -f`, then:
 
     ```sh
-    # Debian/Ubuntu (from the WezTerm APT repo)
+    gsettings set org.gnome.Ptyxis use-system-font false
+    gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 13'
+    ```
+
+    ### Version-controlling a GSettings app
+
+    The full configuration surface — every profile, every shortcut —
+    round-trips through dconf:
+
+    ```sh
+    # Capture (review before committing; contains window geometry too)
+    dconf dump /org/gnome/Ptyxis/ > ptyxis-settings.dconf
+
+    # Restore on a new machine (merges; existing keys win only if absent)
+    dconf load /org/gnome/Ptyxis/ < ptyxis-settings.dconf
+    ```
+
+    The framework deliberately does **not** commit a dconf snapshot:
+    profile UUIDs and window geometry are machine-local noise, and the
+    settings worth converging are already expressed executably in
+    `dotfiles:ptyxis`. Desired state lives in the task; `dconf dump`
+    is for ad-hoc backup before experimenting.
+
+    ### Identity separation
+
+    The iTerm2 badge trick, Ptyxis-style: create a second profile
+    (Preferences → Profiles → +), give it the `label` "WORK" and a
+    visibly different palette, then launch work terminals into it
+    directly:
+
+    ```sh
+    # Find its UUID, then open work tabs with it
+    gsettings get org.gnome.Ptyxis profile-uuids
+    ptyxis --tab-with-profile=<uuid> -d ~/development/work
+    ```
+
+    A `.desktop` launcher wrapping that command gives you a separate
+    dock icon per identity — the cheapest possible "am I in the work
+    context?" signal.
+
+    ### Tips and tricks
+
+    - **Tab overview** — ++ctrl+shift+o++ shows every tab as a card,
+      live. With `restore-session true` (default, blessed) Ptyxis
+      reopens your whole layout on login; the overview is how you find
+      things again.
+    - **Direct tab access** — ++alt+1++ … ++alt+9++, ++alt+0++ for tab
+      10. ++ctrl+shift+alt+t++ reopens a just-closed tab, scrollback
+      intact.
+    - **Zoom** is per-tab: ++ctrl++ + scroll wheel (or ++ctrl+plus++ /
+      ++ctrl+minus++ / ++ctrl+0++). Pair-programming font size without
+      touching settings.
+    - **Custom links** — Ptyxis's answer to iTerm2 Smart Selection:
+      per-profile regex → URL rewrites, so ticket IDs in any command
+      output become clickable:
+
+        ```sh
+        gsettings set \
+          org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d \')/ \
+          custom-links "[('JIRA-[0-9]+', 'https://jira.example.com/browse/\\0')]"
+        ```
+
+    - **Process-aware chrome** — `visual-process-leader` (default on)
+      tints the window header when the foreground process is `ssh` or
+      `sudo`. You get a "this shell is not what it looks like" signal
+      for free — leave it on.
+    - **Containers** — the new-tab button's dropdown lists every
+      toolbox/distrobox alongside the host; a profile's
+      `default-container` pins it permanently. This is the feature no
+      other emulator has natively, and on a Fedora box that uses
+      toolbox for experiments it removes the `toolbox enter` dance.
+    - **Scripting the window** — `ptyxis --tab -d "$PWD"`,
+      `ptyxis -x 'journalctl -f'`, `--title`, `--standalone` for an
+      isolated instance. Project launchers compose from these.
+    - **OSC 8 hyperlinks** — VTE renders real hyperlinks;
+      ++ctrl++-click opens them. `ls --hyperlink=auto` makes every
+      filename clickable; `rg --hyperlink-format=default` does the
+      same for match locations.
+    - **Remote terminfo just works** — Ptyxis sets
+      `TERM=xterm-256color`, which every server on earth has terminfo
+      for. kitty (`xterm-kitty`) and foot (`foot`) both require their
+      terminfo shipped to every SSH target before `clear` stops
+      erroring. This is a real, recurring cost the fancy-TERM
+      emulators charge and Ptyxis doesn't.
+
+=== "Linux: alternatives"
+
+    Ptyxis is the default because it is preinstalled, principled, and
+    sufficient. Two alternatives are worth naming, and one is worth
+    rejecting.
+
+    ### WezTerm — the power option
+
+    WezTerm integrates from the *shell* side on the framework's terms —
+    `25-tool-cache.zsh` loads its integration when `$TERM_PROGRAM` is
+    `WezTerm` — and adds what Ptyxis lacks: OSC 133 prompt-jumping UI,
+    a built-in multiplexer, ligatures, and a programmable Lua config
+    that version-controls cleanly and runs identically on macOS.
+
+    Its cost on Fedora is the install channel: WezTerm is **not in the
+    official repos** — the practical route is a *nightly Copr*
+    (`dnf copr enable wezfurlong/wezterm-nightly`). That is exactly
+    the class of third-party dependency this framework avoids
+    elsewhere (it is why `[bootstrap.packages]` ships `ffmpeg-free`,
+    not RPM Fusion's ffmpeg). If you adopt WezTerm anyway, adopt the
+    Copr knowingly:
+
+    ```sh
+    # Debian/Ubuntu (WezTerm APT repo)
     curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/wezterm.gpg
     echo 'deb [signed-by=/etc/apt/keyrings/wezterm.gpg] https://apt.fury.io/wez/ * *' | \
       sudo tee /etc/apt/sources.list.d/wezterm.list
     sudo apt update && sudo apt install wezterm
 
-    # Fedora (Copr)
+    # Fedora (Copr — nightly; no stable channel exists)
     sudo dnf copr enable wezfurlong/wezterm-nightly
     sudo dnf install wezterm
     ```
 
-    Configuration is Lua at `~/.config/wezterm/wezterm.lua` — programmable,
-    version-controllable, and diffable. WezTerm ships a built-in
-    multiplexer, so tmux is optional for purely local work; we still run
-    tmux (see below) because it owns remote sessions that must survive an
-    SSH drop, and keeping one multiplexer for both local and remote avoids
-    two muscle-memory sets.
-
-    #### Recommended settings
-
-    A starter `~/.config/wezterm/wezterm.lua` covering the settings worth
-    changing from WezTerm's defaults for this framework:
+    A starter `~/.config/wezterm/wezterm.lua` with the framework's
+    settings:
 
     ```lua
     local wezterm = require 'wezterm'
     local config = wezterm.config_builder()
 
-    -- Scrollback: match the 100k tmux history. A short buffer means
-    -- re-running commands to see output you already produced.
-    config.scrollback_lines = 100000
-
-    -- Font: a Nerd Font so prompt/CLI glyphs render instead of tofu.
-    -- font_with_fallback degrades gracefully if the first is absent.
+    config.scrollback_lines = 100000          -- match tmux history
     config.font = wezterm.font_with_fallback {
-      'JetBrainsMono Nerd Font',
-      'MesloLGS Nerd Font',
+      'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font',
     }
     config.font_size = 13.0
-
-    -- Cursor: steady block reads position at a glance, no flicker.
     config.default_cursor_style = 'SteadyBlock'
-
-    -- Get out of tmux's way: WezTerm's own tabs/panes go unused because
-    -- tmux owns sessions. Hide the chrome rather than run two systems.
-    config.hide_tab_bar_if_only_one_tab = true
+    config.hide_tab_bar_if_only_one_tab = true -- tmux owns sessions
     config.enable_scroll_bar = false
-
-    -- Quiet the bell; the visual cue is enough.
     config.audible_bell = 'Disabled'
+
+    -- Identity separation: key the palette off the host, the same
+    -- work/personal signal the Ptyxis profile label gives.
+    if wezterm.hostname():find 'work' then
+      config.color_scheme = 'Catppuccin Frappe'
+    else
+      config.color_scheme = 'Catppuccin Macchiato'
+    end
 
     return config
     ```
 
-    | Setting | Value | Why |
-    |---------|-------|-----|
-    | `scrollback_lines` | `100000` | Align with the tmux 100k history. |
-    | `font` (Nerd Font) | `JetBrainsMono Nerd Font` + fallback | Render git/devicon glyphs instead of tofu boxes. |
-    | `default_cursor_style` | `SteadyBlock` | Position legible at a glance, no blink flicker. |
-    | `hide_tab_bar_if_only_one_tab` | `true` | tmux owns sessions; don't surface WezTerm's competing UI. |
-    | `audible_bell` | `Disabled` | The visual bell suffices; audible is noise in a busy split. |
+    ### Alacritty — the minimalist
 
-    **Identity separation.** Because the config is code, branch it on the
-    machine instead of maintaining separate profiles. Key the color scheme
-    (and an optional window title prefix) off the hostname or an env var
-    so a work box and a personal box are visibly different the moment a
-    window opens — the same work/personal signal the iTerm2 badge gives on
-    macOS:
+    In the official repos (`sudo dnf install alacritty`), fastest
+    startup, TOML config, no multiplexer by design — which pairs
+    cleanly with "tmux owns sessions." Deliberately feature-frozen and
+    trails on protocol support. It emits no integration of its own,
+    but that no longer matters here: `conf.d/26-terminal-osc.zsh`
+    supplies OSC 7/133 from the shell side, so Alacritty gets cwd
+    tracking for free.
 
-    ```lua
-    local host = wezterm.hostname()
-    if host:find 'work' then
-      config.color_scheme = 'Catppuccin Frappe'   -- work: cooler palette
-    else
-      config.color_scheme = 'Catppuccin Macchiato' -- personal: warmer
-    end
-    ```
+    ### Kitty — rejected, still
 
-    !!! note "Where WezTerm is the weaker choice"
+    Kitty is the most protocol-forward emulator on Linux — it authored
+    the graphics and keyboard protocols newer TUIs are adopting — so
+    on a "forward-thinking, not legacy bloat" reading it looks like
+    the obvious pick. The framework passes it over anyway, for one
+    specific reason: **Kitty's zsh integration injects itself by
+    hijacking `ZDOTDIR`.**
 
-        The recommendation is honest about its cost. WezTerm is the
-        heaviest of the mainstream options: GPU-driven, larger memory
-        footprint, and a Lua config that is more to learn than an INI or
-        TOML file. If that weight is the wrong trade for you, **Alacritty**
-        is the reasonable alternative — minimalist, fastest startup, TOML
-        config at `~/.config/alacritty/alacritty.toml`, no multiplexer by
-        design (which pairs cleanly with the framework's "tmux owns
-        sessions" model). Its cost is that it is deliberately
-        feature-frozen and trails on protocol support. Note that it is
-        **not wired into the framework's shell-integration loader**, so you
-        would set up OSC 7/133 yourself. Install: `sudo apt install
-        alacritty` / `sudo dnf install alacritty`.
+    Kitty enables shell integration from the *terminal* side. For zsh
+    it points `ZDOTDIR` at its own bundled startup directory, sources
+    kitty's `.zshenv`, then restores your `ZDOTDIR` and chains onward.
+    That is precisely the move this framework refuses to allow. The
+    startup contract pivots on `~/.zshenv` owning `ZDOTDIR` and the
+    `conf.d/` chain flowing deterministically from it — and
+    `bootstrap.sh` audits startup files for exactly this class of
+    third-party injection, flagging it `[rogue]`. An emulator that
+    rewrites `ZDOTDIR` to slip its own code into the boot path is the
+    same pattern, blessed by the vendor. No exception.
 
-    !!! warning "Why not Kitty"
+    With `shell_integration no-rc` set, Kitty leaves the launch
+    environment alone and becomes usable here — and
+    `26-terminal-osc.zsh` now supplies the OSC 7/133 marks its UI
+    consumes, so less is lost than before. But you are still turning
+    off the flagship feature and installing a custom-`TERM` emulator
+    (`xterm-kitty` terminfo on every SSH target) to get what Ptyxis
+    ships by default. The protocol lead is real; it does not outweigh
+    keeping the shell startup chain authoritative.
 
-        Kitty is the most protocol-forward emulator on Linux — it authored
-        the graphics and keyboard protocols newer TUIs are adopting — so
-        on a "forward-thinking, not legacy bloat" reading it looks like the
-        obvious pick. The framework passes it over anyway, for one specific
-        reason: **Kitty's zsh integration injects itself by hijacking
-        `ZDOTDIR`.**
+    ---
 
-        Kitty enables shell integration from the *terminal* side. For zsh
-        it does this by pointing `ZDOTDIR` at its own bundled startup
-        directory, sourcing kitty's `.zshenv`, then restoring your
-        `ZDOTDIR` and chaining onward. That is precisely the move this
-        framework refuses to allow. The entire startup contract pivots on
-        `~/.zshenv` owning `ZDOTDIR` and the `conf.d/` chain flowing
-        deterministically from it — and `bootstrap.sh` actively audits
-        startup files for exactly this class of third-party injection,
-        flagging it `[rogue]`. An emulator that rewrites `ZDOTDIR` to slip
-        its own code into the boot path is the same pattern, blessed by the
-        vendor. We do not make an exception for it.
-
-        Kitty offers `shell_integration no-rc`, which leaves the launch
-        environment untouched — and with that set, Kitty is usable here.
-        But it means turning off the one feature Kitty leads on and
-        configuring integration the framework's way regardless, at which
-        point WezTerm is the better-aligned tool with nothing to disable.
-        The protocol lead is real; it does not outweigh keeping the shell
-        startup chain authoritative.
-
-    All three read `$TERM` correctly, support 24-bit color, and work with
-    the framework's tmux configuration without modification. The
-    difference that decides it is integration discipline: only WezTerm
-    integrates without reaching into the boot path.
+    All of these read `$TERM` correctly, support 24-bit color, and
+    work with the framework's tmux configuration unmodified. The
+    deciding line is unchanged: integration happens on the shell's
+    terms — the framework emits, the terminal listens.
 
 ## tmux configuration
 

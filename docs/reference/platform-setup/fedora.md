@@ -205,6 +205,49 @@ sudo chattr +C /var/lib/containers
     tool (Timeshift, snapper, btrbk) — choose one, automate it, and
     test restore before depending on it.
 
+### Swap: pair zram with the disk swap you provisioned
+
+Fedora ships `zram-generator-defaults`, which creates an 8 GB
+compressed-in-RAM swap device (`min(ram, 8192)`) and nothing else.
+If you built the [recommended layout](disk-strategy.md#recommended-development-workstation-layout)
+with a swap LV, verify it is *active* — creating the volume is not
+the same as the installer (or you) adding it to `/etc/fstab`, and
+`swapon --show` listing only `/dev/zram0` is the tell. With zram as
+the sole swap, a 16 GB laptop will hit the kernel OOM killer under a
+tab-heavy browser, and the victim will be whatever has the highest
+`oom_score_adj` — usually VS Code — not the process hogging memory.
+
+```sh
+# 1. Is the disk tier active? Both lines should be present.
+swapon --show
+
+# 2. If only zram0 is listed: activate the LV and persist it.
+#    The UUID comes from `lsblk -f` (FSTYPE swap).
+sudo swapon -p 10 /dev/mapper/vg--workstation-lv--swap
+echo 'UUID=<swap-lv-uuid> none swap defaults,pri=10 0 0' | sudo tee -a /etc/fstab
+
+# 3. Shrink zram to a quarter of RAM, capped at 4G, with zstd.
+#    Heredoc + sudo: run `sudo -v` first so the password prompt gets
+#    the terminal — otherwise the heredoc swallows it and sudo fails
+#    with "a terminal is required to read the password".
+sudo -v
+sudo tee /etc/systemd/zram-generator.conf <<'EOF'
+[zram0]
+zram-size = min(ram / 4, 4096)
+compression-algorithm = zstd
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart systemd-zram-setup@zram0.service   # drains the old device first
+
+# 4. Verify
+swapon --show
+zramctl
+```
+
+Expected end state: `/dev/zram0` at ~¼ RAM with `zstd`, priority 100;
+the disk LV at priority 10. The reasoning — and why zram alone is not
+a backstop — is in [Disk and Partition Strategy → zram](disk-strategy.md#zram).
+
 ## SELinux
 
 Fedora ships with SELinux enforcing. **Leave it enforcing.** Disabling
@@ -408,6 +451,12 @@ Then reload so the new limit takes effect: `sudo systemctl restart
 systemd-journald`.
 
 ## GNOME desktop tuning
+
+The terminal itself needs no installing — Ptyxis is the Fedora
+default and the framework's recommended Linux terminal. Its settings
+are applied by `mise run dotfiles:ptyxis`; the reasoning, tips, and
+the shell-integration story live in
+[Terminal Environment](../../shell-environment/terminal.md).
 
 Fedora Workstation ships GNOME. These are not cosmetic preferences —
 they are settings that affect developer productivity.

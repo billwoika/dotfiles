@@ -11,45 +11,45 @@ min_version = "2026.8.10"
 # docs/tools/package-managers.md for rationale.
 [tools]
 # ── Runtimes ────────────────────────────────────────────────────────
-python = "3.14"       # managed alongside uv
-node   = "lts"        # THE JS runtime (bun is the package manager)
-go     = "latest"     # core:go
-rust   = "stable"     # core:rust — ships cargo, rustc, clippy, rustfmt.
-                      # No separate "cargo" tool exists; the cargo: in the
-                      # registry is a BACKEND for installing crates. Using
-                      # core:rust over rustup also avoids rustup's writes
-                      # to ~/.profile, ~/.bashrc and ~/.zshenv — see
-                      # docs/shell-environment/installer-behavior.md.
+python = "3.14"  # managed alongside uv
+node = "lts"  # THE JS runtime (bun is the package manager)
+go = "latest"  # core:go
+rust = "stable"  # core:rust — ships cargo, rustc, clippy, rustfmt.
+# No separate "cargo" tool exists; the cargo: in the
+# registry is a BACKEND for installing crates. Using
+# core:rust over rustup also avoids rustup's writes
+# to ~/.profile, ~/.bashrc and ~/.zshenv — see
+# docs/shell-environment/installer-behavior.md.
 
 # ── JS/TS ───────────────────────────────────────────────────────────
-bun    = "1.2"        # JS/TS PACKAGE MANAGER, and the npm-backend
-                      # installer (settings.npm.package_manager below).
-                      # Node stays the runtime — bun's runtime breaks
-                      # native bindings; see docs/tools/package-managers.md
-pnpm   = "latest"     # kept for team-repo compatibility; bun is the default
-wrangler = "latest"   # npm: backend -> installed via bun
-biome  = "latest"     # JS/TS linter/formatter
+bun = "1.2"  # JS/TS PACKAGE MANAGER, and the npm-backend
+# installer (settings.npm.package_manager below).
+# Node stays the runtime — bun's runtime breaks
+# native bindings; see docs/tools/package-managers.md
+pnpm = "latest"  # kept for team-repo compatibility; bun is the default
+wrangler = "latest"  # npm: backend -> installed via bun
+biome = "latest"  # JS/TS linter/formatter
 
 # ── Python ──────────────────────────────────────────────────────────
-uv     = "latest"     # Astral's package manager; REQUIRED by every pipx:
-                      # tool below — mise shells out to `uv tool install`
-                      # and does NOT auto-install uv. Do not remove.
-ruff   = "latest"     # Python linter/formatter
+uv = "latest"  # Astral's package manager; REQUIRED by every pipx:
+# tool below — mise shells out to `uv tool install`
+# and does NOT auto-install uv. Do not remove.
+ruff = "latest"  # Python linter/formatter
 cookiecutter = "latest"
 
 # ── Cloud / infra ───────────────────────────────────────────────────
-aws      = "latest"   # THE AWS CLI (aqua:aws/aws-cli). Replaced awscli-local:
-                      # the LocalStack wrapper wasn't actually used. Registry
-                      # names aws/aws-cli/awscli all alias this same entry.
+aws = "latest"  # THE AWS CLI (aqua:aws/aws-cli). Replaced awscli-local:
+# the LocalStack wrapper wasn't actually used. Registry
+# names aws/aws-cli/awscli all alias this same entry.
 awsebcli = "latest"
-awsls    = "latest"
+awsls = "latest"
 # Fully-qualified backend on purpose. The SHORT name resolves down a
 # different code path that demands real pipx ("pipx is required to install
 # ansible but was not found"), while the qualified form correctly uses
 # `uv tool install`. Verified on 2026.8.6.
-"pipx:ansible" = "latest"       # bundle: ships ONLY `ansible-community`
+"pipx:ansible" = "latest"  # bundle: ships ONLY `ansible-community`
 "pipx:ansible-core" = "latest"  # ...the actual CLI (ansible-playbook,
-                                # -galaxy, -vault, +7 more). Both needed.
+# -galaxy, -vault, +7 more). Both needed.
 # gcloud is declared as an http: tool below (after the bare keys) —
 # its registry backends are vfox:/asdf: plugins only, and plugin
 # runtimes are not welcome here (same stance as conda). See the
@@ -65,7 +65,7 @@ mongosh = "latest"
 # registry backends are conda: (mysql-client is conda-ONLY) and heavyweight
 # asdf plugins that build from source. They are system packages instead —
 # see mise/config.{linux,macos}.toml. conda is hard-blocked below.
-mitmproxy = "latest"      # pipx: -> installed via uv
+mitmproxy = "latest"  # pipx: -> installed via uv
 
 # ── Shell / CLI ─────────────────────────────────────────────────────
 # bat/fd/ripgrep/fzf/direnv were distro packages; they moved here
@@ -73,22 +73,38 @@ mitmproxy = "latest"      # pipx: -> installed via uv
 # binaries, no plugin runtime). The platform-setup pages no longer
 # list them. All shell wiring (direnv hook, fzf init) is command -v
 # guarded, so nothing breaks in the window before mise installs them.
-bat     = "latest"    # aqua:sharkdp/bat
-fd      = "latest"    # aqua:sharkdp/fd
-ripgrep = "latest"    # aqua:BurntSushi/ripgrep; provides `rg`
-fzf     = "latest"    # aqua:junegunn/fzf
-direnv  = "latest"    # aqua:direnv/direnv; hooked in conf.d/70-tools.zsh
-github-cli = "latest"     # canonical name; "gh" is an alias
-1password  = "latest"     # aliases: 1password-cli, op
-claude     = "latest"     # canonical; "claude-code" is an ALIAS of this
-                          # same entry — declaring both installs it twice
-jq       = "latest"
-delta    = "latest"   # syntax-highlighting git pager
-lefthook = "latest"   # git hook runner
-tmux     = "latest"   # terminal multiplexer
+bat = "latest"  # aqua:sharkdp/bat
+fd = "latest"  # aqua:sharkdp/fd
+ripgrep = "latest"  # aqua:BurntSushi/ripgrep; provides `rg`
+fzf = "latest"  # aqua:junegunn/fzf
+direnv = "latest"  # aqua:direnv/direnv; hooked in conf.d/70-tools.zsh
+github-cli = "latest"  # canonical name; "gh" is an alias
+# 1password (op) is deliberately NOT here on Linux. Desktop-app
+# integration requires the op binary to be group onepassword-cli with
+# the setgid bit — the CLI's rpm/deb sets that; a user-owned mise
+# install cannot hold it (perms reset on every upgrade), and the app
+# refuses the connection ("connecting to desktop app: read: connection
+# reset"). It is a system package in mise/config.linux.toml instead —
+# same stance as ffmpeg. On macOS the app checks the binary's code
+# signature, which the official zip keeps, so mise CAN own op there:
+# declared in mise/config.macos.toml [tools].
+claude = "latest"  # canonical; "claude-code" is an ALIAS of this same
+                   # entry — declaring both installs it twice. Provenance:
+                   # aqua resolves to Anthropic's official GitHub releases
+                   # (github.com/anthropics/claude-code), sha256-pinned in
+                   # mise.lock — same artifacts the claude.ai installer
+                   # ships. Claude's self-updater cannot manage a
+                   # mise-owned install (it never writes here), so updates
+                   # arrive ONLY via `mise upgrade claude` — run it when
+                   # the version nag appears.
+# same entry — declaring both installs it twice
+jq = "latest"
+delta = "latest"  # syntax-highlighting git pager
+lefthook = "latest"  # git hook runner
+tmux = "latest"  # terminal multiplexer
 shellcheck = "latest"
-usage    = "latest"   # required by mise's shell completions
-pandoc   = "latest"
+usage = "latest"  # required by mise's shell completions
+pandoc = "latest"
 
 # rv delivers the Ruby toolchain; mise only delivers the rv binary.
 # Not in the registry — resolved from GitHub releases. Per
@@ -110,9 +126,9 @@ version = "581.0.0"
 bin_path = "google-cloud-sdk/bin"
 
 [tools."http:gcloud".platforms]
-linux-x64   = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-linux-x86_64.tar.gz" }
+linux-x64 = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-linux-x86_64.tar.gz" }
 linux-arm64 = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-linux-arm.tar.gz" }
-macos-x64   = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-darwin-x86_64.tar.gz" }
+macos-x64 = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-darwin-x86_64.tar.gz" }
 macos-arm64 = { url = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-581.0.0-darwin-arm.tar.gz" }
 
 [settings]
@@ -198,7 +214,7 @@ lockfile = true
 
 # Show informative status output on cd but suppress for scripts.
 status.show_tools = true
-status.show_env   = false
+status.show_env = false
 
 [env]
 # Deliberately empty of EDITOR/VISUAL/LANG: the shell startup chain
@@ -220,22 +236,22 @@ status.show_env   = false
 # detected from /Applications, and [dotfiles] has NO conditional support
 # (os/platform/when/enable all parse and are silently ignored).
 [dotfiles]
-"~/.zshenv"                   = { source = "~/development/personal/repos/dotfiles/zsh/zshenv" }
-"~/.config/zsh/.zshenv"       = { source = "~/development/personal/repos/dotfiles/zsh/.zshenv" }
-"~/.config/zsh/.zprofile"     = { source = "~/development/personal/repos/dotfiles/zsh/.zprofile" }
-"~/.config/zsh/.zshrc"        = { source = "~/development/personal/repos/dotfiles/zsh/.zshrc" }
-"~/.config/zsh/.zlogout"      = { source = "~/development/personal/repos/dotfiles/zsh/.zlogout" }
+"~/.zshenv" = { source = "~/development/personal/repos/dotfiles/zsh/zshenv" }
+"~/.config/zsh/.zshenv" = { source = "~/development/personal/repos/dotfiles/zsh/.zshenv" }
+"~/.config/zsh/.zprofile" = { source = "~/development/personal/repos/dotfiles/zsh/.zprofile" }
+"~/.config/zsh/.zshrc" = { source = "~/development/personal/repos/dotfiles/zsh/.zshrc" }
+"~/.config/zsh/.zlogout" = { source = "~/development/personal/repos/dotfiles/zsh/.zlogout" }
 # symlink-each so conf.d can also hold fragments mise doesn't manage
-"~/.config/zsh/conf.d"        = { source = "~/development/personal/repos/dotfiles/zsh/conf.d", mode = "symlink-each" }
-"~/.profile"                  = { source = "~/development/personal/repos/dotfiles/profile" }
-"~/.config/mise/config.toml"  = { source = "~/development/personal/repos/dotfiles/mise/config.toml" }
-"~/.config/mise/miserc.toml"  = { source = "~/development/personal/repos/dotfiles/mise/miserc.toml" }
-"~/.config/direnv/direnvrc"   = { source = "~/development/personal/repos/dotfiles/direnv/direnvrc" }
-"~/.config/git/config"        = { source = "~/development/personal/repos/dotfiles/git/config" }
-"~/.config/git/ignore"        = { source = "~/development/personal/repos/dotfiles/git/ignore" }
-"~/.config/git/attributes"    = { source = "~/development/personal/repos/dotfiles/git/attributes" }
-"~/.config/tmux/tmux.conf"    = { source = "~/development/personal/repos/dotfiles/tmux/tmux.conf" }
-"~/.vim/vimrc"                = { source = "~/development/personal/repos/dotfiles/vim/vimrc" }
+"~/.config/zsh/conf.d" = { source = "~/development/personal/repos/dotfiles/zsh/conf.d", mode = "symlink-each" }
+"~/.profile" = { source = "~/development/personal/repos/dotfiles/profile" }
+"~/.config/mise/config.toml" = { source = "~/development/personal/repos/dotfiles/mise/config.toml" }
+"~/.config/mise/miserc.toml" = { source = "~/development/personal/repos/dotfiles/mise/miserc.toml" }
+"~/.config/direnv/direnvrc" = { source = "~/development/personal/repos/dotfiles/direnv/direnvrc" }
+"~/.config/git/config" = { source = "~/development/personal/repos/dotfiles/git/config" }
+"~/.config/git/ignore" = { source = "~/development/personal/repos/dotfiles/git/ignore" }
+"~/.config/git/attributes" = { source = "~/development/personal/repos/dotfiles/git/attributes" }
+"~/.config/tmux/tmux.conf" = { source = "~/development/personal/repos/dotfiles/tmux/tmux.conf" }
+"~/.vim/vimrc" = { source = "~/development/personal/repos/dotfiles/vim/vimrc" }
 
 # ── Tasks ───────────────────────────────────────────────────────────
 # Global tasks: visible from any directory via `mise tasks ls`.
@@ -278,6 +294,33 @@ check zsh         "dnf:zsh / apt:zsh; the login shell"
 check git         "precedes mise entirely — install via the system package manager"
 check gh          "github-cli; 'gh auth login' raises the GitHub API limit 60 -> 5000/hr"
 exit "$status"
+"""
+
+[tasks."dotfiles:ptyxis"]
+description = "Apply the framework's Ptyxis terminal defaults (GNOME hosts)"
+# Idempotent: applies the settings documented in
+# docs/shell-environment/terminal.md to the app schema and the CURRENT
+# default profile. Deliberately untouched: font, palette, opacity,
+# interface-style — those are personal; the task prints hints instead.
+run = """
+#!/usr/bin/env bash
+set -eu
+command -v gsettings >/dev/null 2>&1 || { echo "gsettings not found — not a GNOME host; skipping."; exit 0; }
+gsettings list-schemas 2>/dev/null | grep -qx org.gnome.Ptyxis || { echo "Ptyxis not installed; skipping."; exit 0; }
+app() { gsettings set org.gnome.Ptyxis "$1" "$2"; printf '  app     %-18s -> %s\n' "$1" "$2"; }
+uuid=$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")
+prof() { gsettings set "org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/$uuid/" "$1" "$2"; printf '  profile %-18s -> %s\n' "$1" "$2"; }
+echo "Applying Ptyxis defaults (profile $uuid)..."
+app  audible-bell      false     # visual-bell stays on; sound is noise
+app  cursor-blink-mode "'off'"   # steady block: position at a glance
+app  text-blink-mode   "'never'" # no flashing TUI text
+prof limit-scrollback  true
+prof scrollback-lines  100000    # match the 100k tmux/iTerm2 history
+prof preserve-directory "'safe'" # honor OSC 7 from 26-terminal-osc.zsh
+echo "Done. Not touched (personal): font, palette, opacity, interface-style."
+echo "  Nerd Font hint: gsettings set org.gnome.Ptyxis use-system-font false &&"
+echo "                  gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 13'"
+echo "  Capture full state: dconf dump /org/gnome/Ptyxis/"
 """
 
 [tasks."dotfiles:doctor"]

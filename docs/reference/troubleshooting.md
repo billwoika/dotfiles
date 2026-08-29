@@ -141,6 +141,91 @@ direnv status     # or: ds (alias)
 - **mise handling the env.** If you moved env vars to `mise.toml`'s
   `[env]` block, direnv is no longer needed for those variables.
 
+## op cannot talk to the 1Password desktop app
+
+**Symptom:** `op whoami` (or any op command) fails with
+`connecting to desktop app: read: connection reset`, even though the
+desktop app is running and "Integrate with 1Password CLI" is enabled
+in Settings → Developer.
+
+**Cause:** on Linux the app verifies the *calling binary* before
+accepting the connection: `op` must be group `onepassword-cli` with
+the setgid bit (`-rwxr-sr-x root onepassword-cli`). The CLI's own
+rpm/deb sets this; a mise/aqua-installed `op` is plain user-owned and
+gets rejected. Worse, a mise `[tools]` entry *shadows* a correctly
+installed `/usr/bin/op` because mise's install paths precede system
+paths — so adding op to mise can break an integration that worked.
+
+**Diagnostic:**
+
+```sh
+command -v op            # mise path = shadowed; /usr/bin/op = system
+ls -l /usr/bin/op        # want: -rwxr-sr-x ... root onepassword-cli
+rpm -qf /usr/bin/op      # want: 1password-cli-<version>
+```
+
+**Fix:** op is a system package on Linux in this framework
+(`mise/config.linux.toml`), NOT a `[tools]` entry — see the comment in
+`mise/config.toml` for why. If a mise copy exists, remove it:
+
+```sh
+mise uninstall --all 1password && mise reshim
+sudo dnf install 1password-cli      # Fedora: repo ships with the desktop rpm
+command -v op                       # now /usr/bin/op
+op whoami                           # "account is not signed in" = integration OK; sign in via the app prompt
+```
+
+(macOS is different: the app checks the binary's code signature, which
+the official zip keeps, so mise owns op there — `mise/config.macos.toml`.)
+
+## Applications are OOM-killed while memory looks fine
+
+**Symptom:** VS Code (or another Electron app) dies mid-session,
+sometimes several times a day. `free -h` afterwards shows several GB
+available. `journalctl -k | grep -i 'out of memory'` confirms the
+kernel OOM killer fired, and the process it names is the one that
+died — not the one that ate the memory.
+
+**Diagnostic:** the kernel logs a full task table at each kill. Read
+it, rather than guessing from the current state of the machine:
+
+```sh
+# When did it fire, and who got killed?
+journalctl -k --since today | grep -E 'Out of memory|oom-kill'
+
+# Who was actually holding memory at that moment? Sum the task
+# table by process name (rss and swap columns are in pages; ×4/1024 = MB).
+T='2026-08-22 15:36'   # minute of the kill, from the line above
+journalctl -k --since "$T:00" --until "$T:59" -o cat \
+  | grep -E '^\[ *[0-9]+\]' | sed 's/[][]/ /g' \
+  | awk 'NF>=12 {r[$12]+=$5*4/1024; s[$12]+=$10*4/1024; n[$12]++}
+         END {for (k in r) printf "%7.0f MB rss %7.0f MB swap  x%-3d %s\n", r[k], s[k], n[k], k}' \
+  | sort -rn | head
+
+# Is swap real, or only zram (compressed RAM)?
+swapon --show
+zramctl
+```
+
+**Common causes:**
+
+- **zram is the only swap.** Fedora's default `zram-generator` gives
+  you 8 GB of compressed-in-RAM swap and no disk tier, so pressure
+  goes straight to the OOM killer. A swap LV that exists but is not in
+  `/etc/fstab` does not count. Fix: activate disk swap behind a smaller
+  zram — see [Fedora → Swap](platform-setup/fedora.md#swap-pair-zram-with-the-disk-swap-you-provisioned)
+  and the reasoning in [Disk Strategy → zram](platform-setup/disk-strategy.md#zram).
+- **The killed process is the scapegoat.** The OOM killer picks by
+  `oom_score_adj`; Electron renderers run at 300, so VS Code is chosen
+  over a browser that is holding five times as much. In the task table
+  above, look for `Isolated` (Firefox content processes) or `chrome`
+  helpers summing to many GB across dozens of processes.
+- **Orphaned sessions.** Long-lived `claude`, language servers or
+  Jupyter kernels in directories that no longer exist still hold their
+  RSS (and swap). `ps -eo pid,etime,rss,args --sort=-rss | head` and
+  `readlink /proc/<pid>/cwd` — a `(deleted)` suffix means it is safe to
+  close.
+
 ## Rogue shell injections after tool install
 
 **Symptom:** `bootstrap.sh` audit reports `[rogue]` entries.

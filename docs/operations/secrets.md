@@ -45,6 +45,17 @@ Manager, Vault, sops + age — but the specific commands change. The
 principle (resolve at use time, not at file-edit time) is what
 matters.
 
+!!! warning "How op is installed matters"
+
+    On Linux, desktop-app integration requires the `op` binary to be
+    setgid `onepassword-cli` — only the CLI's own rpm/deb holds that
+    across upgrades, so op is a **system package** here
+    (`mise/config.linux.toml`), never a mise `[tools]` entry. A mise
+    copy would shadow `/usr/bin/op` on PATH and break the integration
+    with `connection reset`. On macOS the app checks the code
+    signature instead, and mise owns op (`mise/config.macos.toml`).
+    See [Troubleshooting](../reference/troubleshooting.md#op-cannot-talk-to-the-1password-desktop-app).
+
 ## The `op://` reference pattern
 
 A 1Password reference looks like:

@@ -163,7 +163,7 @@ and toolchains, and the need to resize without reinstalling.
 | `/` (root) | 30-50G | OS, system packages | Rarely grows past 30G on a well-maintained system |
 | `/var` | 100-200G | Docker images, containers, logs, package caches, databases | **This is the one that will fill.** Size generously. |
 | `/home` | 200-400G | Source code, toolchains, user config | Grows steadily; extend as needed |
-| swap | RAM size or 16G | Hibernate support, OOM safety | Match RAM if hibernate is used; 16G otherwise |
+| swap | RAM size or 16G | Hibernate support, OOM safety | Match RAM if hibernate is used; 16G otherwise. Must be *activated* (fstab), not just created — zram alone is not a backstop; see [Swap strategy](#swap-strategy) |
 | (free) | 20-40% of disk | Unallocated VG space | **The safety margin.** Never allocate 100%. |
 
 The 20-40% free space in the volume group is not wasted. It is
@@ -625,26 +625,74 @@ hibernate.
 ### zram
 
 zram creates a compressed block device in RAM. Writes to zram are
-compressed and stored in memory — there is no disk I/O. zram
-provides a swap-like pressure relief valve without the performance
-cost of disk-backed swap.
+compressed and stored in memory — there is no disk I/O. It is a fast
+first tier for cold pages, and Fedora enables it by default (since
+Fedora 33). Ubuntu does not, but `zram-tools` or `systemd-zram-setup`
+can enable it.
 
-Fedora enables zram by default (since Fedora 33). Ubuntu does not,
-but `zram-tools` or `systemd-zram-setup` can enable it.
+**What zram is not: a backstop.** Every page "swapped" to zram still
+occupies physical RAM, just compressed (roughly 2:1 with the default
+`lzo-rle`). When zram is the *only* swap, the kernel has nowhere real
+to page to — memory pressure goes from "compress into RAM" straight
+to the OOM killer. And Fedora's default size, `min(ram, 8192)` MiB,
+is calibrated for big-memory desktops: on a 16 GB laptop it lets the
+compressed tier reserve up to half of physical RAM under pressure.
+
+The failure mode is counter-intuitive because the OOM killer does not
+kill the process that caused the pressure. It kills the highest
+`oom_score_adj`, and Electron renderers (VS Code, Slack, browsers'
+helper processes) run at 300 — so a Firefox session holding 8 GB in
+content processes gets *VS Code* killed, repeatedly, while `free`
+looks survivable. See
+[Troubleshooting](../troubleshooting.md#applications-are-oom-killed-while-memory-looks-fine)
+for how to read the kernel's task dump and find the real consumer.
+
+**The right shape is both tiers:** a small zram at high priority for
+the cheap hits, and disk-backed swap at low priority behind it. The
+kernel fills the higher-priority device first, so zram absorbs the
+first few GB of cold pages, then spills to NVMe instead of killing.
 
 ```bash
-# Check if zram is active
+# Check what is actually active — this is the step people skip.
+# A swap LV or file that exists but is not in /etc/fstab is not swap.
 swapon --show
-# NAME       TYPE      SIZE  USED PRIO
-# /dev/zram0 partition   8G  1.2G    5
+# NAME       TYPE       SIZE USED PRIO
+# /dev/zram0 partition  3.8G 1.2G  100   <- compressed tier, fast
+# /dev/dm-3  partition 14.9G   0B   10   <- disk tier, the backstop
 
-# zram configuration (Fedora)
-cat /etc/systemd/zram-generator.conf
+# Activate a disk swap LV that was provisioned but never wired up
+sudo swapon -p 10 /dev/vg-workstation/lv-swap
+# ...and make it permanent. Use the UUID (lsblk -f shows it) — device
+# mapper names are stable, but UUIDs survive a VG rename.
+echo 'UUID=<uuid-of-lv-swap> none swap defaults,pri=10 0 0' | sudo tee -a /etc/fstab
+
+# Shrink zram to a quarter of RAM (capped at 4G) and use zstd, which
+# compresses tighter than lzo-rle — the right trade on a machine that
+# actually swaps. This is zram-generator's own upstream guidance for
+# hosts that also have disk swap.
+sudo tee /etc/systemd/zram-generator.conf <<'EOF'
+[zram0]
+zram-size = min(ram / 4, 4096)
+compression-algorithm = zstd
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart systemd-zram-setup@zram0.service
 ```
 
-**zram does not support hibernate.** If hibernate is needed, a
-disk-backed swap partition or file is required in addition to or
-instead of zram.
+The restart runs `swapoff` on the old zram device first, which has to
+relocate everything it holds into free RAM or the disk tier. Do it
+with the disk tier already active and not in the middle of a heavy
+session; if `swapoff` cannot find room it fails harmlessly and the
+new size applies on the next boot.
+
+Sizing the disk tier: the 16 GB row in the
+[recommended layout](#recommended-development-workstation-layout)
+assumes it is *active*. On a 16 GB laptop, 8–16 GB of real swap
+behind a ~4 GB zram turns a tab-heavy browser into a slowdown rather
+than a kill.
+
+**zram does not support hibernate.** If hibernate is needed, the
+disk-backed partition or file is required for that reason too.
 
 ## Encryption layout
 
