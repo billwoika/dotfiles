@@ -13,9 +13,11 @@ credential reaches which system).
 
 ## In this section
 
-- **[Secrets](secrets.md)** — 1Password as the primary store, direnv
-  for project-scoped credential loading, the `op://` reference
-  pattern, and how this composes with Vault and sops.
+- **[Secrets](secrets.md)** — the three-axis model: backends
+  (1Password primary; Vault, sops, keychain), orchestration (op
+  plugins, mise `[env]`, `op run`, direnv), and scope (identity vs
+  subtree vs project vs invocation), plus the `op://` reference
+  pattern that ties them together.
 - **[SSH and Key Management](ssh.md)** — Ed25519 keys, the
   `~/.ssh/config` reference, ssh-agent and 1Password agent, connection
   multiplexing, host aliases for multi-identity use, and ProxyJump.
@@ -34,7 +36,8 @@ disk where backups, sync tools, and laptop theft can leak them.
 
 **Project-level configuration travels with the project.** The
 patterns that make a project work — its `mise.toml`, its
-`.envrc.template`, its `compose.yml`, its devcontainer — should be
+`.envrc.example` and `.envrc.op`, its `compose.yml`, its
+devcontainer — should be
 in the repo. Engineers cloning the repo should be able to get to a
 working development environment from `git clone` plus a documented
 setup command, with credentials as the only thing they need to
