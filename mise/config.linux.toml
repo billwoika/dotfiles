@@ -34,3 +34,11 @@
 "apt:imagemagick"          = "latest"
 "dnf:mysql"                = "latest"   # provides the mysql client
 "apt:default-mysql-client" = "latest"
+# op must be the CLI's own package, not a mise tool: desktop-app
+# integration verifies the binary is setgid onepassword-cli, which only
+# a root-owned install can hold across upgrades (see mise/config.toml).
+# Fedora: the 1password desktop rpm ships /etc/yum.repos.d/1password.repo,
+# so this resolves from the same repo. Debian/Ubuntu: requires
+# 1Password's apt repo (installed alongside the desktop .deb).
+"dnf:1password-cli"        = "latest"
+"apt:1password-cli"        = "latest"

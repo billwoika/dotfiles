@@ -113,9 +113,13 @@ bin/
 pkg/
 
 # ── Environment and secrets ──────────────────────────────────────────
+# .envrc is per-developer, copied from the committed .envrc.example;
+# it should hold only helper calls and references, but ignoring it is
+# free insurance against a value slipping in.
 .env
 .env.local
 .env.*.local
+.envrc
 .envrc.local
 .envrc.secrets
 *.pem

@@ -25,3 +25,10 @@
 "brew:ffmpeg"        = "latest"
 "brew:imagemagick"   = "latest"
 "brew:mysql-client"  = "latest"
+
+# op lives in [tools] on macOS only: the app verifies the binary's code
+# signature (intact in the official zip aqua downloads), not file perms,
+# so a mise-owned install integrates fine. On Linux it must be a system
+# package — see mise/config.toml and config.linux.toml.
+[tools]
+1password = "latest"   # aliases: 1password-cli, op

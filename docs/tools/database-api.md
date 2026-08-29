@@ -42,8 +42,9 @@ directly:
 
 All clients support reading from environment variables (`PGPASSWORD`
 for Postgres, `MYSQL_PWD` for MySQL). If you launch the client from a
-shell where direnv has loaded the environment via `use_1password`, the
-password is in env vars and the client picks it up.
+project directory where mise (or a direnv helper) has resolved the
+credential's `op://` reference into the environment, the password is
+in env vars and the client picks it up.
 
 ### What not to do
 

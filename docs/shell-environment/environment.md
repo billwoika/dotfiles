@@ -2,17 +2,21 @@
 
 Environment variable management for local development has two
 legitimate concerns: non-secret project configuration (which belongs
-under source control) and secrets (which never do). This framework
-solves both with a layered approach:
+under source control as values) and secrets (which belong under
+source control only as *references* — see
+[Secrets](../operations/secrets.md) for the full backend /
+orchestration / scope model). This framework solves both with one
+primary layer and one escape hatch:
 
-- **mise's `[env]` block** is the primary layer for non-secret project
-  configuration. Fast, declarative, and committed to the repo.
-- **mise's `_.file = ".env.local"`** pulls in developer-local dotenv
-  values without direnv involvement for most cases.
+- **mise's `[env]` block** is the primary layer for project
+  environment — non-secret values directly, secrets as vault
+  references resolved at environment-computation time.
+- **mise's `_.file`** pulls in dotenv-style files, including
+  sops-encrypted ones, which mise decrypts natively.
 - **direnv** is a thin optional layer on top, used only when the
-  loading logic is complex enough to require `sh` execution —
-  1Password CLI integration, age-encrypted file decryption, dynamic
-  AWS profile selection, or team-specific shell helpers.
+  loading logic genuinely requires `sh` execution — dynamic AWS
+  profile selection, conditional construction, team helper
+  functions.
 
 !!! note "The old proto > direnv split"
 
@@ -22,20 +26,21 @@ solves both with a layered approach:
     `layout_rv` in `direnvrc`. mise subsumes most of this. The
     `layout_uv` function is replaced by mise's
     `python.uv_venv_auto` setting; `use_proto` is replaced by `mise
-    activate`; basic env vars move from direnv's bash layer to mise's
-    TOML `[env]` section. direnv stays, but its job shrinks to the
-    cases where bash execution is actually useful.
+    activate`; env vars — secret and non-secret alike — move from
+    direnv's bash layer to mise's TOML `[env]` section. direnv
+    stays, but its job shrinks to the cases where bash execution is
+    actually useful.
 
 ## Defining environment variables in mise.toml
 
-For any non-secret project configuration, mise is the simplest path.
-The `[env]` block in `mise.toml` is TOML-native, fast (no sh
-subprocess), and committed to version control alongside tool versions.
+For project configuration, mise is the simplest path. The `[env]`
+block in `mise.toml` is TOML-native, fast, and committed to version
+control alongside tool versions.
 
 ```toml
 # mise.toml — [env] block examples
 [env]
-# Static values
+# Static non-secret values
 APP_ENV       = "development"
 LOG_LEVEL     = "debug"
 DATABASE_URL  = "postgres://localhost:5432/myapp_dev"
@@ -46,7 +51,7 @@ PROJECT_ROOT  = "{{config_root}}"
 PROJECT_NAME  = "{{config_root | basename}}"
 
 # File-based values
-_.file = ".env"            # loads .env from the project root
+_.file = ".env"                  # loads .env from the project root
 _.file = [".env", ".env.local"]  # multiple, later ones override
 
 # Python venv auto-activation
@@ -56,35 +61,68 @@ _.python.venv = { path = ".venv", create = true }
 _.path = ["./bin", "./scripts"]
 ```
 
+## Secrets in mise
+
+Secrets ride the same `[env]` block as references — the committed
+file names the credential; the vault holds the value:
+
+```toml
+[env]
+# Resolve a 1Password reference when the environment is computed;
+# cache_duration avoids re-running op on every prompt.
+GITHUB_TOKEN = "{{ exec(command='op read op://Personal/GitHub Token/credential', cache_duration='1h') }}"
+
+# sops-encrypted file (age), decrypted natively by mise.
+_.file = { path = ".env.json", redact = true }
+```
+
+The framework pre-configures mise's native sops support
+(`sops.rops`, `sops.strict`, `age.strict` in `mise/config.toml`).
+`redact = true` — or a top-level `redactions = ["*_TOKEN"]` list —
+keeps resolved values out of task output.
+
+Which secrets belong in a *project* `mise.toml` versus a subtree
+config versus no environment variable at all is a scope question —
+see [Secrets: scope](../operations/secrets.md#axis-3-scope). The
+short version: identity credentials (your GitHub token) should be
+resolved by the consuming tool via op plugins, not exported;
+subtree-wide variables go in a parent-directory `mise.toml` (mise
+merges configs from `/` down to the current directory); only the
+project's own configuration goes in the project file.
+
 ## Layering in .env.local
 
-For developer-local values (personal API keys, local database paths,
-toggle flags), use `.env.local` loaded via mise's `_.file` directive.
-This file is never committed — it lives in your global `.gitignore`.
-mise loads it on entry into the directory.
+`.env.local` is for developer-local configuration that isn't
+sensitive in the first place — runtime flags, ports, base URLs,
+local paths. It's loaded via mise's `_.file` directive and never
+committed (it's per-developer, not secret): it lives in your global
+`.gitignore`, and mise loads it on entry into the directory.
+
+`.env.local` is not a secrets channel. If a value would be a
+problem in a git history or a screen share, it isn't `.env.local`
+material — it goes in the vault and is referenced from committed
+files (see [Secrets](../operations/secrets.md)).
 
 Provide an `.env.local.example` file committed to the repository that
-lists every required variable with placeholder values and
-documentation. This is the contract between the team and each
-developer's local environment:
+lists every variable the project honors, with placeholder values and
+documentation:
 
 ```sh
-# .env.local.example  (committed — template only, no real values)
+# .env.local.example  (committed — copy to .env.local and adjust)
 # ────────────────────────────────────────────────────────────────
-# Copy this file to .env.local and fill in your credentials.
-# NEVER commit .env.local.
+# Non-sensitive local configuration only. Credentials are NOT set
+# here — they resolve from 1Password via the references in
+# mise.toml (see docs/operations/secrets.md).
 # ────────────────────────────────────────────────────────────────
 
-# Application secrets
-APP_SECRET_KEY=<generate with: openssl rand -hex 32>
+# Runtime flags and local overrides
+APP_PORT=3000
+LOG_LEVEL=debug
+FEATURE_NEW_CHECKOUT=false
 
-# External service credentials
-API_TOKEN_EXTERNAL=<from team secrets vault>
-STRIPE_SECRET_KEY=<from Stripe dashboard — test mode key>
-
-# API keys
-OPENAI_API_KEY=<your personal key from platform.openai.com>
-ANTHROPIC_API_KEY=<your personal key from console.anthropic.com>
+# Local service endpoints
+API_BASE_URL=http://localhost:8080
+WEBHOOK_TUNNEL_URL=<your ngrok/cloudflared URL>
 ```
 
 !!! info "Trust semantics"
@@ -101,57 +139,42 @@ ANTHROPIC_API_KEY=<your personal key from console.anthropic.com>
 
 ## When to use direnv
 
-direnv is retained for cases where mise's declarative TOML is
-insufficient:
+direnv is retained for the cases where the loading logic is genuine
+shell code rather than a declarative reference:
 
-- **Secret loading from external vaults** — `op inject` (1Password),
-  `aws-vault exec`, `sops -d` (age-encrypted files), or `pass show`.
-  These require running a command and capturing its output — outside
-  mise's TOML model.
-- **Dynamic cloud-credential selection** — setting `AWS_PROFILE` based
-  on the git branch, current IAM role, or a `.aws/config` lookup.
+- **Dynamic cloud-credential selection** — setting `AWS_PROFILE`
+  based on the git branch, current IAM role, or a `.aws/config`
+  lookup.
 - **Complex conditional env construction** — anything that involves
   branching, loops, or multi-line sh logic.
-- **Team-standard helper libraries** — functions like `use_1password`,
-  `source_secrets`, `use_aws_profile` that multiple projects reuse
+- **Team-standard helper libraries** — functions like
+  `use_1password`, `use_aws_profile` that multiple projects reuse
   via `direnvrc`.
+
+Plain secret loading is **not** on this list anymore: `op read`,
+sops decryption, and static references are all handled by mise's
+`[env]` directly. If your `.envrc` would contain nothing but
+exports, delete it and use `mise.toml`.
 
 ## Global direnvrc for complex loaders
 
-When direnv is used, its configuration goes in
-`~/.config/direnv/direnvrc` and defines reusable helper functions.
-This file is committed to the dotfiles repository.
+When direnv is used, its helper library lives at
+`~/.config/direnv/direnvrc` — shipped as
+[`direnv/direnvrc`](https://github.com/billwoika/dotfiles/blob/master/direnv/direnvrc)
+in this repository, which is the source of truth (the excerpt below
+is illustrative). It provides:
+
+- `use_1password [vault]` — renders a committed `.envrc.op`
+  reference file via `op inject`.
+- `op_var VAR "op://…"` — load a single variable via `op read`.
+- `use_vault VAR path field` — HashiCorp Vault lookup.
+- `use_sops [file]` — decrypt an age/sops-encrypted env file.
+- `use_keychain VAR service` — macOS Keychain / Linux Secret
+  Service lookup.
+- `use_aws_profile` — `AWS_PROFILE` by git branch.
 
 ```sh
-# ~/.config/direnv/direnvrc
-# ─────────────────────────────────────────────────────────────────────
-# Standard library for project .envrc files.
-# Scope: secret loading and other sh-script-native patterns. Basic
-# env vars and venv activation live in mise.toml.
-# ─────────────────────────────────────────────────────────────────────
-
-# ── 1Password CLI integration ───────────────────────────────
-# Usage in .envrc:  use_1password dev
-use_1password() {
-  local vault="${1:-dev}"
-  if command -v op &>/dev/null && op account list &>/dev/null; then
-    log_status "Loading secrets from 1Password vault: $vault"
-    eval "$(op inject -i .envrc.op 2>/dev/null || true)"
-  else
-    log_error "1Password CLI not available or not authenticated. Run: op signin"
-  fi
-}
-
-# ── age-encrypted secrets via sops ────────────────────────────
-# Usage in .envrc:  use_sops secrets.enc.env
-use_sops() {
-  local file="${1:-secrets.enc.env}"
-  if command -v sops &>/dev/null && [[ -f "$file" ]]; then
-    eval "$(sops -d "$file")"
-  fi
-}
-
-# ── AWS profile by branch ──────────────────────────────────
+# ── AWS profile by branch (the canonical "actually needs sh" case) ──
 # Usage in .envrc:  use_aws_profile
 use_aws_profile() {
   local branch
@@ -165,11 +188,14 @@ use_aws_profile() {
 }
 ```
 
-A project `.envrc` using these helpers is then minimal and declarative:
+A project using these helpers commits an `.envrc.example` naming
+the team-agreed helper calls; each developer copies it to a
+gitignored `.envrc` (and `direnv allow`s it). Both stay minimal
+and declarative — helper calls and references, never values:
 
 ```sh
-# .envrc  (committed — calls helpers from direnvrc)
-# mise handles tool versions and basic env vars; direnv handles secrets.
+# .envrc.example  (committed — copy to .envrc after cloning)
+# mise handles tool versions and env vars; direnv handles sh logic.
 use_1password dev
 use_aws_profile
 ```
@@ -177,14 +203,21 @@ use_aws_profile
 ## Global .gitignore requirements
 
 Add the following to your global gitignore. This provides a backstop
-beyond any per-project `.gitignore` — these files are never committed
-regardless of whether a project maintainer forgot to add them:
+beyond any per-project `.gitignore` (kept in sync with
+`gitignore.example` and
+[Secrets](../operations/secrets.md#what-gitignore-should-always-have))
+— these files are never committed regardless of whether a project
+maintainer forgot to add them:
 
 ```gitignore
-# mise & direnv local overrides (developer-local secrets)
+# mise & direnv local overrides (developer-local values)
+.env
 .env.local
+.envrc
 .envrc.local
 .envrc.secrets
+mise.local.toml
+.mise.local.toml
 
 # direnv build artifacts
 .direnv/
@@ -198,3 +231,6 @@ Thumbs.db
 *.swp
 *.swo
 ```
+
+Committed by design (references only, no values): `mise.toml`,
+`.envrc.example`, `.envrc.op`, and sops ciphertext files.

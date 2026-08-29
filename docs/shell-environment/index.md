@@ -29,8 +29,8 @@ prioritizes three things:
 - **[POSIX Profile](posix-profile.md)** — the `~/.profile`
   compatibility shim for non-zsh subprocesses.
 - **[Environment Layer](environment.md)** — mise's `[env]` block for
-  project config, `.env.local` for developer secrets, and direnv for
-  complex loading.
+  project config and secret references, `.env.local` for developer
+  overrides, and direnv for sh-logic loading.
 - **[Performance](performance.md)** — profiling with `zprof`, lazy
   eval, and per-component benchmark targets.
 - **[Installer Behavior](installer-behavior.md)** — how tool
