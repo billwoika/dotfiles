@@ -259,6 +259,80 @@ that tracks its debt and makes explicit decisions about it is in a
 fundamentally different position from a team that accumulates debt
 without awareness and discovers it during an incident.
 
+### The interest rate is not constant
+
+The "let it ride" arithmetic above assumes the interest rate is
+fixed: two hours per quarter now, two hours per quarter in three
+years. Some debt does not behave that way. Its interest rate is a
+function of something that grows — row count, traffic, tenants,
+integrations — and a cost that was negligible at launch becomes
+ruinous at scale without anyone changing a line of code.
+
+An example. PostgreSQL's autovacuum decides when to clean up a
+table's dead rows using a scale factor: by default it waits until
+dead tuples exceed 20% of the table (plus a fixed threshold of 50)
+before vacuuming. RDS inherits this default. A team running a
+transactional workload on RDS PostgreSQL never looked at it, because
+there was no reason to. At ten thousand rows, autovacuum fired after
+two thousand dead tuples — many times a day. The tables were clean,
+the planner statistics were fresh, and the default was, at that
+size, correct.
+
+The tables grew. Hundreds of thousands of rows, then millions, then
+approaching billions. The threshold grew with them: 20% of a billion
+rows is two hundred million dead tuples that must accumulate before
+autovacuum runs at all. Functionally, autovacuum stopped running on
+the tables that needed it most. Dead rows piled up in the heap and
+in every index. The visibility map went stale, so index-only scans
+fell back to heap fetches. Statistics — governed by a sibling scale
+factor of 10% — aged the same way, and the planner started choosing
+plans for a table that no longer existed. Queries that had been fast
+got slower, then slower again, on a curve steeper than the growth in
+data that was supposedly the explanation.
+
+Nobody noticed why, because nothing had changed. No deploy, no
+migration, no configuration edit. The dashboards showed rising
+latency against rising row counts, and "the tables are bigger" is a
+satisfying enough story that nobody looked further for a long time.
+The debt was not on any inventory. It had never been taken on — it
+came in the box.
+
+When the cause was finally found, repayment was harder than it would
+have been at any earlier point. The first vacuum of a table carrying
+hundreds of millions of dead tuples runs for hours, throttled by
+autovacuum's cost-based delay, and occupies one of a small fixed pool
+of workers while every other table waits. Plain `VACUUM` marks space
+reusable but does not return it; the bloat that had accumulated
+stayed until a `VACUUM FULL` (which takes an exclusive lock) or
+`pg_repack` — an operation with its own maintenance window and risk
+assessment. Indexes needed rebuilding. And the correct fix — per-table
+storage parameters that replace the percentage with a fixed
+threshold, so a billion-row table vacuums after a hundred thousand
+dead tuples rather than two hundred million — had to be calibrated
+table by table under production pressure rather than as a routine
+tuning pass.
+
+```sql
+ALTER TABLE enrollments SET (
+  autovacuum_vacuum_scale_factor  = 0,
+  autovacuum_vacuum_threshold     = 100000,
+  autovacuum_analyze_scale_factor = 0,
+  autovacuum_analyze_threshold    = 50000
+);
+```
+
+The lesson is not "tune autovacuum" — though do. The lesson is about
+the taxonomy. This debt was not deliberate; nobody chose it. It was
+not entropy in the code; the code was unchanged. It was closest to
+ignorance — the team did not know the parameter existed — except
+that the default was *right* when the system was small, so there was
+no mistake for code review to catch. It was a default whose interest
+rate was indexed to scale, and the only defense against that class
+of debt is periodic inspection of things that appear to be working.
+Every managed service ships with defaults calibrated for the median
+customer at signup. A system that outgrows the median has outgrown
+the defaults, whether or not anyone has looked.
+
 ## Questions to ask
 
 1. Is this technical debt, or is it a design preference? If the code
@@ -280,3 +354,8 @@ without awareness and discovers it during an incident.
    six months, the team does not know whether it is still relevant,
    whether the cost has changed, or whether the repayment plan is
    still appropriate.
+7. Does the interest rate scale with something? A cost that is
+   proportional to row count, traffic, or tenant count is not a
+   fixed quarterly expense — it is a curve. Debt that is cheap to
+   carry today may be unpayable at ten times the data, and defaults
+   nobody chose are the most likely place for this debt to hide.

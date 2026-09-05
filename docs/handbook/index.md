@@ -136,8 +136,10 @@ some pages do it better than others. The shared discipline is:
 - **[Technical Debt](technical-debt.md)** — what technical debt
   actually is (and what it is not). Three forms: deliberate trade-offs,
   entropy, and ignorance. How to make the business case for addressing
-  it, the spreadsheet test for whether the argument is ready, and when
-  the rational decision is to let debt ride.
+  it, the spreadsheet test for whether the argument is ready, when
+  the rational decision is to let debt ride — and the autovacuum
+  default that shows why "let it ride" only works when the interest
+  rate stays constant.
 
 - **[Git Conventions](git-conventions.md)** — commit message style, PR
   conventions, branching strategy, code review etiquette, and mistake

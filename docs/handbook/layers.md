@@ -114,7 +114,10 @@ stability.
 design, normalization trade-offs, transaction isolation levels,
 replication lag, connection pooling, backup verification — this is
 specialized knowledge that most application developers encounter only
-when something breaks.
+when something breaks. The
+[Technical Debt](technical-debt.md#the-interest-rate-is-not-constant)
+page has an example of what "breaks" looks like when a database
+default nobody inspected is quietly outgrown.
 
 #### Data as artifact
 
