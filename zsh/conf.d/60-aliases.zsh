@@ -76,7 +76,9 @@ alias bx="bun x"
 alias reload="exec zsh"
 alias zshconfig="${EDITOR} ${ZDOTDIR}/.zshrc"
 alias miseconfig="${EDITOR} ${XDG_CONFIG_HOME}/mise/config.toml"
-alias path='echo ${PATH} | tr ":" "\n"'
+# One entry per line; mise install dirs shortened to "mise:<tool>/<ver>/…"
+# and $HOME to "~" so the `mise activate` entries stay readable.
+alias path='print -rl -- ${${path//#$XDG_DATA_HOME\/mise\/installs\//mise:}/#$HOME/\~}'
 alias now='date +"%Y-%m-%d %H:%M:%S"'
 
 # ── direnv ──────────────────────────────────────────────────────────

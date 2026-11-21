@@ -17,3 +17,7 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:=$HOME/.cache}"
 # Point zsh at its XDG config directory.
 # Subsequent files (.zshrc, .zprofile, etc.) are resolved from here.
 export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
+
+# zsh picked this file before ZDOTDIR changed and won't re-look, so
+# hand off to $ZDOTDIR/.zshenv explicitly (CARGO_HOME, GNUPGHOME, …).
+[[ -r "${ZDOTDIR}/.zshenv" ]] && source "${ZDOTDIR}/.zshenv"

@@ -16,12 +16,20 @@ typeset -U path PATH
 _path_prepend() { [[ -d "$1" ]] && path=("$1" "${path[@]}"); }
 _path_append()  { [[ -d "$1" ]] && path+=("$1"); }
 
-# ── System baseline (low priority — only if not already set) ────────
-_path_append "/usr/local/bin"
-_path_append "/usr/bin"
-_path_append "/bin"
-_path_append "/usr/sbin"
-_path_append "/sbin"
+# ── System baseline (low priority, canonical FHS order) ─────────────
+# The inherited PATH (GDM, systemd user manager, sshd, a parent shell)
+# can carry these in any order, and typeset -U keeps the FIRST copy, so
+# appending alone can't fix e.g. /bin ahead of /usr/local/bin. Strip them
+# and re-append in order: /usr/local (site-local overrides, per FHS)
+# before the distro's /usr, then the legacy root dirs. Merged-/usr compat
+# symlinks (Fedora's /bin -> usr/bin, /usr/local/sbin -> bin) are skipped
+# like /etc/profile's pathmunge does; on macOS they're real dirs and stay.
+_sys_path=(/usr/local/bin /usr/bin /bin /usr/local/sbin /usr/sbin /sbin)
+path=(${path:|_sys_path})
+for _d in $_sys_path; do
+  [[ -h "$_d" ]] || _path_append "$_d"
+done
+unset _d _sys_path
 
 # ── Homebrew (macOS) ────────────────────────────────────────────────
 # Apple Silicon installs brew at /opt/homebrew, which is NOT in the
@@ -38,11 +46,12 @@ _path_prepend "/opt/homebrew/bin"
 # ── User-local binaries ─────────────────────────────────────────────
 _path_prepend "${HOME}/.local/bin"
 
-# ── Rust ────────────────────────────────────────────────────────────
-_path_prepend "${CARGO_HOME}/bin"
-
-# ── Go ──────────────────────────────────────────────────────────────
-_path_prepend "${GOPATH}/bin"
+# ── Rust / Go ───────────────────────────────────────────────────────
+# Defaults mirror $ZDOTDIR/.zshenv. Without them an unset var turns
+# "${CARGO_HOME}/bin" into a bare "/bin" and prepends it above
+# /usr/local/bin.
+_path_prepend "${CARGO_HOME:-${XDG_DATA_HOME}/cargo}/bin"
+_path_prepend "${GOPATH:-${XDG_DATA_HOME}/go}/bin"
 
 # ── mise shims (highest priority — must shadow system tools) ────────
 # mise activate manipulates PATH in interactive shells directly and does
