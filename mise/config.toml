@@ -59,7 +59,7 @@ cloudflared = "latest"
 caddy = "latest"
 
 # ── Data ────────────────────────────────────────────────────────────
-duckdb = "latest"
+#duckdb = "latest"
 mongosh = "latest"
 # ffmpeg, imagemagick and mysql-client are NOT here on purpose. Their only
 # registry backends are conda: (mysql-client is conda-ONLY) and heavyweight
@@ -110,7 +110,8 @@ pandoc = "latest"
 # Not in the registry — resolved from GitHub releases. Per
 # docs/tools/package-managers.md: rv still owns Ruby and .ruby-version.
 # github:, NOT ubi: — ubi is deprecated, removal slated for 2027.1.0.
-"github:spinel-coop/rv" = "latest"
+"aqua:spinel-coop/rv" = "latest"
+yt-dlp = { version = "latest", rename_exe = "yt-dlp" }
 
 # ── gcloud via the http backend ─────────────────────────────────────
 # No native distro exists: aqua does not package the SDK (it is a

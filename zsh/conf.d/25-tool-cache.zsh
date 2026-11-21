@@ -18,7 +18,7 @@ typeset -gA _ZSHTOOL_CACHE_ENTRIES=(
   uvx-comp       "uvx --generate-shell-completion zsh"
   gh-comp        "gh completion -s zsh"
   kubectl-comp   "kubectl completion zsh"
-  rv-comp        "rv shell completions zsh"
+#  rv-comp        "rv shell completions zsh"
   docker-comp    "docker completion zsh"
   podman-comp    "podman completion zsh"
 )
